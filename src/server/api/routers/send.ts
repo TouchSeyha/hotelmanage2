@@ -2,24 +2,27 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 
 import { createTRPCRouter, publicProcedure } from '~/server/api/trpc';
+import { env } from '~/env';
 import { resend } from '~/server/resend';
-import { EmailTemplate } from '~/server/email/templates/welcome';
+import { ContactEmail } from '~/server/email/templates/contact';
 
 export const sendRouter = createTRPCRouter({
-  sendEmail: publicProcedure
+  sendContactEmail: publicProcedure
     .input(
       z.object({
-        to: z.array(z.string().email()),
-        subject: z.string(),
-        firstName: z.string(),
+        name: z.string().min(1),
+        email: z.string().email(),
+        phone: z.string().optional(),
+        topic: z.enum(['booking', 'itinerary', 'event']),
+        message: z.string().min(1),
       })
     )
     .mutation(async ({ input }) => {
       const { data, error } = await resend.emails.send({
-        from: 'Acme <onboarding@resend.dev>',
-        to: input.to,
-        subject: input.subject,
-        react: EmailTemplate({ firstName: input.firstName }),
+        from: env.NODE_ENV === 'production' ? 'onboarding@resend.dev' : 'onboarding@resend.dev',
+        to: env.NODE_ENV === 'production' ? ['hacurly13@gmail.com'] : [env.RESEND_DEV_EMAIL],
+        subject: `New Message: ${input.topic} from ${input.name}`,
+        react: ContactEmail(input),
       });
 
       if (error) {

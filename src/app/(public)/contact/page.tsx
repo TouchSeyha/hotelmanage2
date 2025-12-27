@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { MapPin, Phone, Mail, Clock, MessageCircle, Sparkles } from 'lucide-react';
+import { api } from '~/trpc/react';
 
 const channels = [
   {
@@ -45,11 +46,22 @@ export default function ContactPage() {
     name: '',
     email: '',
     phone: '',
-    topic: 'booking',
+    topic: 'booking' as const,
     message: '',
   });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const sendContactEmail = api.send.sendContactEmail.useMutation({
+    onSuccess: () => {
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        topic: 'booking',
+        message: '',
+      });
+      setSuccess(true);
+    },
+  });
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -58,20 +70,9 @@ export default function ContactPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setIsSubmitting(false);
-    setSuccess(true);
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      topic: 'booking',
-      message: '',
-    });
-    setTimeout(() => setSuccess(false), 3500);
+    sendContactEmail.mutate(formData);
   };
 
   return (
@@ -174,12 +175,8 @@ export default function ContactPage() {
                 />
               </label>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="btn btn-primary btn-block text-white"
-              >
-                {isSubmitting ? 'Sending...' : 'Send to stylist'}
+              <button type="submit" disabled={sendContactEmail.isPending}>
+                {sendContactEmail.isPending ? 'Sending...' : 'Send to stylist'}
               </button>
             </form>
           </div>
