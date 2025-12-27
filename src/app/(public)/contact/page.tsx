@@ -1,7 +1,30 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin, Phone, Mail, Clock, MessageCircle, Sparkles } from 'lucide-react';
+import { MapPin, Phone, Mail, MessageCircle, Sparkles } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { api } from '~/trpc/react';
+import { Button } from '~/components/ui/button';
+import { Input } from '~/components/ui/input';
+import { Textarea } from '~/components/ui/textarea';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
+import { Card } from '~/components/ui/card';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '~/components/ui/form';
+import { contactFormSchema, type ContactFormValues } from '~/lib/schemas';
 
 const channels = [
   {
@@ -41,37 +64,28 @@ const propertyDetails = [
 ];
 
 export default function ContactPage() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    topic: 'booking',
-    message: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 1200));
-    setIsSubmitting(false);
-    setSuccess(true);
-    setFormData({
+  const form = useForm<ContactFormValues>({
+    resolver: zodResolver(contactFormSchema),
+    defaultValues: {
       name: '',
       email: '',
       phone: '',
       topic: 'booking',
       message: '',
-    });
-    setTimeout(() => setSuccess(false), 3500);
+    },
+  });
+
+  const sendContactEmail = api.send.sendContactEmail.useMutation({
+    onSuccess: () => {
+      form.reset();
+      setSuccess(true);
+    },
+  });
+
+  const onSubmit = (values: ContactFormValues) => {
+    sendContactEmail.mutate(values);
   };
 
   return (
@@ -94,8 +108,8 @@ export default function ContactPage() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <div className="glass-panel rounded-3xl p-8">
+        <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
+          <Card className="p-8">
             <h2 className="text-2xl font-semibold">Send us a note</h2>
             <p className="text-base-content/60 text-sm">
               Stylists reply with suite pairings, hydro circuit times, or help with in-house stays.
@@ -107,85 +121,102 @@ export default function ContactPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="mt-6 space-y-5">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="form-control">
-                  <span className="label-text text-sm font-semibold">Full name *</span>
-                  <input
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="mt-6 space-y-5">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
                     name="name"
-                    required
-                    value={formData.name}
-                    onChange={handleChange}
-                    className="input input-bordered"
-                    placeholder="Taylor Morgan"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Full name *</FormLabel>
+                        <FormControl>
+                          <Input placeholder="Taylor Morgan" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </label>
-                <label className="form-control">
-                  <span className="label-text text-sm font-semibold">Email *</span>
-                  <input
-                    type="email"
+                  <FormField
+                    control={form.control}
                     name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    className="input input-bordered"
-                    placeholder="you@studio.com"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Email *</FormLabel>
+                        <FormControl>
+                          <Input type="email" placeholder="you@studio.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </label>
-              </div>
+                </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="form-control">
-                  <span className="label-text text-sm font-semibold">Phone</span>
-                  <input
-                    type="tel"
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <FormField
+                    control={form.control}
                     name="phone"
-                    value={formData.phone}
-                    onChange={handleChange}
-                    className="input input-bordered"
-                    placeholder="+855 (0)89 555 120"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone</FormLabel>
+                        <FormControl>
+                          <Input type="tel" placeholder="+855 (0)89 555 120" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
                   />
-                </label>
-                <label className="form-control">
-                  <span className="label-text text-sm font-semibold">Topic *</span>
-                  <select
+                  <FormField
+                    control={form.control}
                     name="topic"
-                    value={formData.topic}
-                    onChange={handleChange}
-                    className="select select-bordered"
-                  >
-                    <option value="booking">New booking</option>
-                    <option value="itinerary">Itinerary design</option>
-                    <option value="event">Private dinner or event</option>
-                  </select>
-                </label>
-              </div>
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Topic *</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a topic" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="booking">New booking</SelectItem>
+                            <SelectItem value="itinerary">Itinerary design</SelectItem>
+                            <SelectItem value="event">Private dinner or event</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
 
-              <label className="form-control">
-                <span className="label-text text-sm font-semibold">Tell us everything *</span>
-                <textarea
+                <FormField
+                  control={form.control}
                   name="message"
-                  required
-                  rows={6}
-                  value={formData.message}
-                  onChange={handleChange}
-                  className="textarea textarea-bordered"
-                  placeholder="Dates, suite preferences, rituals—share as much as you like."
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tell us everything *</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          rows={6}
+                          placeholder="Dates, suite preferences, rituals—share as much as you like."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </label>
 
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="btn btn-primary btn-block text-white"
-              >
-                {isSubmitting ? 'Sending...' : 'Send to stylist'}
-              </button>
-            </form>
-          </div>
+                <Button type="submit" disabled={sendContactEmail.isPending} className="w-full">
+                  {sendContactEmail.isPending ? 'Sending...' : 'Send Message'}
+                </Button>
+              </form>
+            </Form>
+          </Card>
 
           <div className="space-y-6">
-            <div className="card border-base-200 bg-base-100 rounded-3xl border p-6">
+            <Card className="p-6">
               <p className="text-base-content/60 text-xs tracking-[0.4em] uppercase">Channels</p>
               <div className="mt-6 space-y-5">
                 {channels.map((channel) => (
@@ -198,9 +229,9 @@ export default function ContactPage() {
                   </div>
                 ))}
               </div>
-            </div>
+            </Card>
 
-            <div className="card border-base-200 bg-base-100 rounded-3xl border p-6">
+            <Card className="p-6">
               <p className="text-base-content/60 text-xs tracking-[0.4em] uppercase">
                 Riverside address
               </p>
@@ -216,19 +247,7 @@ export default function ContactPage() {
                   </div>
                 ))}
               </div>
-            </div>
-
-            <div className="card border-base-200 bg-base-100 rounded-3xl border p-6">
-              <div className="flex items-center gap-3">
-                <Clock className="text-primary h-5 w-5" />
-                <div>
-                  <p className="font-semibold">Always-on concierge</p>
-                  <p className="text-base-content/60 text-sm">
-                    Humanity-first service, real humans 24/7.
-                  </p>
-                </div>
-              </div>
-            </div>
+            </Card>
           </div>
         </div>
       </section>

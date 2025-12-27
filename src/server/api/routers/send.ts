@@ -1,34 +1,27 @@
 import { TRPCError } from '@trpc/server';
-import { z } from 'zod';
 
 import { createTRPCRouter, publicProcedure } from '~/server/api/trpc';
+import { env } from '~/env';
 import { resend } from '~/server/resend';
-import { EmailTemplate } from '~/server/email/templates/welcome';
+import { ContactEmail } from '~/server/email/templates/contact';
+import { contactFormSchema } from '~/lib/schemas';
 
 export const sendRouter = createTRPCRouter({
-  sendEmail: publicProcedure
-    .input(
-      z.object({
-        to: z.array(z.string().email()),
-        subject: z.string(),
-        firstName: z.string(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const { data, error } = await resend.emails.send({
-        from: 'Acme <onboarding@resend.dev>',
-        to: input.to,
-        subject: input.subject,
-        react: EmailTemplate({ firstName: input.firstName }),
+  sendContactEmail: publicProcedure.input(contactFormSchema).mutation(async ({ input }) => {
+    const { data, error } = await resend.emails.send({
+      from: env.NODE_ENV === 'production' ? 'onboarding@resend.dev' : 'onboarding@resend.dev',
+      to: env.NODE_ENV === 'production' ? ['hacurly13@gmail.com'] : [env.RESEND_DEV_EMAIL],
+      subject: `New Message: ${input.topic} from ${input.name}`,
+      react: ContactEmail(input),
+    });
+
+    if (error) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error?.message ?? 'Failed to send email',
       });
+    }
 
-      if (error) {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: error?.message ?? 'Failed to send email',
-        });
-      }
-
-      return data;
-    }),
+    return data;
+  }),
 });
