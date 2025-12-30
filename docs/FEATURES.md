@@ -39,21 +39,21 @@ Detailed feature list organized by user role and functionality area.
 
 - Grid/list view toggle
 - Filter by:
-    - Price range (slider)
-    - Capacity (dropdown)
-    - Amenities (checkboxes)
+  - Price range (slider)
+  - Capacity (dropdown)
+  - Amenities (checkboxes)
 - Sort by:
-    - Price (low to high, high to low)
-    - Capacity
-    - Name
+  - Price (low to high, high to low)
+  - Capacity
+  - Name
 - Room cards showing:
-    - Main image
-    - Room type name
-    - Short description
-    - Price per night
-    - Capacity
-    - Key amenities (icons)
-    - "View Details" button
+  - Main image
+  - Room type name
+  - Short description
+  - Price per night
+  - Capacity
+  - Key amenities (icons)
+  - "View Details" button
 
 **Technical:**
 
@@ -165,8 +165,8 @@ Detailed feature list organized by user role and functionality area.
 **Step 3: Payment Selection**
 
 - Two options:
-    - **Pay Online:** QR code modal
-    - **Pay at Counter:** Confirmation message
+  - **Pay Online:** QR code modal
+  - **Pay at Counter:** Confirmation message
 - Payment instructions
 - Final confirmation button
 
@@ -200,13 +200,13 @@ Detailed feature list organized by user role and functionality area.
 
 - Tabs: All / Upcoming / Past / Cancelled
 - Booking cards showing:
-    - Booking number
-    - Room type & number
-    - Check-in/out dates
-    - Status badge (color-coded)
-    - Total price
-    - Payment status
-    - "View Details" button
+  - Booking number
+  - Room type & number
+  - Check-in/out dates
+  - Status badge (color-coded)
+  - Total price
+  - Payment status
+  - "View Details" button
 - Empty state for no bookings
 
 **Booking Details Modal:**
@@ -283,14 +283,14 @@ Detailed feature list organized by user role and functionality area.
 **Features:**
 
 - Data table with columns:
-    - Booking number
-    - Guest name & contact
-    - Room number
-    - Check-in/out dates
-    - Status
-    - Payment status
-    - Total price
-    - Actions
+  - Booking number
+  - Guest name & contact
+  - Room number
+  - Check-in/out dates
+  - Status
+  - Payment status
+  - Total price
+  - Actions
 
 **Filters:**
 
@@ -331,17 +331,17 @@ Detailed feature list organized by user role and functionality area.
 **Features:**
 
 - Quick booking form:
-    - Guest info input
-    - Room selection dropdown (only available rooms)
-    - Check-in/out date picker
-    - Number of guests
-    - Auto-calculate total price
+  - Guest info input
+  - Room selection dropdown (only available rooms)
+  - Check-in/out date picker
+  - Number of guests
+  - Auto-calculate total price
 
 - Payment process:
-    - Click "Collect Payment"
-    - Modal shows QR code
-    - "Payment Received" button
-    - Booking auto-confirms
+  - Click "Collect Payment"
+  - Modal shows QR code
+  - "Payment Received" button
+  - Booking auto-confirms
 
 **After Payment:**
 
@@ -365,9 +365,9 @@ Detailed feature list organized by user role and functionality area.
 **Check-in:**
 
 - Search booking by:
-    - Booking number
-    - Guest name
-    - Room number
+  - Booking number
+  - Guest name
+  - Room number
 - Display booking details
 - Verify ID (manual process)
 - "Check In" button
@@ -406,10 +406,10 @@ Detailed feature list organized by user role and functionality area.
 
 - Data table of room types
 - Actions:
-    - Create new room type
-    - Edit existing
-    - Delete (if no rooms)
-    - Toggle active/inactive
+  - Create new room type
+  - Edit existing
+  - Delete (if no rooms)
+  - Toggle active/inactive
 
 **Create/Edit Form:**
 
@@ -448,11 +448,11 @@ Detailed feature list organized by user role and functionality area.
 
 - Data table grouped by room type
 - Columns:
-    - Room number
-    - Room type
-    - Floor
-    - Status (available, occupied, maintenance, out_of_service)
-    - Actions
+  - Room number
+  - Room type
+  - Floor
+  - Status (available, occupied, maintenance, out_of_service)
+  - Actions
 
 **Actions:**
 
@@ -491,13 +491,13 @@ Detailed feature list organized by user role and functionality area.
 
 - Data table of users
 - Columns:
-    - Name
-    - Email
-    - Role
-    - Phone
-    - Bookings count
-    - Created date
-    - Actions
+  - Name
+  - Email
+  - Role
+  - Phone
+  - Bookings count
+  - Created date
+  - Actions
 
 **Filters:**
 

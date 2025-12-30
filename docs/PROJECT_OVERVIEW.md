@@ -105,11 +105,9 @@ Uses Resend to send:
 ❌ Real payment gateway integration
 ❌ Complex availability algorithms
 ❌ Multi-language support
-❌ Advanced analytics/reporting
 ❌ Review/rating system
 ❌ Live chat support
 ❌ Discount codes/promotions
-❌ Calendar integrations
 
 ## Success Metrics
 
@@ -119,16 +117,6 @@ Uses Resend to send:
 4. **Mobile responsive** on all pages
 5. **Deployed & accessible** via Vercel URL
 
-## Project Timeline
-
-- **Week 1:** Foundation (DB, Auth, Setup)
-- **Week 2:** Public Website
-- **Week 2-3:** Admin Dashboard
-- **Week 3:** Room Management
-- **Week 4:** Email & Polish
-
-**Total:** 3-4 weeks part-time or 1.5-2 weeks full-time
-
 ## Development Approach
 
 1. **Phase-based development** (complete one phase before next)
@@ -136,27 +124,3 @@ Uses Resend to send:
 3. **Component reusability** (build once, use everywhere)
 4. **Type safety** (TypeScript strict mode)
 5. **Clean code** (proper folder structure, naming conventions)
-
-## Environment Variables Needed
-
-```env
-# Database
-DATABASE_URL=
-
-# Auth
-NEXTAUTH_URL=
-NEXTAUTH_SECRET=
-
-# Email
-RESEND_API_KEY=
-ADMIN_EMAIL=
-
-# Optional
-NEXT_PUBLIC_APP_URL=
-```
-
-## Folder Structure
-
-```
-
-```
