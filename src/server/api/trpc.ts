@@ -128,3 +128,21 @@ export const protectedProcedure = t.procedure.use(timingMiddleware).use(({ ctx, 
     },
   });
 });
+
+/**
+ * Admin procedure
+ *
+ * This procedure extends protectedProcedure and verifies that the user has the "admin" role.
+ * Use this for admin-only endpoints like managing rooms, bookings, and users.
+ *
+ * @see https://trpc.io/docs/procedures
+ */
+export const adminProcedure = protectedProcedure.use(({ ctx, next }) => {
+  if (ctx.session.user.role !== 'admin') {
+    throw new TRPCError({
+      code: 'FORBIDDEN',
+      message: 'You do not have permission to access this resource',
+    });
+  }
+  return next({ ctx });
+});
