@@ -20,6 +20,10 @@ export default function UploadPage() {
 
           const file = inputFileRef.current.files[0];
 
+          if (!file) {
+            throw new Error('No file selected');
+          }
+
           const response = await fetch(`/api/upload?filename=${file.name}`, {
             method: 'POST',
             body: file,
