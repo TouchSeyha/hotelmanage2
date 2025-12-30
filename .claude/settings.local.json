@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bunx shadcn@latest add:*)",
+      "Bash(bun typecheck:*)",
+      "Bash(bun run typecheck:*)"
+    ]
+  }
+}
