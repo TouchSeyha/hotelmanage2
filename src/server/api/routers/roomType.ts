@@ -29,6 +29,26 @@ export const roomTypeRouter = createTRPCRouter({
   }),
 
   /**
+   * Get a single room type by ID (admin)
+   */
+  getById: adminProcedure
+    .input(z.object({ id: z.string().cuid() }))
+    .query(async ({ ctx, input }) => {
+      const roomType = await ctx.db.roomType.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!roomType) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Room type not found',
+        });
+      }
+
+      return roomType;
+    }),
+
+  /**
    * Get a single room type by slug (public)
    * Includes available rooms
    */

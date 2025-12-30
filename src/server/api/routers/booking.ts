@@ -629,17 +629,15 @@ export const bookingRouter = createTRPCRouter({
       ? await ctx.db.user.findUnique({ where: { email: guestEmail } })
       : null;
 
-    if (!guestUser) {
-      // Create a new guest user account
-      guestUser = await ctx.db.user.create({
-        data: {
-          name: guestName,
-          email: guestEmail ?? `walk-in-${Date.now()}@guest.local`,
-          phone: guestPhone,
-          role: 'user',
-        },
-      });
-    }
+    // Create a new guest user account if not found
+    guestUser ??= await ctx.db.user.create({
+      data: {
+        name: guestName,
+        email: guestEmail ?? `walk-in-${Date.now()}@guest.local`,
+        phone: guestPhone,
+        role: 'user',
+      },
+    });
 
     // Calculate total price
     const totalPrice = calculateTotalPrice(

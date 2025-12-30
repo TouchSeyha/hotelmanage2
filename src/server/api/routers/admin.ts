@@ -137,7 +137,7 @@ export const adminRouter = createTRPCRouter({
       // Default date range based on period
       const today = new Date();
       let dateFrom = startDate;
-      let dateTo = endDate ?? today;
+      const dateTo = endDate ?? today;
 
       if (!dateFrom) {
         switch (period) {

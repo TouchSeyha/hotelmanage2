@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, X, User, LogOut } from 'lucide-react';
+import { Menu, User, LogOut } from 'lucide-react';
 import { useState } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
 
@@ -171,7 +171,7 @@ export function Header() {
                       className="mt-4 w-full"
                       onClick={() => {
                         setMobileMenuOpen(false);
-                        signOut();
+                        void signOut();
                       }}
                     >
                       Sign out
@@ -182,7 +182,7 @@ export function Header() {
                     className="w-full"
                     onClick={() => {
                       setMobileMenuOpen(false);
-                      signIn();
+                      void signIn();
                     }}
                   >
                     Sign In

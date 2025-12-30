@@ -35,7 +35,7 @@ export const roomFiltersSchema = z.object({
 export type RoomFiltersInput = z.infer<typeof roomFiltersSchema>;
 
 // Check availability schema
-export const checkAvailabilitySchema = dateRangeSchema.extend({
+export const checkAvailabilitySchema = dateRangeSchema.safeExtend({
   roomTypeId: z.string().cuid().optional(),
   guests: z.number().int().positive().optional(),
 });
