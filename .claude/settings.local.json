@@ -3,7 +3,9 @@
     "allow": [
       "Bash(bunx shadcn@latest add:*)",
       "Bash(bun typecheck:*)",
-      "Bash(bun run typecheck:*)"
+      "Bash(bun run typecheck:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(bun run lint)"
     ]
   }
 }
