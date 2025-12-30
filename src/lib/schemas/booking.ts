@@ -1,44 +1,54 @@
-import { z } from "zod";
-import { paginationSchema } from "./common";
+import { z } from 'zod';
+import { paginationSchema } from './common';
 
 // Booking status enum matching Prisma
 export const bookingStatusSchema = z.enum([
-  "pending",
-  "confirmed",
-  "checked_in",
-  "completed",
-  "cancelled",
+  'pending',
+  'confirmed',
+  'checked_in',
+  'completed',
+  'cancelled',
 ]);
 
 export type BookingStatus = z.infer<typeof bookingStatusSchema>;
 
 // Payment method enum matching Prisma
-export const paymentMethodSchema = z.enum(["online", "counter"]);
+export const paymentMethodSchema = z.enum(['online', 'counter']);
 
 export type PaymentMethod = z.infer<typeof paymentMethodSchema>;
 
 // Payment status enum matching Prisma
-export const paymentStatusSchema = z.enum(["pending", "paid", "refunded"]);
+export const paymentStatusSchema = z.enum(['pending', 'paid', 'refunded']);
 
 export type PaymentStatus = z.infer<typeof paymentStatusSchema>;
 
-// Create booking schema
+// Create booking schema (supports both roomId and roomTypeId)
 export const createBookingSchema = z
   .object({
-    roomId: z.string().cuid(),
+    // Either roomId OR roomTypeId must be provided
+    roomId: z.string().cuid().optional(),
+    roomTypeId: z.string().cuid().optional(),
     checkInDate: z.coerce.date(),
     checkOutDate: z.coerce.date(),
-    numberOfGuests: z.number().int().positive("Number of guests must be at least 1"),
+    numberOfGuests: z.number().int().positive('Number of guests must be at least 1'),
     paymentMethod: paymentMethodSchema,
     specialRequests: z.string().max(500).optional(),
+    // Guest info (optional - will use logged-in user info if not provided)
+    guestName: z.string().min(1).optional(),
+    guestEmail: z.string().email().optional(),
+    guestPhone: z.string().optional(),
+  })
+  .refine((data) => data.roomId ?? data.roomTypeId, {
+    message: 'Either roomId or roomTypeId must be provided',
+    path: ['roomId'],
   })
   .refine((data) => data.checkOutDate > data.checkInDate, {
-    message: "Check-out date must be after check-in date",
-    path: ["checkOutDate"],
+    message: 'Check-out date must be after check-in date',
+    path: ['checkOutDate'],
   })
   .refine((data) => data.checkInDate >= new Date(new Date().setHours(0, 0, 0, 0)), {
-    message: "Check-in date cannot be in the past",
-    path: ["checkInDate"],
+    message: 'Check-in date cannot be in the past',
+    path: ['checkInDate'],
   });
 
 export type CreateBookingInput = z.infer<typeof createBookingSchema>;
@@ -100,14 +110,14 @@ export const posBookingSchema = z
     checkInDate: z.coerce.date(),
     checkOutDate: z.coerce.date(),
     numberOfGuests: z.number().int().positive(),
-    guestName: z.string().min(1, "Guest name is required"),
-    guestEmail: z.string().email("Invalid email").optional(),
+    guestName: z.string().min(1, 'Guest name is required'),
+    guestEmail: z.string().email('Invalid email').optional(),
     guestPhone: z.string().optional(),
     specialRequests: z.string().max(500).optional(),
   })
   .refine((data) => data.checkOutDate > data.checkInDate, {
-    message: "Check-out date must be after check-in date",
-    path: ["checkOutDate"],
+    message: 'Check-out date must be after check-in date',
+    path: ['checkOutDate'],
   });
 
 export type PosBookingInput = z.infer<typeof posBookingSchema>;

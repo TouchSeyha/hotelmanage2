@@ -1,14 +1,14 @@
-import { z } from "zod";
-import { paginationSchema } from "./common";
+import { z } from 'zod';
+import { paginationSchema } from './common';
 
 // Role enum matching Prisma
-export const roleSchema = z.enum(["user", "admin"]);
+export const roleSchema = z.enum(['user', 'admin']);
 
 export type Role = z.infer<typeof roleSchema>;
 
 // Update user profile schema (for own profile)
 export const updateProfileSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100).optional(),
+  name: z.string().min(1, 'Name is required').max(100).optional(),
   phone: z.string().max(20).optional(),
 });
 

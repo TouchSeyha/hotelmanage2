@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 // Pagination schema
 export const paginationSchema = z.object({
@@ -15,14 +15,14 @@ export const dateRangeSchema = z
     checkOut: z.coerce.date(),
   })
   .refine((data) => data.checkOut > data.checkIn, {
-    message: "Check-out date must be after check-in date",
-    path: ["checkOut"],
+    message: 'Check-out date must be after check-in date',
+    path: ['checkOut'],
   });
 
 export type DateRangeInput = z.infer<typeof dateRangeSchema>;
 
 // Sort order schema
-export const sortOrderSchema = z.enum(["asc", "desc"]).default("asc");
+export const sortOrderSchema = z.enum(['asc', 'desc']).default('asc');
 
 // ID schema (cuid)
 export const idSchema = z.string().cuid();
@@ -33,5 +33,5 @@ export const slugSchema = z
   .min(1)
   .max(100)
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-    message: "Slug must be lowercase with hyphens only",
+    message: 'Slug must be lowercase with hyphens only',
   });
