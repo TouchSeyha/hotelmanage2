@@ -7,7 +7,7 @@ const compat = new FlatCompat({
 
 export default tseslint.config(
   {
-    ignores: ['.next'],
+    ignores: ['.next', 'generated'],
   },
   ...compat.extends('next/core-web-vitals'),
   {
@@ -30,6 +30,17 @@ export default tseslint.config(
         'error',
         { checksVoidReturn: { attributes: false } },
       ],
+    },
+  },
+  // Disable unsafe rules for tRPC routers (Prisma types not resolved by ESLint's type checker)
+  {
+    files: ['src/server/api/routers/**/*.ts'],
+    rules: {
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-return': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
     },
   },
   {

@@ -9,6 +9,7 @@
     "db:generate": "prisma migrate dev",
     "db:migrate": "prisma migrate deploy",
     "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
     "dev": "next dev --turbo",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,mdx}\" --cache",
@@ -83,5 +84,8 @@
   },
   "ct3aMetadata": {
     "initVersion": "7.40.0"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
   }
 }
