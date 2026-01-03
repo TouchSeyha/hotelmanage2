@@ -34,7 +34,7 @@ import {
   SelectValue,
 } from '~/components/ui/select';
 import { TableSkeleton } from '~/components/shared/loading-skeleton';
-import type { BookingStatus, PaymentStatus } from '~/lib/schemas/booking';
+import type { BookingStatus, PaymentStatus } from '~/lib/schemas';
 
 function getStatusBadgeVariant(status: BookingStatus) {
   switch (status) {

@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useReducer, type ReactNode } from 'react';
-import type { PaymentMethod } from '~/lib/schemas/booking';
+import type { PaymentMethod } from '~/lib/schemas';
 
 interface BookingState {
   step: 1 | 2 | 3;

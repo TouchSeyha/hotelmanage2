@@ -7,7 +7,7 @@ import { ArrowLeft, CreditCard, Building2, Loader2, CheckCircle } from 'lucide-r
 
 import { api } from '~/trpc/react';
 import { useBooking } from './booking-context';
-import type { PaymentMethod } from '~/lib/schemas/booking';
+import type { PaymentMethod } from '~/lib/schemas';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import { Label } from '~/components/ui/label';

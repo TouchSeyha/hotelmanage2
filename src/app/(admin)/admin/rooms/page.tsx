@@ -5,7 +5,6 @@ import { Plus, MoreHorizontal, Pencil, Trash2, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
@@ -62,15 +61,12 @@ import {
 } from '~/components/ui/select';
 import { Badge } from '~/components/ui/badge';
 import { TableSkeleton } from '~/components/shared/loading-skeleton';
-
-const roomFormSchema = z.object({
-  roomNumber: z.string().min(1, 'Room number is required'),
-  floor: z.number().int().min(1, 'Floor must be at least 1'),
-  roomTypeId: z.string().min(1, 'Room type is required'),
-  status: z.enum(['available', 'occupied', 'maintenance', 'out_of_service']),
-});
-
-type RoomFormData = z.infer<typeof roomFormSchema>;
+import {
+  roomFormSchema,
+  defaultRoomFormData,
+  transformRoomFormToApi,
+  type RoomFormData,
+} from '~/lib/schemas';
 
 function getStatusBadgeVariant(status: string) {
   switch (status) {
@@ -97,12 +93,7 @@ export default function RoomsPage() {
 
   const form = useForm<RoomFormData>({
     resolver: zodResolver(roomFormSchema),
-    defaultValues: {
-      roomNumber: '',
-      floor: 1,
-      roomTypeId: '',
-      status: 'available',
-    },
+    defaultValues: defaultRoomFormData,
   });
 
   const createRoom = api.room.create.useMutation({
@@ -167,20 +158,10 @@ export default function RoomsPage() {
     if (editingRoom) {
       updateRoom.mutate({
         id: editingRoom,
-        data: {
-          roomNumber: formData.roomNumber,
-          floor: formData.floor,
-          roomTypeId: formData.roomTypeId,
-          status: formData.status,
-        },
+        data: transformRoomFormToApi(formData),
       });
     } else {
-      createRoom.mutate({
-        roomNumber: formData.roomNumber,
-        roomTypeId: formData.roomTypeId,
-        floor: formData.floor,
-        status: formData.status,
-      });
+      createRoom.mutate(transformRoomFormToApi(formData));
     }
   };
 

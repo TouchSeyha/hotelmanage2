@@ -2,7 +2,6 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { Loader2, User, Mail, Phone, Calendar, Shield } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
@@ -23,13 +22,7 @@ import { Input } from '~/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
 import { Skeleton } from '~/components/ui/skeleton';
-
-const profileFormSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  phone: z.string().optional(),
-});
-
-type ProfileFormData = z.infer<typeof profileFormSchema>;
+import { profileFormSchema, transformProfileFormToApi, type ProfileFormData } from '~/lib/schemas';
 
 export default function ProfilePage() {
   const { data: profile, isLoading, refetch } = api.user.getProfile.useQuery();
@@ -53,7 +46,7 @@ export default function ProfilePage() {
   });
 
   const onSubmit = (data: ProfileFormData) => {
-    updateProfile.mutate(data);
+    updateProfile.mutate(transformProfileFormToApi(data));
   };
 
   if (isLoading) {

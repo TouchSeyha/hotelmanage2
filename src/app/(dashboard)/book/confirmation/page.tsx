@@ -18,7 +18,7 @@ import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import { Badge } from '~/components/ui/badge';
-import type { PaymentMethod } from '~/lib/schemas/booking';
+import type { PaymentMethod } from '~/lib/schemas';
 
 function PaymentInstructions({ method, amount }: { method: PaymentMethod; amount: number }) {
   if (method === 'online') {

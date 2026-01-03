@@ -6,7 +6,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import { z } from 'zod';
 
 import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
@@ -22,20 +21,11 @@ import {
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
-
-// Form schema for create form (flat structure for UI)
-const roomTypeFormSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100),
-  slug: z.string().min(1, 'Slug is required'),
-  description: z.string().min(1, 'Description is required'),
-  shortDescription: z.string().min(1, 'Short description is required').max(200),
-  basePrice: z.number().positive('Price must be positive'),
-  capacity: z.number().int().positive('Capacity must be at least 1'),
-  amenities: z.string().optional(),
-  images: z.string().optional(),
-});
-
-type RoomTypeFormData = z.infer<typeof roomTypeFormSchema>;
+import {
+  roomTypeFormSchema,
+  transformRoomTypeFormToApi,
+  type RoomTypeFormData,
+} from '~/lib/schemas';
 
 export default function NewRoomTypePage() {
   const router = useRouter();
@@ -49,8 +39,9 @@ export default function NewRoomTypePage() {
       shortDescription: '',
       basePrice: 0,
       capacity: 2,
-      amenities: '',
+      size: undefined,
       images: '',
+      amenities: '',
     },
   });
 
@@ -74,32 +65,7 @@ export default function NewRoomTypePage() {
   };
 
   const onSubmit = (formData: RoomTypeFormData) => {
-    // Parse amenities from comma-separated string
-    const amenities = formData.amenities
-      ? formData.amenities
-          .split(',')
-          .map((a) => a.trim())
-          .filter(Boolean)
-      : [];
-
-    // Parse images from newline-separated string
-    const images = formData.images
-      ? formData.images
-          .split('\n')
-          .map((i) => i.trim())
-          .filter(Boolean)
-      : [];
-
-    createRoomType.mutate({
-      name: formData.name,
-      slug: formData.slug,
-      description: formData.description,
-      shortDescription: formData.shortDescription,
-      basePrice: formData.basePrice,
-      capacity: formData.capacity,
-      amenities,
-      images,
-    });
+    createRoomType.mutate(transformRoomTypeFormToApi(formData));
   };
 
   return (
@@ -119,7 +85,7 @@ export default function NewRoomTypePage() {
       <Card className="max-w-2xl">
         <CardHeader>
           <CardTitle>Room Type Details</CardTitle>
-          <CardDescription>Enter the information for this room type</CardDescription>
+          <CardDescription>Enter information for this room type</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -169,7 +135,7 @@ export default function NewRoomTypePage() {
                   <FormItem>
                     <FormLabel>Short Description</FormLabel>
                     <FormControl>
-                      <Input placeholder="A brief summary of the room type..." {...field} />
+                      <Input placeholder="A brief summary of room type..." {...field} />
                     </FormControl>
                     <FormDescription>Max 200 characters, used in listings</FormDescription>
                     <FormMessage />

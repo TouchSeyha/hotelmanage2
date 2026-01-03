@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { format, addDays } from 'date-fns';
+import { format } from 'date-fns';
 import { CalendarIcon, Loader2, User, Mail, Phone, CreditCard } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -33,24 +32,12 @@ import { Calendar } from '~/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { Textarea } from '~/components/ui/textarea';
 import { cn } from '~/lib/utils';
-
-const posBookingSchema = z
-  .object({
-    roomId: z.string().min(1, 'Please select a room'),
-    checkInDate: z.date({ message: 'Check-in date is required' }),
-    checkOutDate: z.date({ message: 'Check-out date is required' }),
-    numberOfGuests: z.number().int().min(1, 'At least 1 guest required'),
-    guestName: z.string().min(2, 'Guest name is required'),
-    guestEmail: z.string().email('Invalid email').optional().or(z.literal('')),
-    guestPhone: z.string().optional(),
-    specialRequests: z.string().max(500).optional(),
-  })
-  .refine((data) => data.checkOutDate > data.checkInDate, {
-    message: 'Check-out date must be after check-in date',
-    path: ['checkOutDate'],
-  });
-
-type POSBookingData = z.infer<typeof posBookingSchema>;
+import {
+  posBookingFormSchema,
+  defaultPOSBookingFormData,
+  transformPOSBookingFormToApi,
+  type POSBookingFormData,
+} from '~/lib/schemas';
 
 export default function POSPage() {
   const router = useRouter();
@@ -59,18 +46,9 @@ export default function POSPage() {
   const { data: roomTypes } = api.roomType.getAll.useQuery();
   const { data: rooms } = api.room.getAll.useQuery();
 
-  const form = useForm<POSBookingData>({
-    resolver: zodResolver(posBookingSchema),
-    defaultValues: {
-      numberOfGuests: 1,
-      checkInDate: new Date(),
-      checkOutDate: addDays(new Date(), 1),
-      guestName: '',
-      guestEmail: '',
-      guestPhone: '',
-      specialRequests: '',
-      roomId: '',
-    },
+  const form = useForm<POSBookingFormData>({
+    resolver: zodResolver(posBookingFormSchema),
+    defaultValues: defaultPOSBookingFormData,
   });
 
   const checkInDate = form.watch('checkInDate');
@@ -120,17 +98,8 @@ export default function POSPage() {
     (room) => selectedRoomTypeId === 'all' || room.roomTypeId === selectedRoomTypeId
   );
 
-  const onSubmit = (data: POSBookingData) => {
-    createBooking.mutate({
-      roomId: data.roomId,
-      checkInDate: data.checkInDate,
-      checkOutDate: data.checkOutDate,
-      numberOfGuests: data.numberOfGuests,
-      guestName: data.guestName,
-      guestEmail: data.guestEmail ?? undefined,
-      guestPhone: data.guestPhone ?? undefined,
-      specialRequests: data.specialRequests ?? undefined,
-    });
+  const onSubmit = (data: POSBookingFormData) => {
+    createBooking.mutate(transformPOSBookingFormToApi(data));
   };
 
   return (

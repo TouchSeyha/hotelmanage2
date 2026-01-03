@@ -7,7 +7,6 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 import { use, useEffect } from 'react';
-import { z } from 'zod';
 
 import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
@@ -24,20 +23,12 @@ import {
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
 import { Skeleton } from '~/components/ui/skeleton';
-
-// Form schema for the edit form (flat structure for UI)
-const roomTypeFormSchema = z.object({
-  name: z.string().min(1, 'Name is required').max(100),
-  slug: z.string().min(1, 'Slug is required'),
-  description: z.string().min(1, 'Description is required'),
-  shortDescription: z.string().min(1, 'Short description is required').max(200),
-  basePrice: z.number().positive('Price must be positive'),
-  capacity: z.number().int().positive('Capacity must be at least 1'),
-  amenities: z.string().optional(),
-  images: z.string().optional(),
-});
-
-type RoomTypeFormData = z.infer<typeof roomTypeFormSchema>;
+import {
+  roomTypeFormSchema,
+  transformRoomTypeFormToApi,
+  transformRoomTypeApiToForm,
+  type RoomTypeFormData,
+} from '~/lib/schemas';
 
 export default function EditRoomTypePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -54,6 +45,7 @@ export default function EditRoomTypePage({ params }: { params: Promise<{ id: str
       shortDescription: '',
       basePrice: 0,
       capacity: 2,
+      size: undefined,
       amenities: '',
       images: '',
     },
@@ -62,18 +54,7 @@ export default function EditRoomTypePage({ params }: { params: Promise<{ id: str
   // Populate form when data loads
   useEffect(() => {
     if (roomType) {
-      form.reset({
-        name: roomType.name,
-        slug: roomType.slug,
-        description: roomType.description ?? '',
-        shortDescription: roomType.shortDescription ?? '',
-        basePrice: Number(roomType.basePrice),
-        capacity: roomType.capacity,
-        amenities: Array.isArray(roomType.amenities)
-          ? (roomType.amenities as string[]).join(', ')
-          : '',
-        images: Array.isArray(roomType.images) ? (roomType.images as string[]).join('\n') : '',
-      });
+      form.reset(transformRoomTypeApiToForm(roomType));
     }
   }, [roomType, form]);
 
@@ -87,35 +68,19 @@ export default function EditRoomTypePage({ params }: { params: Promise<{ id: str
     },
   });
 
+  // Auto-generate slug from name
+  const handleNameChange = (name: string) => {
+    const slug = name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/(^-|-$)/g, '');
+    form.setValue('slug', slug);
+  };
+
   const onSubmit = (formData: RoomTypeFormData) => {
-    // Parse amenities from comma-separated string
-    const amenities = formData.amenities
-      ? formData.amenities
-          .split(',')
-          .map((a) => a.trim())
-          .filter(Boolean)
-      : [];
-
-    // Parse images from newline-separated string
-    const images = formData.images
-      ? formData.images
-          .split('\n')
-          .map((i) => i.trim())
-          .filter(Boolean)
-      : [];
-
     updateRoomType.mutate({
       id,
-      data: {
-        name: formData.name,
-        slug: formData.slug,
-        description: formData.description,
-        shortDescription: formData.shortDescription,
-        basePrice: formData.basePrice,
-        capacity: formData.capacity,
-        amenities,
-        images,
-      },
+      data: transformRoomTypeFormToApi(formData),
     });
   };
 
@@ -128,23 +93,13 @@ export default function EditRoomTypePage({ params }: { params: Promise<{ id: str
           <CardHeader>
             <Skeleton className="h-6 w-48" />
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-6">
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
-            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
           </CardContent>
         </Card>
-      </div>
-    );
-  }
-
-  if (!roomType) {
-    return (
-      <div className="py-12 text-center">
-        <h2 className="text-lg font-medium">Room type not found</h2>
-        <Button asChild className="mt-4">
-          <Link href="/admin/room-types">Back to Room Types</Link>
-        </Button>
       </div>
     );
   }
@@ -160,13 +115,13 @@ export default function EditRoomTypePage({ params }: { params: Promise<{ id: str
           Back to Room Types
         </Link>
         <h1 className="text-2xl font-bold">Edit Room Type</h1>
-        <p className="text-muted-foreground">Update {roomType.name} details</p>
+        <p className="text-muted-foreground">Update room type details</p>
       </div>
 
       <Card className="max-w-2xl">
         <CardHeader>
           <CardTitle>Room Type Details</CardTitle>
-          <CardDescription>Update the information for this room type</CardDescription>
+          <CardDescription>Edit information for this room type</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -179,7 +134,14 @@ export default function EditRoomTypePage({ params }: { params: Promise<{ id: str
                     <FormItem>
                       <FormLabel>Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="Deluxe Suite" {...field} />
+                        <Input
+                          placeholder="Deluxe Suite"
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            handleNameChange(e.target.value);
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -209,7 +171,7 @@ export default function EditRoomTypePage({ params }: { params: Promise<{ id: str
                   <FormItem>
                     <FormLabel>Short Description</FormLabel>
                     <FormControl>
-                      <Input placeholder="A brief summary of the room type..." {...field} />
+                      <Input placeholder="A brief summary of room type..." {...field} />
                     </FormControl>
                     <FormDescription>Max 200 characters, used in listings</FormDescription>
                     <FormMessage />
@@ -324,7 +286,7 @@ export default function EditRoomTypePage({ params }: { params: Promise<{ id: str
                   {updateRoomType.isPending ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Saving...
+                      Updating...
                     </>
                   ) : (
                     'Save Changes'

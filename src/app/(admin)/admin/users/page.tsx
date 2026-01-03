@@ -17,7 +17,6 @@ import {
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 
 import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
@@ -75,14 +74,12 @@ import {
 import { Badge } from '~/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { TableSkeleton } from '~/components/shared/loading-skeleton';
-
-const userEditSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  phone: z.string().optional(),
-  role: z.enum(['user', 'admin']),
-});
-
-type UserEditData = z.infer<typeof userEditSchema>;
+import {
+  userEditFormSchema,
+  defaultUserEditFormData,
+  transformUserEditFormToApi,
+  type UserEditFormData,
+} from '~/lib/schemas';
 
 export default function UsersPage() {
   const [search, setSearch] = useState('');
@@ -99,13 +96,9 @@ export default function UsersPage() {
     role: roleFilter !== 'all' ? (roleFilter as 'user' | 'admin') : undefined,
   });
 
-  const form = useForm<UserEditData>({
-    resolver: zodResolver(userEditSchema),
-    defaultValues: {
-      name: '',
-      phone: '',
-      role: 'user',
-    },
+  const form = useForm<UserEditFormData>({
+    resolver: zodResolver(userEditFormSchema),
+    defaultValues: defaultUserEditFormData,
   });
 
   const updateUser = api.user.update.useMutation({
@@ -142,11 +135,11 @@ export default function UsersPage() {
     setIsDialogOpen(true);
   };
 
-  const onSubmit = (formData: UserEditData) => {
+  const onSubmit = (formData: UserEditFormData) => {
     if (!editingUser) return;
     updateUser.mutate({
       id: editingUser,
-      data: formData,
+      data: transformUserEditFormToApi(formData),
     });
   };
 

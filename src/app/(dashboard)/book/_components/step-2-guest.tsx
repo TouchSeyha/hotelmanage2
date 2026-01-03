@@ -3,7 +3,6 @@
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
 import { format } from 'date-fns';
 import { ArrowLeft } from 'lucide-react';
 
@@ -21,15 +20,7 @@ import {
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
-
-const guestInfoSchema = z.object({
-  guestName: z.string().min(2, 'Name must be at least 2 characters'),
-  guestEmail: z.string().email('Please enter a valid email'),
-  guestPhone: z.string().min(10, 'Please enter a valid phone number'),
-  specialRequests: z.string().optional(),
-});
-
-type GuestInfoFormData = z.infer<typeof guestInfoSchema>;
+import { guestInfoSchema, defaultGuestInfoFormData, type GuestInfoFormData } from '~/lib/schemas';
 
 interface Step2GuestProps {
   userEmail?: string | null;
@@ -42,6 +33,7 @@ export function Step2Guest({ userEmail, userName }: Step2GuestProps) {
   const form = useForm<GuestInfoFormData>({
     resolver: zodResolver(guestInfoSchema),
     defaultValues: {
+      ...defaultGuestInfoFormData,
       guestName: state.guestName ?? userName ?? '',
       guestEmail: state.guestEmail ?? userEmail ?? '',
       guestPhone: state.guestPhone ?? '',

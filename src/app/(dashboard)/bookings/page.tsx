@@ -23,7 +23,7 @@ import {
 } from '~/components/ui/alert-dialog';
 import { EmptyState } from '~/components/shared/empty-state';
 import { BookingCardSkeleton } from '~/components/shared/loading-skeleton';
-import type { BookingStatus, PaymentStatus } from '~/lib/schemas/booking';
+import type { BookingStatus, PaymentStatus } from '~/lib/schemas';
 
 function getStatusBadgeVariant(status: BookingStatus) {
   switch (status) {
