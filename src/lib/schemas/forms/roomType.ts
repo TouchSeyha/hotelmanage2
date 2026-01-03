@@ -53,7 +53,7 @@ export function transformRoomTypeApiToForm(apiData: {
   slug: string;
   description: string;
   shortDescription: string;
-  basePrice: { toNumber: () => number };
+  basePrice: unknown;
   capacity: number;
   size?: number | null;
   images: unknown;
@@ -65,8 +65,7 @@ export function transformRoomTypeApiToForm(apiData: {
     slug: apiData.slug,
     description: apiData.description,
     shortDescription: apiData.shortDescription,
-    basePrice:
-      typeof apiData.basePrice === 'number' ? apiData.basePrice : apiData.basePrice.toNumber(),
+    basePrice: Number(apiData.basePrice),
     capacity: apiData.capacity,
     size: apiData.size ?? undefined,
     images: Array.isArray(apiData.images) ? (apiData.images as string[]).join('\n') : '',
