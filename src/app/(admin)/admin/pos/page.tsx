@@ -54,7 +54,7 @@ type POSBookingData = z.infer<typeof posBookingSchema>;
 
 export default function POSPage() {
   const router = useRouter();
-  const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<string>('');
+  const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<string>('all');
 
   const { data: roomTypes } = api.roomType.getAll.useQuery();
   const { data: rooms } = api.room.getAll.useQuery();
@@ -81,7 +81,7 @@ export default function POSPage() {
     {
       checkIn: checkInDate,
       checkOut: checkOutDate,
-      roomTypeId: selectedRoomTypeId || undefined,
+      roomTypeId: selectedRoomTypeId === 'all' ? undefined : selectedRoomTypeId,
     },
     {
       enabled: !!checkInDate && !!checkOutDate,
@@ -117,7 +117,7 @@ export default function POSPage() {
 
   // Filter available rooms by selected room type
   const availableRooms = availability?.availableRooms.filter(
-    (room) => !selectedRoomTypeId || room.roomTypeId === selectedRoomTypeId
+    (room) => selectedRoomTypeId === 'all' || room.roomTypeId === selectedRoomTypeId
   );
 
   const onSubmit = (data: POSBookingData) => {
@@ -241,7 +241,7 @@ export default function POSPage() {
                           <SelectValue placeholder="All room types" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">All room types</SelectItem>
+                          <SelectItem value="all">All room types</SelectItem>
                           {roomTypes?.map((type) => (
                             <SelectItem key={type.id} value={type.id}>
                               {type.name} - ${Number(type.basePrice)}/night
@@ -276,7 +276,7 @@ export default function POSPage() {
                                   );
                                 })
                               ) : (
-                                <SelectItem value="" disabled>
+                                <SelectItem value="none" disabled>
                                   No rooms available
                                 </SelectItem>
                               )}
