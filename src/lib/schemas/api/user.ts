@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { paginationSchema } from './common';
+import { paginationSchema } from '../common';
 
 // Role enum matching Prisma
 export const roleSchema = z.enum(['user', 'admin']);
@@ -29,7 +29,7 @@ export type AdminUpdateUserInput = z.infer<typeof adminUpdateUserSchema>;
 // User query filters (admin)
 export const userFiltersSchema = paginationSchema.extend({
   role: roleSchema.optional(),
-  search: z.string().optional(), // Search by name or email
+  search: z.string().optional(),
 });
 
 export type UserFiltersInput = z.infer<typeof userFiltersSchema>;

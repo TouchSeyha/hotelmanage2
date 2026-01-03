@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { paginationSchema } from './common';
+import { paginationSchema } from '../common';
 
 // Booking status enum matching Prisma
 export const bookingStatusSchema = z.enum([
@@ -25,7 +25,6 @@ export type PaymentStatus = z.infer<typeof paymentStatusSchema>;
 // Create booking schema (supports both roomId and roomTypeId)
 export const createBookingSchema = z
   .object({
-    // Either roomId OR roomTypeId must be provided
     roomId: z.string().cuid().optional(),
     roomTypeId: z.string().cuid().optional(),
     checkInDate: z.coerce.date(),
@@ -33,7 +32,6 @@ export const createBookingSchema = z
     numberOfGuests: z.number().int().positive('Number of guests must be at least 1'),
     paymentMethod: paymentMethodSchema,
     specialRequests: z.string().max(500).optional(),
-    // Guest info (optional - will use logged-in user info if not provided)
     guestName: z.string().min(1).optional(),
     guestEmail: z.string().email().optional(),
     guestPhone: z.string().optional(),
@@ -77,7 +75,7 @@ export const bookingFiltersSchema = paginationSchema.extend({
   paymentStatus: paymentStatusSchema.optional(),
   checkInDate: z.coerce.date().optional(),
   checkOutDate: z.coerce.date().optional(),
-  search: z.string().optional(), // Search by booking number or guest name
+  search: z.string().optional(),
 });
 
 export type BookingFiltersInput = z.infer<typeof bookingFiltersSchema>;

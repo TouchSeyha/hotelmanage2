@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { slugSchema, sortOrderSchema } from './common';
+import { slugSchema, sortOrderSchema } from '../common';
 
 // Room type create schema
 export const createRoomTypeSchema = z.object({
