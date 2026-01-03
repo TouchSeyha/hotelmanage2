@@ -21,6 +21,7 @@ import {
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
 import { Textarea } from '~/components/ui/textarea';
+import { ImageUpload } from '~/components/image-upload';
 import {
   roomTypeFormSchema,
   transformRoomTypeFormToApi,
@@ -40,7 +41,7 @@ export default function NewRoomTypePage() {
       basePrice: 0,
       capacity: 2,
       size: undefined,
-      images: '',
+      images: [],
       amenities: '',
     },
   });
@@ -231,15 +232,19 @@ export default function NewRoomTypePage() {
                 name="images"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Image URLs</FormLabel>
+                    <FormLabel>Room Images</FormLabel>
                     <FormControl>
-                      <Textarea
-                        placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg"
-                        rows={3}
-                        {...field}
+                      <ImageUpload
+                        value={field.value}
+                        onChange={field.onChange}
+                        maxImages={5}
+                        folder="room-types"
+                        disabled={createRoomType.isPending}
                       />
                     </FormControl>
-                    <FormDescription>One URL per line</FormDescription>
+                    <FormDescription>
+                      Upload up to 5 images. The first image will be the primary showcase image. Click the star icon to set a different image as primary.
+                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}

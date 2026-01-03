@@ -15,6 +15,7 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     RESEND_API_KEY: z.string(),
     RESEND_DEV_EMAIL: z.string().email(),
+    BLOB_READ_WRITE_TOKEN: z.string(),
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   },
 
@@ -40,6 +41,7 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     RESEND_DEV_EMAIL: process.env.RESEND_DEV_EMAIL,
+    BLOB_READ_WRITE_TOKEN: process.env.BLOB_READ_WRITE_TOKEN,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

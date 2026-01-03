@@ -9,7 +9,7 @@ export const roomTypeFormSchema = z.object({
   basePrice: z.number().positive('Price must be positive'),
   capacity: z.number().int().positive('Capacity must be at least 1'),
   size: z.number().int().positive().optional(),
-  images: z.string().optional(),
+  images: z.array(z.string().url()),
   amenities: z.string().optional(),
 });
 
@@ -24,7 +24,7 @@ export const defaultRoomTypeFormData: RoomTypeFormData = {
   basePrice: 0,
   capacity: 2,
   size: undefined,
-  images: '',
+  images: [],
   amenities: '',
 };
 
@@ -32,12 +32,7 @@ export const defaultRoomTypeFormData: RoomTypeFormData = {
 export function transformRoomTypeFormToApi(formData: RoomTypeFormData) {
   return {
     ...formData,
-    images: formData.images
-      ? formData.images
-          .split('\n')
-          .map((i) => i.trim())
-          .filter(Boolean)
-      : [],
+    images: formData.images ?? [],
     amenities: formData.amenities
       ? formData.amenities
           .split(',')
@@ -68,7 +63,7 @@ export function transformRoomTypeApiToForm(apiData: {
     basePrice: Number(apiData.basePrice),
     capacity: apiData.capacity,
     size: apiData.size ?? undefined,
-    images: Array.isArray(apiData.images) ? (apiData.images as string[]).join('\n') : '',
+    images: Array.isArray(apiData.images) ? (apiData.images as string[]) : [],
     amenities: Array.isArray(apiData.amenities) ? (apiData.amenities as string[]).join(', ') : '',
   };
 }
