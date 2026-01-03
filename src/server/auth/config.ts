@@ -5,6 +5,9 @@ import GoogleProvider from 'next-auth/providers/google';
 
 import { db } from '~/server/db';
 
+// Role type matching Prisma enum
+type Role = 'user' | 'admin';
+
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
  * object and keep type safety.
@@ -15,13 +18,10 @@ declare module 'next-auth' {
   interface Session extends DefaultSession {
     user: {
       id: string;
+      role: Role;
+      phone: string | null;
     } & DefaultSession['user'];
   }
-
-  // interface User {
-  //   // ...other properties
-  //   // role: UserRole;
-  // }
 }
 
 /**
@@ -57,6 +57,10 @@ export const authConfig = {
      */
   ],
   adapter: PrismaAdapter(db),
+  pages: {
+    signIn: '/signin',
+    error: '/error',
+  },
   callbacks: {
     async signIn({ account, profile }) {
       if (account?.provider === 'google') {
@@ -64,12 +68,22 @@ export const authConfig = {
       }
       return true; // Do different verification for other providers that don't have `email_verified`
     },
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
+    async session({ session, user }) {
+      // Fetch the user with role and phone from database
+      const dbUser = await db.user.findUnique({
+        where: { id: user.id },
+        select: { id: true, role: true, phone: true },
+      });
+
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: user.id,
+          role: dbUser?.role ?? 'user',
+          phone: dbUser?.phone ?? null,
+        },
+      };
+    },
   },
 } satisfies NextAuthConfig;

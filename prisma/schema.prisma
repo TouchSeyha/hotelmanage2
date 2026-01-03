@@ -8,26 +8,151 @@ generator client {
 
 datasource db {
     provider = "postgresql"
-    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+// ============================================
+// ENUMS
+// ============================================
 
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
+enum Role {
+    user
+    admin
 }
 
-// Necessary for Next auth
+enum RoomStatus {
+    available
+    occupied
+    maintenance
+    out_of_service
+}
+
+enum BookingStatus {
+    pending
+    confirmed
+    checked_in
+    completed
+    cancelled
+}
+
+enum PaymentMethod {
+    online
+    counter
+}
+
+enum PaymentStatus {
+    pending
+    paid
+    refunded
+}
+
+// ============================================
+// HOTEL DOMAIN MODELS
+// ============================================
+
+model RoomType {
+    id               String   @id @default(cuid())
+    name             String   @unique
+    slug             String   @unique
+    description      String
+    shortDescription String
+    basePrice        Decimal  @db.Decimal(10, 2)
+    capacity         Int
+    size             Int?
+    images           Json     @db.JsonB @default("[]")
+    amenities        Json     @db.JsonB @default("[]")
+    isActive         Boolean  @default(true)
+    createdAt        DateTime @default(now())
+    updatedAt        DateTime @updatedAt
+
+    // Relations
+    rooms Room[]
+
+    @@index([slug])
+    @@index([isActive])
+    @@map("room_types")
+}
+
+model Room {
+    id         String     @id @default(cuid())
+    roomNumber String     @unique
+    roomTypeId String
+    floor      Int?
+    status     RoomStatus @default(available)
+    notes      String?
+    createdAt  DateTime   @default(now())
+    updatedAt  DateTime   @updatedAt
+
+    // Relations
+    roomType RoomType  @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
+    bookings Booking[]
+
+    @@index([roomNumber])
+    @@index([roomTypeId])
+    @@index([status])
+    @@map("rooms")
+}
+
+model Booking {
+    id                 String        @id @default(cuid())
+    bookingNumber      String        @unique
+    userId             String
+    roomId             String
+    checkInDate        DateTime
+    checkOutDate       DateTime
+    numberOfGuests     Int
+    totalPrice         Decimal       @db.Decimal(10, 2)
+    status             BookingStatus @default(pending)
+    paymentMethod      PaymentMethod
+    paymentStatus      PaymentStatus @default(pending)
+    specialRequests    String?
+    cancellationReason String?
+    // Guest info (can differ from user for walk-ins or booking for others)
+    guestName          String?
+    guestEmail         String?
+    guestPhone         String?
+    createdAt          DateTime      @default(now())
+    updatedAt          DateTime      @updatedAt
+    checkedInAt        DateTime?
+    checkedOutAt       DateTime?
+
+    // Relations
+    user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    room Room         @relation(fields: [roomId], references: [id], onDelete: Restrict)
+    logs BookingLog[]
+
+    @@index([bookingNumber])
+    @@index([userId])
+    @@index([roomId])
+    @@index([status])
+    @@index([paymentStatus])
+    @@index([checkInDate, checkOutDate])
+    @@map("bookings")
+}
+
+model BookingLog {
+    id             String   @id @default(cuid())
+    bookingId      String
+    action         String
+    performedById  String
+    previousStatus String?
+    newStatus      String?
+    notes          String?
+    createdAt      DateTime @default(now())
+
+    // Relations
+    booking     Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+    performedBy User    @relation("BookingLogPerformer", fields: [performedById], references: [id], onDelete: Restrict)
+
+    @@index([bookingId])
+    @@index([createdAt])
+    @@map("booking_logs")
+}
+
+// ============================================
+// NEXT AUTH MODELS
+// ============================================
+
 model Account {
     id                       String  @id @default(cuid())
     userId                   String
@@ -45,6 +170,7 @@ model Account {
     refresh_token_expires_in Int?
 
     @@unique([provider, providerAccountId])
+    @@map("accounts")
 }
 
 model Session {
@@ -53,6 +179,8 @@ model Session {
     userId       String
     expires      DateTime
     user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("sessions")
 }
 
 model User {
@@ -61,9 +189,21 @@ model User {
     email         String?   @unique
     emailVerified DateTime?
     image         String?
-    accounts      Account[]
-    sessions      Session[]
-    posts         Post[]
+    phone         String?
+    role          Role      @default(user)
+    createdAt     DateTime  @default(now())
+    updatedAt     DateTime  @updatedAt
+
+    // Relations
+    accounts    Account[]
+    sessions    Session[]
+    posts       Post[]
+    bookings    Booking[]
+    bookingLogs BookingLog[] @relation("BookingLogPerformer")
+
+    @@index([email])
+    @@index([role])
+    @@map("users")
 }
 
 model VerificationToken {
@@ -72,4 +212,22 @@ model VerificationToken {
     expires    DateTime
 
     @@unique([identifier, token])
+    @@map("verification_tokens")
+}
+
+// ============================================
+// LEGACY/EXAMPLE MODEL (can be removed later)
+// ============================================
+
+model Post {
+    id        Int      @id @default(autoincrement())
+    name      String
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    createdBy   User   @relation(fields: [createdById], references: [id])
+    createdById String
+
+    @@index([name])
+    @@map("posts")
 }
