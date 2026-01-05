@@ -23,6 +23,7 @@ import {
 } from '~/components/ui/alert-dialog';
 import { EmptyState } from '~/components/shared/empty-state';
 import { BookingCardSkeleton } from '~/components/shared/loading-skeleton';
+import { Breadcrumb } from '~/components/shared/breadcrumb';
 import type { BookingStatus, PaymentStatus } from '~/lib/schemas';
 
 function getStatusBadgeVariant(status: BookingStatus) {
@@ -105,13 +106,16 @@ export default function BookingsPage() {
 
   return (
     <div className="container py-8">
+      {/* Breadcrumb */}
+      <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'My Bookings' }]} />
+
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">My Bookings</h1>
           <p className="text-muted-foreground">View and manage your hotel reservations</p>
         </div>
         <Button asChild>
-          <Link href="/book">New Booking</Link>
+          <Link href="/dashboard/book">New Booking</Link>
         </Button>
       </div>
 

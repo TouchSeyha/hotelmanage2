@@ -16,10 +16,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
     // Admin role check
     if (session.user.role !== 'admin') {
-      return NextResponse.json(
-        { error: 'Forbidden - Admin access required' },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: 'Forbidden - Admin access required' }, { status: 403 });
     }
 
     // Get parameters

@@ -1,4 +1,5 @@
 import { TRPCError } from '@trpc/server';
+import { startOfDay } from 'date-fns';
 
 import { createTRPCRouter, protectedProcedure, adminProcedure } from '~/server/api/trpc';
 import {
@@ -147,6 +148,79 @@ export const userRouter = createTRPCRouter({
     }
 
     return user;
+  }),
+
+  /**
+   * Get dashboard statistics (protected)
+   * Returns booking statistics for the current user
+   */
+  getDashboardStats: protectedProcedure.query(async ({ ctx }) => {
+    const today = new Date();
+    const startOfToday = startOfDay(today);
+
+    const [upcomingBookings, completedBookings, cancelledBookings, totalSpent] = await Promise.all([
+      ctx.db.booking.count({
+        where: {
+          userId: ctx.session.user.id,
+          status: { in: ['confirmed', 'checked_in'] },
+          checkInDate: { gte: startOfToday },
+        },
+      }),
+      ctx.db.booking.count({
+        where: {
+          userId: ctx.session.user.id,
+          status: 'completed',
+        },
+      }),
+      ctx.db.booking.count({
+        where: {
+          userId: ctx.session.user.id,
+          status: 'cancelled',
+        },
+      }),
+      ctx.db.booking.aggregate({
+        where: {
+          userId: ctx.session.user.id,
+          paymentStatus: 'paid',
+        },
+        _sum: {
+          totalPrice: true,
+        },
+      }),
+    ]);
+
+    return {
+      upcomingBookings,
+      completedBookings,
+      cancelledBookings,
+      totalSpent: totalSpent._sum.totalPrice ?? 0,
+    };
+  }),
+
+  /**
+   * Get next upcoming booking (protected)
+   * Returns the nearest upcoming booking for the current user
+   */
+  getNextBooking: protectedProcedure.query(async ({ ctx }) => {
+    const today = new Date();
+
+    const booking = await ctx.db.booking.findFirst({
+      where: {
+        userId: ctx.session.user.id,
+        status: { in: ['confirmed', 'checked_in'] },
+        checkInDate: { gte: today },
+      },
+      include: {
+        room: {
+          include: {
+            roomType: true,
+          },
+        },
+      },
+      orderBy: { checkInDate: 'asc' },
+    });
+
+    return booking;
   }),
 
   /**

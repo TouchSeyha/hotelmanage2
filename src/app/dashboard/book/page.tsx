@@ -9,6 +9,7 @@ import { Step1Room } from './_components/step-1-room';
 import { Step2Guest } from './_components/step-2-guest';
 import { Step3Payment } from './_components/step-3-payment';
 import { api } from '~/trpc/react';
+import { Breadcrumb } from '~/components/shared/breadcrumb';
 
 function BookingContent() {
   const { state } = useBooking();
@@ -18,6 +19,9 @@ function BookingContent() {
 
   return (
     <div className="container py-8">
+      {/* Breadcrumb */}
+      <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Book a Room' }]} />
+
       {/* Progress Steps */}
       <div className="mb-8">
         <BookingSteps />

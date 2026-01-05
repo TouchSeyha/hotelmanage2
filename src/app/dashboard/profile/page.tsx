@@ -22,6 +22,7 @@ import { Input } from '~/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
 import { Skeleton } from '~/components/ui/skeleton';
+import { Breadcrumb } from '~/components/shared/breadcrumb';
 import { profileFormSchema, transformProfileFormToApi, type ProfileFormData } from '~/lib/schemas';
 
 export default function ProfilePage() {
@@ -83,6 +84,9 @@ export default function ProfilePage() {
 
   return (
     <div className="container py-8">
+      {/* Breadcrumb */}
+      <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Profile' }]} />
+
       <h1 className="mb-6 text-2xl font-bold">Profile</h1>
 
       <div className="grid gap-6 lg:grid-cols-3">

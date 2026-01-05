@@ -42,7 +42,10 @@ export function validateUpload(options: {
     return { valid: false, error: 'Filename is required' };
   }
 
-  if (!contentType || !ALLOWED_MIME_TYPES.includes(contentType as typeof ALLOWED_MIME_TYPES[number])) {
+  if (
+    !contentType ||
+    !ALLOWED_MIME_TYPES.includes(contentType as (typeof ALLOWED_MIME_TYPES)[number])
+  ) {
     return {
       valid: false,
       error: `Invalid file type. Allowed types: ${ALLOWED_MIME_TYPES.join(', ')}`,
@@ -71,7 +74,11 @@ export function validateUpload(options: {
 /**
  * Generates a safe filename with timestamp to avoid collisions
  */
-export function generateSafeFilename(filename: string, contentType: string, folder = 'uploads'): string {
+export function generateSafeFilename(
+  filename: string,
+  contentType: string,
+  folder = 'uploads'
+): string {
   const timestamp = Date.now();
   const extension = MIME_TO_EXT[contentType] ?? 'jpg';
   const sanitizedFilename = filename
