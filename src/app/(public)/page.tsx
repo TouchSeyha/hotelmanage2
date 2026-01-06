@@ -5,7 +5,7 @@ import { ArrowRight, Wifi, Car, Coffee, Utensils, Waves, Dumbbell } from 'lucide
 import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
 import { api } from '~/trpc/server';
-import { RoomCard } from '~/components/shared/room-card';
+import { RoomCard } from '~/components/shared/roomCard';
 
 const amenities = [
   { icon: Wifi, label: 'Free WiFi', description: 'High-speed internet throughout' },

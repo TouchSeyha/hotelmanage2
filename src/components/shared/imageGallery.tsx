@@ -1,0 +1,202 @@
+'use client';
+
+import { useState } from 'react';
+import Image from 'next/image';
+import Lightbox from 'yet-another-react-lightbox';
+import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
+import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
+import 'yet-another-react-lightbox/styles.css';
+import 'yet-another-react-lightbox/plugins/thumbnails.css';
+import { cn } from '~/lib/utils';
+
+export interface GalleryImage {
+  src: string;
+  alt?: string;
+  title?: string;
+  width?: number;
+  height?: number;
+}
+
+interface ImageGalleryProps {
+  images: GalleryImage[];
+  className?: string;
+  thumbnailClassName?: string;
+  columns?: 2 | 3 | 4 | 5;
+  aspectRatio?: 'square' | 'video' | 'auto';
+}
+
+export function ImageGallery({
+  images,
+  className,
+  thumbnailClassName,
+  columns = 4,
+  aspectRatio = 'video',
+}: ImageGalleryProps) {
+  const [open, setOpen] = useState(false);
+  const [index, setIndex] = useState(0);
+
+  const handleImageClick = (clickedIndex: number) => {
+    setIndex(clickedIndex);
+    setOpen(true);
+  };
+
+  const columnClasses = {
+    2: 'grid-cols-2',
+    3: 'grid-cols-2 sm:grid-cols-3',
+    4: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4',
+    5: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5',
+  };
+
+  const aspectClasses = {
+    square: 'aspect-square',
+    video: 'aspect-video',
+    auto: 'aspect-auto',
+  };
+
+  return (
+    <>
+      <div className={cn('grid gap-4', columnClasses[columns], className)}>
+        {images.map((image, idx) => (
+          <button
+            key={idx}
+            onClick={() => handleImageClick(idx)}
+            className={cn(
+              'group focus:ring-ring relative overflow-hidden rounded-lg transition-all hover:opacity-90 focus:ring-2 focus:ring-offset-2 focus:outline-none',
+              aspectClasses[aspectRatio],
+              thumbnailClassName
+            )}
+            type="button"
+            aria-label={image.alt ?? `View image ${idx + 1}`}
+          >
+            <Image
+              src={image.src}
+              alt={image.alt ?? `Gallery image ${idx + 1}`}
+              fill
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+              className="object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+            {image.title && (
+              <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
+                <p className="text-sm font-medium text-white">{image.title}</p>
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
+
+      <Lightbox
+        open={open}
+        close={() => setOpen(false)}
+        index={index}
+        slides={images.map((img) => ({
+          src: img.src,
+          alt: img.alt,
+          width: img.width ?? 1920,
+          height: img.height ?? 1080,
+        }))}
+        plugins={[Thumbnails, Zoom, Fullscreen]}
+        thumbnails={{
+          position: 'bottom',
+          width: 120,
+          height: 80,
+          border: 1,
+          borderRadius: 4,
+          padding: 4,
+          gap: 16,
+        }}
+        zoom={{
+          maxZoomPixelRatio: 3,
+          scrollToZoom: true,
+        }}
+        animation={{
+          fade: 250,
+          swipe: 250,
+        }}
+        carousel={{
+          finite: false,
+          preload: 2,
+        }}
+        controller={{
+          closeOnBackdropClick: true,
+        }}
+      />
+    </>
+  );
+}
+
+interface ImagePreviewProps {
+  src: string;
+  alt?: string;
+  title?: string;
+  width?: number;
+  height?: number;
+  className?: string;
+  imageClassName?: string;
+}
+
+export function ImagePreview({
+  src,
+  alt,
+  title,
+  width,
+  height,
+  className,
+  imageClassName,
+}: ImagePreviewProps) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen(true)}
+        className={cn(
+          'group focus:ring-ring relative overflow-hidden rounded-lg transition-all hover:opacity-90 focus:ring-2 focus:ring-offset-2 focus:outline-none',
+          className
+        )}
+        type="button"
+        aria-label={alt ?? 'View image'}
+      >
+        <Image
+          src={src}
+          alt={alt ?? 'Preview image'}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 60vw"
+          className={cn(
+            'object-cover transition-transform duration-300 group-hover:scale-105',
+            imageClassName
+          )}
+        />
+        {title && (
+          <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
+            <p className="text-sm font-medium text-white">{title}</p>
+          </div>
+        )}
+      </button>
+
+      <Lightbox
+        open={open}
+        close={() => setOpen(false)}
+        slides={[
+          {
+            src,
+            alt,
+            width: width ?? 1920,
+            height: height ?? 1080,
+          },
+        ]}
+        plugins={[Zoom, Fullscreen]}
+        zoom={{
+          maxZoomPixelRatio: 3,
+          scrollToZoom: true,
+        }}
+        animation={{
+          fade: 250,
+        }}
+        controller={{
+          closeOnBackdropClick: true,
+        }}
+      />
+    </>
+  );
+}

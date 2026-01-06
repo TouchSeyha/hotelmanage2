@@ -15,10 +15,10 @@ import {
 import { api } from '~/trpc/server';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
-import { Badge } from '~/components/ui/badge';
-import { DashboardSkeleton } from '~/components/shared/loading-skeleton';
-import { EmptyState } from '~/components/shared/empty-state';
+import { DashboardSkeleton } from '~/components/shared/loadingSkeleton';
+import { EmptyState } from '~/components/shared/emptyState';
 import { Breadcrumb } from '~/components/shared/breadcrumb';
+import { StatusBadge } from '~/components/shared/statusBadge';
 
 async function DashboardContent() {
   const [stats, nextBooking, profile] = await Promise.all([
@@ -102,9 +102,17 @@ async function DashboardContent() {
                       Booking #{nextBooking.bookingNumber}
                     </p>
                   </div>
-                  <Badge variant={nextBooking.status === 'confirmed' ? 'default' : 'secondary'}>
-                    {nextBooking.status.replace('_', ' ')}
-                  </Badge>
+                  <StatusBadge
+                    status={
+                      nextBooking.status as
+                        | 'pending'
+                        | 'confirmed'
+                        | 'checked_in'
+                        | 'completed'
+                        | 'cancelled'
+                    }
+                    type="booking"
+                  />
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">

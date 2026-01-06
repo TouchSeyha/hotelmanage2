@@ -9,7 +9,6 @@ import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { Badge } from '~/components/ui/badge';
 import {
   Table,
   TableBody,
@@ -33,34 +32,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { TableSkeleton } from '~/components/shared/loading-skeleton';
-import type { BookingStatus, PaymentStatus } from '~/lib/schemas';
-
-function getStatusBadgeVariant(status: BookingStatus) {
-  switch (status) {
-    case 'confirmed':
-      return 'default';
-    case 'checked_in':
-      return 'default';
-    case 'completed':
-      return 'secondary';
-    case 'cancelled':
-      return 'destructive';
-    default:
-      return 'outline';
-  }
-}
-
-function getPaymentBadgeVariant(status: PaymentStatus) {
-  switch (status) {
-    case 'paid':
-      return 'default';
-    case 'refunded':
-      return 'secondary';
-    default:
-      return 'outline';
-  }
-}
+import { TableSkeleton } from '~/components/shared/loadingSkeleton';
+import { StatusBadge } from '~/components/shared/statusBadge';
+import type { BookingStatus } from '~/lib/schemas';
 
 export default function AdminBookingsPage() {
   const [search, setSearch] = useState('');
@@ -106,13 +80,13 @@ export default function AdminBookingsPage() {
                 <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
                 <Input
                   placeholder="Search bookings..."
-                  className="w-[200px] pl-8"
+                  className="w-50 pl-8"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-[150px]">
+                <SelectTrigger className="w-37.5">
                   <Filter className="mr-2 h-4 w-4" />
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
@@ -143,7 +117,7 @@ export default function AdminBookingsPage() {
                     <TableHead>Status</TableHead>
                     <TableHead>Payment</TableHead>
                     <TableHead>Total</TableHead>
-                    <TableHead className="w-[50px]"></TableHead>
+                    <TableHead className="w-12.5"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -176,16 +150,10 @@ export default function AdminBookingsPage() {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getStatusBadgeVariant(booking.status as BookingStatus)}>
-                          {booking.status.replace('_', ' ')}
-                        </Badge>
+                        <StatusBadge status={booking.status} type="booking" />
                       </TableCell>
                       <TableCell>
-                        <Badge
-                          variant={getPaymentBadgeVariant(booking.paymentStatus as PaymentStatus)}
-                        >
-                          {booking.paymentStatus}
-                        </Badge>
+                        <StatusBadge status={booking.paymentStatus} type="payment" />
                       </TableCell>
                       <TableCell className="font-medium">${Number(booking.totalPrice)}</TableCell>
                       <TableCell>

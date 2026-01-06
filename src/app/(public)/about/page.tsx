@@ -65,8 +65,8 @@ export default function AboutPage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative h-[400px] w-full">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40">
+      <section className="relative h-100 w-full">
+        <div className="absolute inset-0 bg-linear-to-r from-black/70 to-black/40">
           <Image
             src="/about-hero.jpg"
             alt="Hotel lobby"
@@ -130,7 +130,7 @@ export default function AboutPage() {
               </Link>
             </Button>
           </div>
-          <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
+          <div className="relative aspect-4/3 overflow-hidden rounded-lg">
             <Image
               src="/about-story.jpg"
               alt="Hotel history"

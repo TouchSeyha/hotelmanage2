@@ -46,16 +46,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '~/components/ui/alert-dialog';
+import { ConfirmDialog } from '~/components/shared/confirmDialog';
 import {
   Form,
   FormControl,
@@ -73,7 +64,7 @@ import {
 } from '~/components/ui/select';
 import { Badge } from '~/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
-import { TableSkeleton } from '~/components/shared/loading-skeleton';
+import { TableSkeleton } from '~/components/shared/loadingSkeleton';
 import {
   userEditFormSchema,
   defaultUserEditFormData,
@@ -174,7 +165,7 @@ export default function UsersPage() {
             setPage(1);
           }}
         >
-          <SelectTrigger className="w-[150px]">
+          <SelectTrigger className="w-37.5">
             <SelectValue placeholder="Filter by role" />
           </SelectTrigger>
           <SelectContent>
@@ -205,7 +196,7 @@ export default function UsersPage() {
                     <TableHead>Role</TableHead>
                     <TableHead>Bookings</TableHead>
                     <TableHead>Joined</TableHead>
-                    <TableHead className="w-[50px]"></TableHead>
+                    <TableHead className="w-12.5"></TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -398,26 +389,16 @@ export default function UsersPage() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete this user account. Users with active bookings cannot be
-              deleted. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteId && deleteUser.mutate({ id: deleteId })}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={() => setDeleteId(null)}
+        title="Are you sure?"
+        description="This will permanently delete this user account. Users with active bookings cannot be deleted. This action cannot be undone."
+        confirmLabel="Delete"
+        onConfirm={() => deleteId && deleteUser.mutate({ id: deleteId })}
+        variant="destructive"
+        loading={deleteUser.isPending}
+      />
     </div>
   );
 }

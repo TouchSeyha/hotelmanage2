@@ -1,12 +1,13 @@
 import { Suspense } from 'react';
 import { api } from '~/trpc/server';
-import { RoomCard } from '~/components/shared/room-card';
-import { RoomGridSkeleton } from '~/components/shared/loading-skeleton';
-import { EmptyState } from '~/components/shared/empty-state';
+import { RoomCard } from '~/components/shared/roomCard';
+import { RoomGridSkeleton } from '~/components/shared/loadingSkeleton';
+import { EmptyState } from '~/components/shared/emptyState';
 import { BedDouble } from 'lucide-react';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Our Rooms | Hotel Name',
+export const metadata: Metadata = {
+  title: 'Our Rooms',
   description: 'Browse our selection of comfortable and luxurious rooms',
 };
 

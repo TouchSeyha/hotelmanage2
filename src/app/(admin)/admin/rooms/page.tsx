@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
+import { StatusBadge } from '~/components/shared/statusBadge';
 import {
   Table,
   TableBody,
@@ -33,16 +34,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '~/components/ui/alert-dialog';
+import { ConfirmDialog } from '~/components/shared/confirmDialog';
 import {
   Form,
   FormControl,
@@ -59,29 +51,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { Badge } from '~/components/ui/badge';
-import { TableSkeleton } from '~/components/shared/loading-skeleton';
+import { TableSkeleton } from '~/components/shared/loadingSkeleton';
 import {
   roomFormSchema,
   defaultRoomFormData,
   transformRoomFormToApi,
   type RoomFormData,
 } from '~/lib/schemas';
-
-function getStatusBadgeVariant(status: string) {
-  switch (status) {
-    case 'available':
-      return 'default';
-    case 'occupied':
-      return 'secondary';
-    case 'maintenance':
-      return 'outline';
-    case 'out_of_service':
-      return 'destructive';
-    default:
-      return 'outline';
-  }
-}
 
 export default function RoomsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -194,7 +170,7 @@ export default function RoomsPage() {
                   <TableHead>Floor</TableHead>
                   <TableHead>Type</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="w-[50px]"></TableHead>
+                  <TableHead className="w-12.5"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -211,9 +187,12 @@ export default function RoomsPage() {
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={getStatusBadgeVariant(room.status)}>
-                        {room.status.replace('_', ' ')}
-                      </Badge>
+                      <StatusBadge
+                        status={
+                          room.status as 'available' | 'occupied' | 'maintenance' | 'out_of_service'
+                        }
+                        type="room"
+                      />
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
@@ -368,26 +347,16 @@ export default function RoomsPage() {
       </Dialog>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={!!deleteId} onOpenChange={() => setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This will permanently delete this room. Bookings associated with this room will be
-              affected. This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={() => deleteId && deleteRoom.mutate({ id: deleteId })}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-            >
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={() => setDeleteId(null)}
+        title="Are you sure?"
+        description="This will permanently delete this room. Bookings associated with this room will be affected. This action cannot be undone."
+        confirmLabel="Delete"
+        variant="destructive"
+        loading={deleteRoom.isPending}
+        onConfirm={() => deleteId && deleteRoom.mutate({ id: deleteId })}
+      />
     </div>
   );
 }

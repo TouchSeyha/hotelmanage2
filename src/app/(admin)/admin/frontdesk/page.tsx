@@ -20,7 +20,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '~/components/ui/dialog';
-import { TableSkeleton } from '~/components/shared/loading-skeleton';
+import { TableSkeleton } from '~/components/shared/loadingSkeleton';
 
 export default function FrontDeskPage() {
   const searchParams = useSearchParams();

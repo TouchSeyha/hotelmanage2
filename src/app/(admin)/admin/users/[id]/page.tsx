@@ -28,21 +28,7 @@ import {
 import { Badge } from '~/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Skeleton } from '~/components/ui/skeleton';
-
-function getStatusBadgeVariant(status: string) {
-  switch (status) {
-    case 'confirmed':
-      return 'default';
-    case 'checked_in':
-      return 'secondary';
-    case 'completed':
-      return 'outline';
-    case 'cancelled':
-      return 'destructive';
-    default:
-      return 'outline';
-  }
-}
+import { StatusBadge } from '~/components/shared/statusBadge';
 
 export default function UserDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
@@ -232,9 +218,17 @@ export default function UserDetailPage({ params }: { params: Promise<{ id: strin
                         {format(new Date(booking.checkOutDate), 'MMM d, yyyy')}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={getStatusBadgeVariant(booking.status)}>
-                          {booking.status.replace('_', ' ')}
-                        </Badge>
+                        <StatusBadge
+                          status={
+                            booking.status as
+                              | 'pending'
+                              | 'confirmed'
+                              | 'checked_in'
+                              | 'completed'
+                              | 'cancelled'
+                          }
+                          type="booking"
+                        />
                       </TableCell>
                       <TableCell className="text-right font-medium">
                         ${Number(booking.totalPrice).toLocaleString()}

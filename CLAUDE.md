@@ -218,12 +218,18 @@ src/
 
 ## Code Style Guidelines
 
+### File Naming
+- **Use camelCase** for all file names: `imageGallery.tsx`, `roomCard.tsx`, `bookingForm.tsx`
+- Component files match component name: `RoomCard` component → `roomCard.tsx`
+- Route folders can use lowercase: `app/galleryDemo/page.tsx`
+- Avoid kebab-case or snake_case for TypeScript/React files
+
 ### Imports
 - Use `~/` alias for all internal imports: `import { db } from "~/server/db"`
 - Use inline type imports: `import type { User } from "@prisma/client"`
 - Group imports: external packages first, then internal modules
 
-### TypeScript
+### TypeScript</text>
 - Strict mode enabled with `noUncheckedIndexedAccess`
 - Never use `any` - leverage generated Prisma types
 - Zod schemas for runtime validation
@@ -342,6 +348,13 @@ The `/docs/` directory contains comprehensive planning documentation:
 - **AGENTS.md** - Developer guidelines (similar to this file)
 
 **Note:** Most features documented in `/docs/` are not yet implemented. Refer to these files when building out hotel management functionality.
+
+### Documentation Guidelines
+
+- **DO NOT create README files** unless explicitly requested by the user
+- Component documentation should be inline JSDoc comments or `.md` files co-located with components
+- Only create summary/setup docs when user specifically asks for them
+- Keep documentation minimal and focused on code-level docs
 
 ## Git Workflow
 

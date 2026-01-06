@@ -4,7 +4,7 @@ import { Card, CardContent, CardFooter } from '~/components/ui/card';
 export function RoomCardSkeleton() {
   return (
     <Card className="overflow-hidden">
-      <Skeleton className="aspect-[4/3] w-full" />
+      <Skeleton className="aspect-4/3 w-full" />
       <CardContent className="p-4">
         <Skeleton className="mb-2 h-6 w-3/4" />
         <Skeleton className="mb-4 h-4 w-full" />
@@ -123,12 +123,12 @@ export function DashboardSkeleton() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card>
           <CardContent className="p-6">
-            <Skeleton className="h-[300px] w-full" />
+            <Skeleton className="h-75 w-full" />
           </CardContent>
         </Card>
         <Card>
           <CardContent className="p-6">
-            <Skeleton className="h-[300px] w-full" />
+            <Skeleton className="h-75 w-full" />
           </CardContent>
         </Card>
       </div>

@@ -1,18 +1,9 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import {
-  Hotel,
-  LayoutDashboard,
-  Calendar,
-  BedDouble,
-  Users,
-  CreditCard,
-  ClipboardList,
-  Settings,
-  LogOut,
-} from 'lucide-react';
+import { Hotel, Settings, LogOut } from 'lucide-react';
 
 import { auth, signOut } from '~/server/auth';
+import { AdminSidebarNav } from '~/components/layout/adminSidebarNav';
 import { Button } from '~/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import {
@@ -23,16 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-
-const sidebarItems = [
-  { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/bookings', label: 'Bookings', icon: Calendar },
-  { href: '/admin/frontdesk', label: 'Front Desk', icon: ClipboardList },
-  { href: '/admin/pos', label: 'POS', icon: CreditCard },
-  { href: '/admin/room-types', label: 'Room Types', icon: BedDouble },
-  { href: '/admin/rooms', label: 'Rooms', icon: BedDouble },
-  { href: '/admin/users', label: 'Users', icon: Users },
-];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -57,18 +38,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 space-y-1 p-4">
-            {sidebarItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="text-muted-foreground hover:bg-muted hover:text-foreground flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors"
-              >
-                <item.icon className="h-4 w-4" />
-                {item.label}
-              </Link>
-            ))}
-          </nav>
+          <AdminSidebarNav />
 
           {/* User Profile */}
           <div className="border-t p-4">
