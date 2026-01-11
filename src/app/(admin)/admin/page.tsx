@@ -7,7 +7,7 @@ import { api } from '~/trpc/server';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
 import { Badge } from '~/components/ui/badge';
-import { DashboardSkeleton } from '~/components/shared/loading-skeleton';
+import { DashboardSkeleton } from '~/components/shared/loadingSkeleton';
 
 async function DashboardContent() {
   const [stats, todaySchedule, recentBookings] = await Promise.all([

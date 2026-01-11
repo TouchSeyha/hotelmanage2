@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Hotel, User, Calendar, LogOut, Settings } from 'lucide-react';
+import { Hotel, Home, User, LogOut, Settings } from 'lucide-react';
 
 import { auth, signOut } from '~/server/auth';
 import { Button } from '~/components/ui/button';
@@ -15,8 +15,9 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 
 const navItems = [
-  { href: '/bookings', label: 'My Bookings', icon: Calendar },
-  { href: '/profile', label: 'Profile', icon: User },
+  { href: '/dashboard', label: 'Dashboard', icon: Home },
+  { href: '/dashboard/bookings', label: 'My Bookings', icon: User },
+  { href: '/dashboard/profile', label: 'Profile', icon: User },
 ];
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -41,7 +42,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors"
+                  className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors"
                 >
                   <item.icon className="h-4 w-4" />
                   {item.label}
@@ -72,16 +73,19 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 </div>
               </DropdownMenuLabel>
               <DropdownMenuSeparator />
-              {navItems.map((item) => (
-                <DropdownMenuItem key={item.href} asChild>
-                  <Link href={item.href} className="flex items-center gap-2">
-                    <item.icon className="h-4 w-4" />
-                    {item.label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
+              {session.user.role === 'admin' && (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin" className="flex items-center gap-2">
+                      <User className="h-4 w-4" />
+                      Admin Panel
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
               <DropdownMenuItem asChild>
-                <Link href="/profile/settings" className="flex items-center gap-2">
+                <Link href="/dashboard/profile" className="flex items-center gap-2">
                   <Settings className="h-4 w-4" />
                   Settings
                 </Link>

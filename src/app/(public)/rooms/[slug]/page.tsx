@@ -1,6 +1,5 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Users, Maximize, Check, ArrowLeft } from 'lucide-react';
 import type { Metadata } from 'next';
 
@@ -8,6 +7,7 @@ import { api } from '~/trpc/server';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
 import { Badge } from '~/components/ui/badge';
+import { RoomGallery } from '~/components/shared/roomGallery';
 
 interface RoomDetailPageProps {
   params: Promise<{
@@ -21,12 +21,12 @@ export async function generateMetadata({ params }: RoomDetailPageProps): Promise
   try {
     const roomType = await api.roomType.getBySlug({ slug });
     return {
-      title: `${roomType.name} | Hotel Name`,
+      title: `${roomType.name}`,
       description: roomType.shortDescription,
     };
   } catch {
     return {
-      title: 'Room Not Found | Hotel Name',
+      title: 'Room Not Found',
     };
   }
 }
@@ -43,8 +43,14 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
 
   const images = roomType.images as string[];
   const amenities = roomType.amenities as string[];
-  const mainImage = images[0] ?? '/placeholder-room.jpg';
   const availableRooms = roomType.rooms.length;
+
+  // Transform images for the gallery component
+  const galleryImages = images.map((image, index) => ({
+    src: image,
+    alt: `${roomType.name} - Image ${index + 1}`,
+    title: index === 0 ? 'Main View' : undefined,
+  }));
 
   return (
     <div className="container py-8">
@@ -60,34 +66,8 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
-        {/* Image Gallery */}
-        <div className="space-y-4">
-          <div className="relative aspect-[4/3] overflow-hidden rounded-lg">
-            <Image
-              src={mainImage}
-              alt={roomType.name}
-              fill
-              className="object-cover"
-              priority
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-          </div>
-          {images.length > 1 && (
-            <div className="grid grid-cols-4 gap-2">
-              {images.slice(1, 5).map((image, index) => (
-                <div key={index} className="relative aspect-square overflow-hidden rounded-md">
-                  <Image
-                    src={image}
-                    alt={`${roomType.name} - Image ${index + 2}`}
-                    fill
-                    className="object-cover"
-                    sizes="25vw"
-                  />
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        {/* Image Gallery with Hero + Thumbnails Layout */}
+        <RoomGallery images={galleryImages} roomName={roomType.name} maxThumbnails={4} />
 
         {/* Room Details */}
         <div>

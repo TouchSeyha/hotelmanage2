@@ -279,7 +279,8 @@ export default function EditRoomTypePage({ params }: { params: Promise<{ id: str
                       />
                     </FormControl>
                     <FormDescription>
-                      Upload up to 5 images. The first image will be the primary showcase image. Click the star icon to set a different image as primary.
+                      Upload up to 5 images. The first image will be the primary showcase image.
+                      Click the star icon to set a different image as primary.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

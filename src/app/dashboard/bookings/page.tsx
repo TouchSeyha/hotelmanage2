@@ -3,56 +3,22 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
-import { Calendar, MapPin, Users, Clock, XCircle, Loader2 } from 'lucide-react';
+import { Calendar, MapPin, Users, Clock, XCircle } from 'lucide-react';
 
 import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { Badge } from '~/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '~/components/ui/alert-dialog';
-import { EmptyState } from '~/components/shared/empty-state';
-import { BookingCardSkeleton } from '~/components/shared/loading-skeleton';
+import { ConfirmDialog } from '~/components/shared/confirmDialog';
+import { EmptyState } from '~/components/shared/emptyState';
+import { BookingCardSkeleton } from '~/components/shared/loadingSkeleton';
+import { Breadcrumb } from '~/components/shared/breadcrumb';
+import { StatusBadge } from '~/components/shared/statusBadge';
 import type { BookingStatus, PaymentStatus } from '~/lib/schemas';
-
-function getStatusBadgeVariant(status: BookingStatus) {
-  switch (status) {
-    case 'confirmed':
-      return 'default';
-    case 'checked_in':
-      return 'default';
-    case 'completed':
-      return 'secondary';
-    case 'cancelled':
-      return 'destructive';
-    default:
-      return 'outline';
-  }
-}
-
-function getPaymentBadgeVariant(status: PaymentStatus) {
-  switch (status) {
-    case 'paid':
-      return 'default';
-    case 'refunded':
-      return 'secondary';
-    default:
-      return 'outline';
-  }
-}
 
 export default function BookingsPage() {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'cancelled'>('upcoming');
+  const [cancelBookingId, setCancelBookingId] = useState<string | null>(null);
 
   const { data, isLoading, refetch } = api.booking.getAll.useQuery({
     limit: 50,
@@ -105,13 +71,16 @@ export default function BookingsPage() {
 
   return (
     <div className="container py-8">
+      {/* Breadcrumb */}
+      <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'My Bookings' }]} />
+
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">My Bookings</h1>
           <p className="text-muted-foreground">View and manage your hotel reservations</p>
         </div>
         <Button asChild>
-          <Link href="/book">New Booking</Link>
+          <Link href="/dashboard/book">New Booking</Link>
         </Button>
       </div>
 
@@ -151,12 +120,8 @@ export default function BookingsPage() {
                     <CardDescription>Booking #{booking.bookingNumber}</CardDescription>
                   </div>
                   <div className="flex gap-2">
-                    <Badge variant={getStatusBadgeVariant(booking.status as BookingStatus)}>
-                      {booking.status.replace('_', ' ')}
-                    </Badge>
-                    <Badge variant={getPaymentBadgeVariant(booking.paymentStatus as PaymentStatus)}>
-                      {booking.paymentStatus}
-                    </Badge>
+                    <StatusBadge status={booking.status as BookingStatus} type="booking" />
+                    <StatusBadge status={booking.paymentStatus as PaymentStatus} type="payment" />
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -194,37 +159,15 @@ export default function BookingsPage() {
 
                   {activeTab === 'upcoming' && booking.status !== 'checked_in' && (
                     <div className="mt-4 flex gap-2">
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                          <Button variant="outline" size="sm" className="text-destructive">
-                            <XCircle className="mr-2 h-4 w-4" />
-                            Cancel Booking
-                          </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                          <AlertDialogHeader>
-                            <AlertDialogTitle>Cancel Booking?</AlertDialogTitle>
-                            <AlertDialogDescription>
-                              Are you sure you want to cancel this booking? This action cannot be
-                              undone. You may be subject to a cancellation fee depending on our
-                              policy.
-                            </AlertDialogDescription>
-                          </AlertDialogHeader>
-                          <AlertDialogFooter>
-                            <AlertDialogCancel>Keep Booking</AlertDialogCancel>
-                            <AlertDialogAction
-                              onClick={() => cancelBooking.mutate({ id: booking.id })}
-                              disabled={cancelBooking.isPending}
-                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                            >
-                              {cancelBooking.isPending ? (
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              ) : null}
-                              Yes, Cancel
-                            </AlertDialogAction>
-                          </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="text-destructive"
+                        onClick={() => setCancelBookingId(booking.id)}
+                      >
+                        <XCircle className="mr-2 h-4 w-4" />
+                        Cancel Booking
+                      </Button>
                     </div>
                   )}
                 </CardContent>
@@ -233,6 +176,19 @@ export default function BookingsPage() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Cancel Booking Confirmation Dialog */}
+      <ConfirmDialog
+        open={!!cancelBookingId}
+        onOpenChange={() => setCancelBookingId(null)}
+        title="Cancel Booking?"
+        description="Are you sure you want to cancel this booking? This action cannot be undone. You may be subject to a cancellation fee depending on our policy."
+        confirmLabel="Yes, Cancel"
+        cancelLabel="Keep Booking"
+        onConfirm={() => cancelBookingId && cancelBooking.mutate({ id: cancelBookingId })}
+        variant="destructive"
+        loading={cancelBooking.isPending}
+      />
     </div>
   );
 }

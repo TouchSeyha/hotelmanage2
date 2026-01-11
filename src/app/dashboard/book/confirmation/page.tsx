@@ -18,6 +18,7 @@ import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import { Badge } from '~/components/ui/badge';
+import { Breadcrumb } from '~/components/shared/breadcrumb';
 import type { PaymentMethod } from '~/lib/schemas';
 
 function PaymentInstructions({ method, amount }: { method: PaymentMethod; amount: number }) {
@@ -103,7 +104,7 @@ function ConfirmationContent() {
               We couldn&apos;t find your booking. Please try again or contact support.
             </p>
             <Button className="mt-6" asChild>
-              <Link href="/book">Try Again</Link>
+              <Link href="/dashboard/book">Try Again</Link>
             </Button>
           </CardContent>
         </Card>
@@ -113,6 +114,15 @@ function ConfirmationContent() {
 
   return (
     <div className="container py-8">
+      {/* Breadcrumb */}
+      <Breadcrumb
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'My Bookings', href: '/dashboard/bookings' },
+          { label: 'Booking Confirmed' },
+        ]}
+      />
+
       {/* Success Header */}
       <div className="mb-8 text-center">
         <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
@@ -206,7 +216,7 @@ function ConfirmationContent() {
         {/* Actions */}
         <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
           <Button asChild>
-            <Link href="/bookings">
+            <Link href="/dashboard/bookings">
               View My Bookings
               <ArrowRight className="ml-2 h-4 w-4" />
             </Link>

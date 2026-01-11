@@ -243,7 +243,8 @@ export default function NewRoomTypePage() {
                       />
                     </FormControl>
                     <FormDescription>
-                      Upload up to 5 images. The first image will be the primary showcase image. Click the star icon to set a different image as primary.
+                      Upload up to 5 images. The first image will be the primary showcase image.
+                      Click the star icon to set a different image as primary.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>

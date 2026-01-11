@@ -204,6 +204,7 @@ const roomName = booking.room?.roomType?.name ?? 'Unknown';
 
 | Type                | Convention            | Example                                 |
 | ------------------- | --------------------- | --------------------------------------- |
+| **Files**           | camelCase             | `imageGallery.tsx`, `roomCard.tsx`      |
 | Components          | PascalCase            | `RoomCard`, `BookingForm`               |
 | Functions/Variables | camelCase             | `calculateTotalPrice`, `isAvailable`    |
 | tRPC Routers        | camelCase + `Router`  | `bookingRouter`, `roomTypeRouter`       |
@@ -211,6 +212,12 @@ const roomName = booking.room?.roomType?.name ?? 'Unknown';
 | API Routes          | kebab-case dirs       | `app/api/auth/[...nextauth]/route.ts`   |
 | Zod Schemas         | camelCase + `Schema`  | `createBookingSchema`                   |
 | Enums (Prisma)      | PascalCase values     | `Role.admin`, `BookingStatus.confirmed` |
+
+**File Naming Rules:**
+- TypeScript/React files: **camelCase** (`imageGallery.tsx`, `bookingForm.tsx`)
+- Component file names match component names: `RoomCard` component → `roomCard.tsx`
+- Route folders: lowercase or camelCase (`app/galleryDemo/page.tsx`)
+- Avoid kebab-case or snake_case for TypeScript/React files
 
 ## File Structure
 
@@ -246,6 +253,16 @@ Before committing:
 3.  No `any` types introduced
 4.  Database migrations committed (if schema changed)
 5.  `.env` files NOT committed
+
+## Documentation Guidelines
+
+**Important:** Follow these rules when creating documentation:
+
+- **DO NOT create README files** unless explicitly requested by the user
+- Component documentation should be inline JSDoc comments or `.md` files co-located with components
+- Only create summary/setup docs when user specifically asks for them
+- Keep documentation minimal and focused on code-level docs
+- Existing docs in `/docs/` are for planning; avoid creating redundant documentation
 
 ## Common Patterns
 

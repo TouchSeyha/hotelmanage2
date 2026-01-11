@@ -2,7 +2,14 @@
 
 import { useCallback, useState } from 'react';
 import Image from 'next/image';
-import { Upload, X, Loader2, ImageIcon, Star } from 'lucide-react';
+import { Upload, X, Loader2, ImageIcon, Star, ZoomIn } from 'lucide-react';
+import Lightbox from 'yet-another-react-lightbox';
+import Zoom from 'yet-another-react-lightbox/plugins/zoom';
+import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
+import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
+import 'yet-another-react-lightbox/styles.css';
+import 'yet-another-react-lightbox/plugins/thumbnails.css';
+
 import { Button } from '~/components/ui/button';
 import { cn } from '~/lib/utils';
 import { useImageUpload } from '~/lib/hooks/use-image-upload';
@@ -25,6 +32,8 @@ export function ImageUpload({
   className,
 }: ImageUploadProps) {
   const [dragActive, setDragActive] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
 
   const { isUploading, uploadMultiple } = useImageUpload({
     folder,
@@ -102,7 +111,20 @@ export function ImageUpload({
     [value, onChange]
   );
 
+  const handlePreview = useCallback((index: number) => {
+    setLightboxIndex(index);
+    setLightboxOpen(true);
+  }, []);
+
   const canUploadMore = value.length < maxImages;
+
+  // Prepare slides for lightbox
+  const lightboxSlides = value.map((url, index) => ({
+    src: url,
+    alt: `Uploaded image ${index + 1}`,
+    width: 1920,
+    height: 1080,
+  }));
 
   return (
     <div className={cn('space-y-4', className)}>
@@ -166,6 +188,16 @@ export function ImageUpload({
                 sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, 25vw"
               />
 
+              {/* Clickable overlay for preview */}
+              <button
+                type="button"
+                onClick={() => handlePreview(index)}
+                className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/20"
+                aria-label={`Preview image ${index + 1}`}
+              >
+                <ZoomIn className="h-8 w-8 text-white opacity-0 transition-opacity group-hover:opacity-100" />
+              </button>
+
               {/* Action Buttons */}
               <div className="absolute top-2 right-2 flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
                 {index !== 0 && (
@@ -174,7 +206,10 @@ export function ImageUpload({
                     variant="secondary"
                     size="icon"
                     className="h-8 w-8"
-                    onClick={() => handleSetPrimary(index)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleSetPrimary(index);
+                    }}
                     disabled={disabled || isUploading}
                     title="Set as primary image"
                   >
@@ -186,7 +221,10 @@ export function ImageUpload({
                   variant="destructive"
                   size="icon"
                   className="h-8 w-8"
-                  onClick={() => handleRemove(url)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemove(url);
+                  }}
                   disabled={disabled || isUploading}
                 >
                   <X className="h-4 w-4" />
@@ -205,6 +243,13 @@ export function ImageUpload({
         </div>
       )}
 
+      {/* Hint text */}
+      {value.length > 0 && (
+        <p className="text-muted-foreground text-center text-xs">
+          Click any image to preview in full screen with zoom
+        </p>
+      )}
+
       {/* Empty State */}
       {value.length === 0 && !canUploadMore && (
         <div className="text-muted-foreground flex flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center">
@@ -212,6 +257,39 @@ export function ImageUpload({
           <p className="text-sm">No images uploaded</p>
         </div>
       )}
+
+      {/* Lightbox */}
+      <Lightbox
+        open={lightboxOpen}
+        close={() => setLightboxOpen(false)}
+        index={lightboxIndex}
+        slides={lightboxSlides}
+        plugins={[Zoom, Thumbnails, Fullscreen]}
+        thumbnails={{
+          position: 'bottom',
+          width: 120,
+          height: 80,
+          border: 1,
+          borderRadius: 4,
+          padding: 4,
+          gap: 16,
+        }}
+        zoom={{
+          maxZoomPixelRatio: 3,
+          scrollToZoom: true,
+        }}
+        animation={{
+          fade: 250,
+          swipe: 250,
+        }}
+        carousel={{
+          finite: false,
+          preload: 2,
+        }}
+        controller={{
+          closeOnBackdropClick: true,
+        }}
+      />
     </div>
   );
 }

@@ -46,7 +46,7 @@ export function RoomCard({
   return (
     <Card className={cn('overflow-hidden transition-shadow hover:shadow-lg', className)}>
       {/* Image */}
-      <div className="relative aspect-[4/3] overflow-hidden">
+      <div className="relative aspect-4/3 overflow-hidden">
         <Image
           src={mainImage}
           alt={name}

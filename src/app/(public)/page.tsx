@@ -5,7 +5,7 @@ import { ArrowRight, Wifi, Car, Coffee, Utensils, Waves, Dumbbell } from 'lucide
 import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
 import { api } from '~/trpc/server';
-import { RoomCard } from '~/components/shared/room-card';
+import { RoomCard } from '~/components/shared/roomCard';
 
 const amenities = [
   { icon: Wifi, label: 'Free WiFi', description: 'High-speed internet throughout' },
@@ -29,8 +29,8 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative h-[600px] w-full">
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30">
+      <section className="relative h-150 w-full">
+        <div className="absolute inset-0 bg-linear-to-r from-black/70 to-black/30">
           <Image
             src="/hero-hotel.jpg"
             alt="Hotel exterior"
