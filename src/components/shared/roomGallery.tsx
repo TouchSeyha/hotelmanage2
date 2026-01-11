@@ -24,12 +24,7 @@ interface RoomGalleryProps {
   maxThumbnails?: number;
 }
 
-export function RoomGallery({
-  images,
-  roomName,
-  className,
-  maxThumbnails = 4,
-}: RoomGalleryProps) {
+export function RoomGallery({ images, roomName, className, maxThumbnails = 4 }: RoomGalleryProps) {
   const [open, setOpen] = useState(false);
   const [index, setIndex] = useState(0);
 
@@ -112,9 +107,7 @@ export function RoomGallery({
                   {/* "More images" overlay on last thumbnail */}
                   {showMoreOverlay && (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/50">
-                      <span className="text-lg font-semibold text-white">
-                        +{remainingCount}
-                      </span>
+                      <span className="text-lg font-semibold text-white">+{remainingCount}</span>
                     </div>
                   )}
                 </button>

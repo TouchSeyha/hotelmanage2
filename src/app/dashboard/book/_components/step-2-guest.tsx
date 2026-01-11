@@ -119,7 +119,7 @@ export function Step2Guest({ userEmail, userName }: Step2GuestProps) {
                   name="guestName"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel required>Full Name</FormLabel>
                       <FormControl>
                         <Input placeholder="John Doe" {...field} />
                       </FormControl>
@@ -134,11 +134,10 @@ export function Step2Guest({ userEmail, userName }: Step2GuestProps) {
                     name="guestEmail"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Email</FormLabel>
+                        <FormLabel required>Email</FormLabel>
                         <FormControl>
                           <Input type="email" placeholder="john@example.com" {...field} />
                         </FormControl>
-                        <FormDescription>Confirmation will be sent here</FormDescription>
                         <FormMessage />
                       </FormItem>
                     )}
@@ -149,9 +148,9 @@ export function Step2Guest({ userEmail, userName }: Step2GuestProps) {
                     name="guestPhone"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
+                        <FormLabel required>Phone Number</FormLabel>
                         <FormControl>
-                          <Input type="tel" placeholder="+1 (555) 000-0000" {...field} />
+                          <Input type="tel" placeholder="+855 (096) 000-0000" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

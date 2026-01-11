@@ -128,7 +128,7 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
           {/* Booking CTA */}
           <div className="flex gap-4">
             <Button size="lg" className="flex-1" disabled={availableRooms === 0} asChild>
-              <Link href={`/book?room=${roomType.slug}`}>
+              <Link href={`/dashboard/book?room=${roomType.slug}`}>
                 {availableRooms > 0 ? 'Book Now' : 'Not Available'}
               </Link>
             </Button>

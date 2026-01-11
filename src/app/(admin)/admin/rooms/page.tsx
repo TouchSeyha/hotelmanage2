@@ -247,7 +247,7 @@ export default function RoomsPage() {
                 name="roomNumber"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Room Number</FormLabel>
+                    <FormLabel required>Room Number</FormLabel>
                     <FormControl>
                       <Input placeholder="101" {...field} />
                     </FormControl>
@@ -261,7 +261,7 @@ export default function RoomsPage() {
                 name="floor"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Floor</FormLabel>
+                    <FormLabel required>Floor</FormLabel>
                     <FormControl>
                       <Input
                         type="number"
@@ -280,7 +280,7 @@ export default function RoomsPage() {
                 name="roomTypeId"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Room Type</FormLabel>
+                    <FormLabel required>Room Type</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -305,7 +305,7 @@ export default function RoomsPage() {
                 name="status"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
+                    <FormLabel required>Status</FormLabel>
                     <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>

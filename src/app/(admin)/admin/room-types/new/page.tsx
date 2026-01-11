@@ -97,7 +97,7 @@ export default function NewRoomTypePage() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel required>Name</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Deluxe Suite"
@@ -118,11 +118,10 @@ export default function NewRoomTypePage() {
                   name="slug"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Slug</FormLabel>
+                      <FormLabel required>Slug</FormLabel>
                       <FormControl>
                         <Input placeholder="deluxe-suite" {...field} />
                       </FormControl>
-                      <FormDescription>URL-friendly identifier</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -134,7 +133,7 @@ export default function NewRoomTypePage() {
                 name="shortDescription"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Short Description</FormLabel>
+                    <FormLabel required>Short Description</FormLabel>
                     <FormControl>
                       <Input placeholder="A brief summary of room type..." {...field} />
                     </FormControl>
@@ -149,7 +148,7 @@ export default function NewRoomTypePage() {
                 name="description"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Description</FormLabel>
+                    <FormLabel required>Description</FormLabel>
                     <FormControl>
                       <Textarea
                         placeholder="A spacious suite with panoramic views..."
@@ -168,20 +167,21 @@ export default function NewRoomTypePage() {
                   name="basePrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Base Price (per night)</FormLabel>
+                      <FormLabel required>Base Price (per night)</FormLabel>
                       <FormControl>
                         <div className="relative">
-                          <span className="text-muted-foreground absolute top-2.5 left-3">$</span>
+                          <span className="text-muted-foreground absolute top-1 left-3">$</span>
                           <Input
                             type="number"
-                            min={0}
-                            step={0.01}
+                            min={30}
+                            step={5}
                             className="pl-7"
                             {...field}
                             onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
                           />
                         </div>
                       </FormControl>
+                      <FormDescription>Base price per night in USD</FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -192,7 +192,7 @@ export default function NewRoomTypePage() {
                   name="capacity"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Capacity</FormLabel>
+                      <FormLabel required>Capacity</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -232,7 +232,7 @@ export default function NewRoomTypePage() {
                 name="images"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Room Images</FormLabel>
+                    <FormLabel required>Room Images</FormLabel>
                     <FormControl>
                       <ImageUpload
                         value={field.value}

@@ -122,7 +122,7 @@ export default function ProfilePage() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Full Name</FormLabel>
+                      <FormLabel required>Full Name</FormLabel>
                       <FormControl>
                         <div className="relative">
                           <User className="text-muted-foreground absolute top-3 left-3 h-4 w-4" />

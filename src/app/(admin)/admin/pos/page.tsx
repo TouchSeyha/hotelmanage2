@@ -57,12 +57,12 @@ export default function POSPage() {
 
   const { data: availability } = api.room.checkAvailability.useQuery(
     {
-      checkIn: checkInDate,
-      checkOut: checkOutDate,
+      checkIn: checkInDate ?? new Date(),
+      checkOut: checkOutDate ?? new Date(),
       roomTypeId: selectedRoomTypeId === 'all' ? undefined : selectedRoomTypeId,
     },
     {
-      enabled: !!checkInDate && !!checkOutDate,
+      enabled: !!checkInDate && !!checkOutDate && checkOutDate > checkInDate,
     }
   );
 
@@ -128,7 +128,7 @@ export default function POSPage() {
                       name="checkInDate"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel>Check-in Date</FormLabel>
+                          <FormLabel required>Check-in Date</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -166,7 +166,7 @@ export default function POSPage() {
                       name="checkOutDate"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel>Check-out Date</FormLabel>
+                          <FormLabel required>Check-out Date</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -225,7 +225,7 @@ export default function POSPage() {
                       name="roomId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Available Room</FormLabel>
+                          <FormLabel required>Available Room</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
@@ -262,7 +262,7 @@ export default function POSPage() {
                     name="numberOfGuests"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Number of Guests</FormLabel>
+                        <FormLabel required>Number of Guests</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -303,7 +303,7 @@ export default function POSPage() {
                       name="guestName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Full Name</FormLabel>
+                          <FormLabel required>Full Name</FormLabel>
                           <FormControl>
                             <div className="relative">
                               <User className="text-muted-foreground absolute top-3 left-3 h-4 w-4" />

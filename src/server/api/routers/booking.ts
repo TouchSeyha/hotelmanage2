@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
+import { format } from 'date-fns';
 
 import { createTRPCRouter, protectedProcedure, adminProcedure } from '~/server/api/trpc';
 import {
@@ -12,6 +13,10 @@ import {
   checkOutSchema,
   posBookingSchema,
 } from '~/lib/schemas';
+import { resend } from '~/server/resend';
+import { env } from '~/env';
+import { BookingConfirmationEmail } from '~/server/email/templates/booking-confirmation';
+import { PaymentConfirmationEmail } from '~/server/email/templates/payment-confirmation';
 
 // Helper function to generate booking number
 function generateBookingNumber(): string {
@@ -312,6 +317,32 @@ export const bookingRouter = createTRPCRouter({
       },
     });
 
+    // Send confirmation email (don't fail booking if email fails)
+    try {
+      const guestEmailAddress = booking.guestEmail ?? user?.email;
+      if (guestEmailAddress) {
+        await resend.emails.send({
+          from: env.NODE_ENV === 'production' ? 'onboarding@resend.dev' : 'onboarding@resend.dev',
+          to: env.NODE_ENV === 'production' ? [guestEmailAddress] : [env.RESEND_DEV_EMAIL],
+          subject: `Booking Confirmation - ${bookingNumber}`,
+          react: BookingConfirmationEmail({
+            guestName: booking.guestName ?? user?.name ?? 'Guest',
+            bookingNumber: booking.bookingNumber,
+            roomType: booking.room.roomType.name,
+            roomNumber: booking.room.roomNumber,
+            checkInDate: format(booking.checkInDate, 'EEEE, MMMM d, yyyy'),
+            checkOutDate: format(booking.checkOutDate, 'EEEE, MMMM d, yyyy'),
+            numberOfGuests: booking.numberOfGuests,
+            totalPrice: Number(booking.totalPrice),
+            paymentStatus: booking.paymentStatus,
+          }),
+        });
+      }
+    } catch (emailError) {
+      // Log error but don't fail the booking
+      console.error('Failed to send booking confirmation email:', emailError);
+    }
+
     return booking;
   }),
 
@@ -531,6 +562,19 @@ export const bookingRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const booking = await ctx.db.booking.findUnique({
         where: { id: input.id },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          room: {
+            include: {
+              roomType: true,
+            },
+          },
+        },
       });
 
       if (!booking) {
@@ -566,6 +610,31 @@ export const bookingRouter = createTRPCRouter({
           notes: 'Payment confirmed by admin',
         },
       });
+
+      // Send payment confirmation email (don't fail if email fails)
+      try {
+        const guestEmailAddress = booking.guestEmail ?? booking.user.email;
+        if (guestEmailAddress) {
+          await resend.emails.send({
+            from: env.NODE_ENV === 'production' ? 'onboarding@resend.dev' : 'onboarding@resend.dev',
+            to: env.NODE_ENV === 'production' ? [guestEmailAddress] : [env.RESEND_DEV_EMAIL],
+            subject: `Payment Confirmed - ${booking.bookingNumber}`,
+            react: PaymentConfirmationEmail({
+              guestName: booking.guestName ?? booking.user.name ?? 'Guest',
+              bookingNumber: booking.bookingNumber,
+              paymentAmount: Number(booking.totalPrice),
+              paymentMethod: booking.paymentMethod === 'online' ? 'Online Payment' : 'Pay at Hotel',
+              paymentDate: format(new Date(), 'EEEE, MMMM d, yyyy'),
+              roomType: booking.room.roomType.name,
+              checkInDate: format(booking.checkInDate, 'EEEE, MMMM d, yyyy'),
+              checkOutDate: format(booking.checkOutDate, 'EEEE, MMMM d, yyyy'),
+            }),
+          });
+        }
+      } catch (emailError) {
+        // Log error but don't fail the payment confirmation
+        console.error('Failed to send payment confirmation email:', emailError);
+      }
 
       return updatedBooking;
     }),

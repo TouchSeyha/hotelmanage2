@@ -85,9 +85,15 @@ export const roomRouter = createTRPCRouter({
         orderBy: [{ roomType: { basePrice: 'asc' } }, { roomNumber: 'asc' }],
       });
 
+      // Include roomTypeId in the returned room objects for easier filtering
+      const roomsWithTypeId = availableRooms.map((room) => ({
+        ...room,
+        roomTypeId: room.roomType.id,
+      }));
+
       return {
-        availableRooms,
-        totalAvailable: availableRooms.length,
+        availableRooms: roomsWithTypeId,
+        totalAvailable: roomsWithTypeId.length,
       };
     }),
 

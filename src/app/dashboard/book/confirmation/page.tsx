@@ -3,6 +3,7 @@
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { format } from 'date-fns';
 import {
   CheckCircle,
@@ -37,15 +38,27 @@ function PaymentInstructions({ method, amount }: { method: PaymentMethod; amount
           </p>
           <div className="mt-3 rounded bg-white p-3">
             <p>
-              <strong>Bank:</strong> Example Bank
+              <strong>Bank:</strong> ABA Bank
             </p>
             <p>
-              <strong>Account Name:</strong> Hotel Name Co., Ltd.
+              <strong>Account Name:</strong> LuxeStay Phnom Penh
             </p>
             <p>
-              <strong>Account Number:</strong> 123-456-7890
+              <strong>Account Number:</strong> 967 097 999
             </p>
           </div>
+
+          <div className="mt-4 flex flex-col items-center rounded bg-white p-4">
+            <p className="mb-3 font-semibold text-blue-800">Scan QR Code to Pay</p>
+            <Image
+              src="/assets/qr/qr-dollar.jpg"
+              alt="Payment QR Code"
+              width={200}
+              height={200}
+              className="rounded-lg border border-gray-200"
+            />
+          </div>
+
           <p className="mt-3">
             Please complete the transfer within 24 hours to confirm your booking. Include your
             booking reference in the transfer note.
