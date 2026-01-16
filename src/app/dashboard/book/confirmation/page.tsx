@@ -41,7 +41,7 @@ function PaymentInstructions({ method, amount }: { method: PaymentMethod; amount
               <strong>Bank:</strong> ABA Bank
             </p>
             <p>
-              <strong>Account Name:</strong> LuxeStay Phnom Penh
+              <strong>Account Name:</strong> LuxeStay
             </p>
             <p>
               <strong>Account Number:</strong> 967 097 999
