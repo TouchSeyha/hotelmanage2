@@ -20,7 +20,7 @@ export function Footer() {
           {/* Brand & Description */}
           <div className="space-y-4">
             <Link href="/" className="text-xl font-bold">
-              Hotel Name
+              LuxeStay
             </Link>
             <p className="text-muted-foreground text-sm">
               Experience luxury and comfort at our beautiful hotel. Perfect for business and leisure
@@ -74,12 +74,12 @@ export function Footer() {
             <ul className="space-y-3">
               <li className="text-muted-foreground flex items-start gap-2 text-sm">
                 <MapPin className="mt-0.5 h-4 w-4 shrink-0" />
-                <span>123 Hotel Street, City Name, Country</span>
+                <span>325 Sisowath Quay, Phnom Penh, Cambodia</span>
               </li>
               <li className="text-muted-foreground flex items-center gap-2 text-sm">
                 <Phone className="h-4 w-4 shrink-0" />
-                <a href="tel:+1234567890" className="hover:text-primary">
-                  +1 (234) 567-890
+                <a href="tel:+855234567890" className="hover:text-primary">
+                  +855 (234) 567-890
                 </a>
               </li>
               <li className="text-muted-foreground flex items-center gap-2 text-sm">
@@ -112,7 +112,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-8 border-t pt-8 text-center">
           <p className="text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} Hotel Name. All rights reserved.
+            &copy; {new Date().getFullYear()} LuxeStay. All rights reserved.
           </p>
         </div>
       </div>

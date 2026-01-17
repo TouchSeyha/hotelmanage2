@@ -35,7 +35,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <div className="flex items-center gap-6">
             <Link href="/" className="flex items-center gap-2 font-bold">
               <Hotel className="h-6 w-6" />
-              <span>Hotel Name</span>
+              <span>LuxeStay</span>
             </Link>
             <nav className="hidden md:flex md:gap-4">
               {navItems.map((item) => (
@@ -115,7 +115,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* Footer */}
       <footer className="border-t py-6">
         <div className="text-muted-foreground container text-center text-sm">
-          &copy; {new Date().getFullYear()} Hotel Name. All rights reserved.
+          &copy; {new Date().getFullYear()} LuxeStay. All rights reserved.
         </div>
       </footer>
     </div>

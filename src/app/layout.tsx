@@ -8,7 +8,7 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { TRPCReactProvider } from '~/trpc/react';
 
 export const metadata: Metadata = {
-  title: 'Hotel Name | Luxury Accommodation',
+  title: 'LuxeStay | Luxury Accommodation',
   description:
     'Experience luxury and comfort at our beautiful hotel. Exceptional service, stunning views, and unforgettable memories await.',
   icons: [{ rel: 'icon', url: '/favicon.ico' }],

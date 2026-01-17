@@ -52,7 +52,7 @@ export function BookingAdminAlertEmail({
           color: '#171717',
         }}
       >
-        LuxeStay Phnom Penh - Admin Alert
+        LuxeStay - Admin Alert
       </h1>
 
       <div

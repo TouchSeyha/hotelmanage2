@@ -534,7 +534,7 @@ Detailed feature list organized by user role and functionality area.
 **Booking Confirmation (to User):**
 
 ```
-Subject: Booking Confirmation - [Hotel Name]
+Subject: Booking Confirmation - [LuxeStay]
 
 Dear [Guest Name],
 

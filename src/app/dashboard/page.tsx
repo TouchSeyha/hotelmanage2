@@ -197,12 +197,6 @@ async function DashboardContent() {
                   Update Profile
                 </Link>
               </Button>
-              <Button variant="outline" asChild className="w-full justify-start">
-                <Link href="/dashboard/profile/settings">
-                  <Clock className="mr-2 h-4 w-4" />
-                  Manage Preferences
-                </Link>
-              </Button>
             </div>
           </CardContent>
         </Card>

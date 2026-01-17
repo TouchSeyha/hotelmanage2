@@ -42,7 +42,7 @@ export function CheckinReminderEmail({
           color: '#171717',
         }}
       >
-        LuxeStay Phnom Penh
+        LuxeStay
       </h1>
 
       <div
@@ -325,7 +325,7 @@ export function CheckinReminderEmail({
         <p style={{ margin: '0 0 8px 0' }}>
           Need to modify your reservation? Reply to this email or call +855 23 123 456
         </p>
-        <p style={{ margin: '0' }}>LuxeStay Phnom Penh • 325 Sisowath Quay, Daun Penh</p>
+        <p style={{ margin: '0' }}>LuxeStay • 325 Sisowath Quay, Daun Penh</p>
       </div>
     </div>
   );

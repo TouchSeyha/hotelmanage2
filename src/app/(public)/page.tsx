@@ -32,7 +32,7 @@ export default async function HomePage() {
       <section className="relative h-150 w-full">
         <div className="absolute inset-0 bg-linear-to-r from-black/70 to-black/30">
           <Image
-            src="/hero-hotel.jpg"
+            src="/assets/hotel/home.png"
             alt="Hotel exterior"
             fill
             className="-z-10 object-cover"
