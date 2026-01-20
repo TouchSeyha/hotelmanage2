@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, cache } from 'react';
 import Link from 'next/link';
 import { format, differenceInDays } from 'date-fns';
 import {
@@ -20,11 +20,15 @@ import { EmptyState } from '~/components/shared/emptyState';
 import { Breadcrumb } from '~/components/shared/breadcrumb';
 import { StatusBadge } from '~/components/shared/statusBadge';
 
+const cachedGetDashboardStats = cache(() => api.user.getDashboardStats());
+const cachedGetNextBooking = cache(() => api.user.getNextBooking());
+const cachedGetProfile = cache(() => api.user.getProfile());
+
 async function DashboardContent() {
   const [stats, nextBooking, profile] = await Promise.all([
-    api.user.getDashboardStats(),
-    api.user.getNextBooking(),
-    api.user.getProfile(),
+    cachedGetDashboardStats(),
+    cachedGetNextBooking(),
+    cachedGetProfile(),
   ]);
 
   const totalBookings = stats.upcomingBookings + stats.completedBookings + stats.cancelledBookings;

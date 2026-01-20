@@ -1,4 +1,4 @@
-import { Suspense } from 'react';
+import { Suspense, cache } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Calendar, DollarSign, Users, BedDouble, ArrowUpRight, Clock } from 'lucide-react';
@@ -9,11 +9,15 @@ import { Button } from '~/components/ui/button';
 import { Badge } from '~/components/ui/badge';
 import { DashboardSkeleton } from '~/components/shared/loadingSkeleton';
 
+const cachedGetDashboardStats = cache(() => api.admin.getDashboardStats());
+const cachedGetTodaySchedule = cache(() => api.admin.getTodaySchedule());
+const cachedGetRecentBookings = cache(() => api.booking.getAll({ limit: 5 }));
+
 async function DashboardContent() {
   const [stats, todaySchedule, recentBookings] = await Promise.all([
-    api.admin.getDashboardStats(),
-    api.admin.getTodaySchedule(),
-    api.booking.getAll({ limit: 5 }),
+    cachedGetDashboardStats(),
+    cachedGetTodaySchedule(),
+    cachedGetRecentBookings(),
   ]);
 
   return (

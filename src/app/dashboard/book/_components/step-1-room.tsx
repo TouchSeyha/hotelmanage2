@@ -41,11 +41,10 @@ export function Step1Room() {
 
   // Set initial room type from URL
   useEffect(() => {
-    if (roomSlugFromUrl && roomTypes) {
-      const room = roomTypes.find((r) => r.slug === roomSlugFromUrl);
-      if (room) {
-        setSelectedRoomTypeId(room.id);
-      }
+    if (!roomSlugFromUrl) return;
+    const room = roomTypes?.find((r) => r.slug === roomSlugFromUrl);
+    if (room) {
+      setSelectedRoomTypeId(room.id);
     }
   }, [roomSlugFromUrl, roomTypes]);
 
@@ -78,13 +77,13 @@ export function Step1Room() {
     });
   };
 
-  const isFormValid =
-    selectedRoomTypeId &&
-    checkIn &&
-    checkOut &&
-    checkOut > checkIn &&
-    availability &&
-    availability.totalAvailable > 0;
+  const hasValidDates = checkIn && checkOut && checkOut > checkIn;
+  const hasAvailability = availability && availability.totalAvailable > 0;
+  const isFormValid = selectedRoomTypeId && hasValidDates && hasAvailability;
+  const nights =
+    checkIn && checkOut
+      ? Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))
+      : 0;
 
   if (isLoading) {
     return (
@@ -254,14 +253,10 @@ export function Step1Room() {
             <div>
               <p className="font-semibold">{selectedRoomType.name}</p>
               <p className="text-muted-foreground text-sm">
-                {format(checkIn, 'MMM d')} - {format(checkOut, 'MMM d, yyyy')} ({' '}
-                {Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))}{' '}
-                nights)
+                {format(checkIn, 'MMM d')} - {format(checkOut, 'MMM d, yyyy')} ({nights} nights)
               </p>
               <p className="mt-1 text-lg font-bold">
-                $
-                {Number(selectedRoomType.basePrice) *
-                  Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))}
+                ${Number(selectedRoomType.basePrice) * nights}
                 <span className="text-muted-foreground text-sm font-normal"> total</span>
               </p>
             </div>
