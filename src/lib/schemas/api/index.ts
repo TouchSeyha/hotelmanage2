@@ -80,3 +80,15 @@ export {
   type GetUserByIdInput,
   type DeleteUserInput,
 } from './user';
+
+// Amenity schemas
+export {
+  createAmenitySchema,
+  updateAmenitySchema,
+  getAmenityByIdSchema,
+  deleteAmenitySchema,
+  type CreateAmenityInput,
+  type UpdateAmenityInput,
+  type GetAmenityByIdInput,
+  type DeleteAmenityInput,
+} from './amenity';

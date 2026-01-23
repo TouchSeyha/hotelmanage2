@@ -7,6 +7,12 @@ import { Card, CardContent, CardFooter } from '~/components/ui/card';
 import { Badge } from '~/components/ui/badge';
 import { cn } from '~/lib/utils';
 
+interface Amenity {
+  id: string;
+  name: string;
+  icon?: string | null;
+}
+
 interface RoomCardProps {
   id: string;
   name: string;
@@ -16,7 +22,7 @@ interface RoomCardProps {
   capacity: number;
   size?: number | null;
   images: string[];
-  amenities: string[];
+  amenities: Amenity[];
   availableRooms?: number;
   className?: string;
 }
@@ -87,11 +93,11 @@ export function RoomCard({
         <div className="flex flex-wrap gap-2">
           {displayAmenities.map((amenity) => (
             <div
-              key={amenity}
+              key={amenity.id}
               className="bg-muted flex items-center gap-1 rounded-full px-2 py-1 text-xs"
             >
-              {amenityIcons[amenity] ?? null}
-              <span>{amenity}</span>
+              {amenityIcons[amenity.name] ?? null}
+              <span>{amenity.name}</span>
             </div>
           ))}
           {amenities.length > 3 && (

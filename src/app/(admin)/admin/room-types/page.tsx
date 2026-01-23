@@ -131,11 +131,11 @@ export default function RoomTypesPage() {
                 <p className="text-muted-foreground line-clamp-2 text-sm">
                   {roomType.description ?? 'No description available'}
                 </p>
-                {Array.isArray(roomType.amenities) && roomType.amenities.length > 0 && (
+                {roomType.amenities.length > 0 && (
                   <div className="mt-3 flex flex-wrap gap-1">
-                    {(roomType.amenities as string[]).slice(0, 4).map((amenity) => (
-                      <Badge key={amenity} variant="secondary" className="text-xs">
-                        {amenity}
+                    {roomType.amenities.slice(0, 4).map((amenity) => (
+                      <Badge key={amenity.id} variant="secondary" className="text-xs">
+                        {amenity.name}
                       </Badge>
                     ))}
                     {roomType.amenities.length > 4 && (
