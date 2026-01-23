@@ -1,15 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import Image from 'next/image';
-import { ZoomIn } from 'lucide-react';
-import Lightbox from 'yet-another-react-lightbox';
-import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
-import Zoom from 'yet-another-react-lightbox/plugins/zoom';
-import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
+import { ZoomIn, Loader2 } from 'lucide-react';
+import { cn } from '~/lib/utils';
 import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/thumbnails.css';
-import { cn } from '~/lib/utils';
+
+const LightboxWrapper = lazy(() => import('./lightboxWrapper'));
 
 export interface RoomGalleryImage {
   src: string;
@@ -105,11 +103,11 @@ export function RoomGallery({ images, roomName, className, maxThumbnails = 4 }: 
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                   {/* "More images" overlay on last thumbnail */}
-                  {showMoreOverlay && (
+                  {showMoreOverlay ? (
                     <div className="absolute inset-0 flex items-center justify-center bg-black/50">
                       <span className="text-lg font-semibold text-white">+{remainingCount}</span>
                     </div>
-                  )}
+                  ) : null}
                 </button>
               );
             })}
@@ -122,43 +120,25 @@ export function RoomGallery({ images, roomName, className, maxThumbnails = 4 }: 
         </p>
       </div>
 
-      {/* Lightbox */}
-      <Lightbox
-        open={open}
-        close={() => setOpen(false)}
-        index={index}
-        slides={images.map((img, idx) => ({
-          src: img.src,
-          alt: img.alt ?? `${roomName} - Image ${idx + 1}`,
-          width: 1920,
-          height: 1080,
-        }))}
-        plugins={[Thumbnails, Zoom, Fullscreen]}
-        thumbnails={{
-          position: 'bottom',
-          width: 120,
-          height: 80,
-          border: 1,
-          borderRadius: 4,
-          padding: 4,
-          gap: 16,
-        }}
-        zoom={{
-          maxZoomPixelRatio: 3,
-          scrollToZoom: true,
-        }}
-        animation={{
-          fade: 250,
-          swipe: 250,
-        }}
-        carousel={{
-          finite: false,
-          preload: 2,
-        }}
-        controller={{
-          closeOnBackdropClick: true,
-        }}
-      />
+      <Suspense
+        fallback={
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+        }
+      >
+        <LightboxWrapper
+          open={open}
+          onClose={() => setOpen(false)}
+          index={index}
+          slides={images.map((img, idx) => ({
+            src: img.src,
+            alt: img.alt ?? `${roomName} - Image ${idx + 1}`,
+            width: 1920,
+            height: 1080,
+          }))}
+        />
+      </Suspense>
     </>
   );
 }

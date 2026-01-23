@@ -1,14 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import Image from 'next/image';
-import Lightbox from 'yet-another-react-lightbox';
-import Thumbnails from 'yet-another-react-lightbox/plugins/thumbnails';
-import Zoom from 'yet-another-react-lightbox/plugins/zoom';
-import Fullscreen from 'yet-another-react-lightbox/plugins/fullscreen';
+import { Loader2 } from 'lucide-react';
+import { cn } from '~/lib/utils';
 import 'yet-another-react-lightbox/styles.css';
 import 'yet-another-react-lightbox/plugins/thumbnails.css';
-import { cn } from '~/lib/utils';
+
+const LightboxWrapper = lazy(() => import('./lightboxWrapper'));
 
 export interface GalleryImage {
   src: string;
@@ -76,51 +75,34 @@ export function ImageGallery({
               sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
               className="object-cover transition-transform duration-300 group-hover:scale-105"
             />
-            {image.title && (
+            {image.title ? (
               <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
                 <p className="text-sm font-medium text-white">{image.title}</p>
               </div>
-            )}
+            ) : null}
           </button>
         ))}
       </div>
 
-      <Lightbox
-        open={open}
-        close={() => setOpen(false)}
-        index={index}
-        slides={images.map((img) => ({
-          src: img.src,
-          alt: img.alt,
-          width: img.width ?? 1920,
-          height: img.height ?? 1080,
-        }))}
-        plugins={[Thumbnails, Zoom, Fullscreen]}
-        thumbnails={{
-          position: 'bottom',
-          width: 120,
-          height: 80,
-          border: 1,
-          borderRadius: 4,
-          padding: 4,
-          gap: 16,
-        }}
-        zoom={{
-          maxZoomPixelRatio: 3,
-          scrollToZoom: true,
-        }}
-        animation={{
-          fade: 250,
-          swipe: 250,
-        }}
-        carousel={{
-          finite: false,
-          preload: 2,
-        }}
-        controller={{
-          closeOnBackdropClick: true,
-        }}
-      />
+      <Suspense
+        fallback={
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+        }
+      >
+        <LightboxWrapper
+          open={open}
+          onClose={() => setOpen(false)}
+          index={index}
+          slides={images.map((img) => ({
+            src: img.src,
+            alt: img.alt,
+            width: img.width ?? 1920,
+            height: img.height ?? 1080,
+          }))}
+        />
+      </Suspense>
     </>
   );
 }
@@ -167,36 +149,34 @@ export function ImagePreview({
             imageClassName
           )}
         />
-        {title && (
+        {title ? (
           <div className="absolute inset-x-0 bottom-0 bg-linear-to-t from-black/60 to-transparent p-3 opacity-0 transition-opacity group-hover:opacity-100">
             <p className="text-sm font-medium text-white">{title}</p>
           </div>
-        )}
+        ) : null}
       </button>
 
-      <Lightbox
-        open={open}
-        close={() => setOpen(false)}
-        slides={[
-          {
-            src,
-            alt,
-            width: width ?? 1920,
-            height: height ?? 1080,
-          },
-        ]}
-        plugins={[Zoom, Fullscreen]}
-        zoom={{
-          maxZoomPixelRatio: 3,
-          scrollToZoom: true,
-        }}
-        animation={{
-          fade: 250,
-        }}
-        controller={{
-          closeOnBackdropClick: true,
-        }}
-      />
+      <Suspense
+        fallback={
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+        }
+      >
+        <LightboxWrapper
+          open={open}
+          onClose={() => setOpen(false)}
+          index={0}
+          slides={[
+            {
+              src,
+              alt,
+              width: width ?? 1920,
+              height: height ?? 1080,
+            },
+          ]}
+        />
+      </Suspense>
     </>
   );
 }

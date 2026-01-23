@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import { Suspense } from 'react';
 import { ArrowRight, Wifi, Car, Coffee, Utensils, Waves, Dumbbell } from 'lucide-react';
 
 import { Button } from '~/components/ui/button';
@@ -16,8 +17,7 @@ const amenities = [
   { icon: Dumbbell, label: 'Fitness Center', description: '24/7 gym access' },
 ];
 
-export default async function HomePage() {
-  // Fetch featured room types
+async function FeaturedRoomsSection() {
   const roomTypes = await api.roomType.getAll({
     isActive: true,
     sortBy: 'basePrice',
@@ -26,6 +26,32 @@ export default async function HomePage() {
 
   const featuredRooms = roomTypes.slice(0, 3);
 
+  return featuredRooms.length > 0 ? (
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      {featuredRooms.map((room) => (
+        <RoomCard
+          key={room.id}
+          id={room.id}
+          name={room.name}
+          slug={room.slug}
+          shortDescription={room.shortDescription}
+          basePrice={Number(room.basePrice)}
+          capacity={room.capacity}
+          size={room.size}
+          images={room.images as string[]}
+          amenities={room.amenities as string[]}
+          availableRooms={room._count.rooms}
+        />
+      ))}
+    </div>
+  ) : (
+    <Card className="p-12 text-center">
+      <p className="text-muted-foreground">No rooms available at the moment.</p>
+    </Card>
+  );
+}
+
+export default async function HomePage() {
   return (
     <div>
       {/* Hero Section */}
@@ -118,29 +144,9 @@ export default async function HomePage() {
           </Button>
         </div>
 
-        {featuredRooms.length > 0 ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {featuredRooms.map((room) => (
-              <RoomCard
-                key={room.id}
-                id={room.id}
-                name={room.name}
-                slug={room.slug}
-                shortDescription={room.shortDescription}
-                basePrice={Number(room.basePrice)}
-                capacity={room.capacity}
-                size={room.size}
-                images={room.images as string[]}
-                amenities={room.amenities as string[]}
-                availableRooms={room._count.rooms}
-              />
-            ))}
-          </div>
-        ) : (
-          <Card className="p-12 text-center">
-            <p className="text-muted-foreground">No rooms available at the moment.</p>
-          </Card>
-        )}
+        <Suspense fallback={<div>Loading featured rooms...</div>}>
+          <FeaturedRoomsSection />
+        </Suspense>
       </section>
 
       {/* Amenities Section */}

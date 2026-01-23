@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { format } from 'date-fns';
 import { Search, ArrowUpRight, Clock, CheckCircle, Loader2 } from 'lucide-react';
@@ -71,16 +71,24 @@ export default function FrontDeskPage() {
     }
   };
 
-  const filteredCheckIns = todaySchedule?.checkIns.filter(
-    (b) =>
-      b.bookingNumber.toLowerCase().includes(search.toLowerCase()) ||
-      (b.guestName ?? b.user.name)?.toLowerCase().includes(search.toLowerCase())
+  const filteredCheckIns = useMemo(
+    () =>
+      todaySchedule?.checkIns.filter(
+        (b) =>
+          b.bookingNumber.toLowerCase().includes(search.toLowerCase()) ||
+          (b.guestName ?? b.user.name)?.toLowerCase().includes(search.toLowerCase())
+      ),
+    [todaySchedule, search]
   );
 
-  const filteredCheckOuts = todaySchedule?.checkOuts.filter(
-    (b) =>
-      b.bookingNumber.toLowerCase().includes(search.toLowerCase()) ||
-      (b.guestName ?? b.user.name)?.toLowerCase().includes(search.toLowerCase())
+  const filteredCheckOuts = useMemo(
+    () =>
+      todaySchedule?.checkOuts.filter(
+        (b) =>
+          b.bookingNumber.toLowerCase().includes(search.toLowerCase()) ||
+          (b.guestName ?? b.user.name)?.toLowerCase().includes(search.toLowerCase())
+      ),
+    [todaySchedule, search]
   );
 
   return (
