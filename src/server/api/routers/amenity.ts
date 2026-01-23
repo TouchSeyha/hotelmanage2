@@ -1,4 +1,5 @@
 import { TRPCError } from '@trpc/server';
+import { z } from 'zod';
 
 import { createTRPCRouter, publicProcedure, adminProcedure } from '~/server/api/trpc';
 import {
@@ -8,11 +9,54 @@ import {
   deleteAmenitySchema,
 } from '~/lib/schemas';
 
+/** Schema for filtering and paginating amenities */
+const amenityFiltersSchema = z
+  .object({
+    category: z.string().optional(),
+    isActive: z.boolean().optional(),
+    search: z.string().optional(),
+    page: z.number().int().min(1).default(1),
+    limit: z.number().int().min(1).max(100).default(50),
+  })
+  .optional();
+
 export const amenityRouter = createTRPCRouter({
-  getAll: publicProcedure.query(async ({ ctx }) => {
-    return ctx.db.amenity.findMany({
-      orderBy: [{ category: 'asc' }, { name: 'asc' }],
-    });
+  /**
+   * Get all amenities with optional filtering and pagination.
+   * Public endpoint for displaying amenities on room pages.
+   */
+  getAll: publicProcedure.input(amenityFiltersSchema).query(async ({ ctx, input }) => {
+    const { category, isActive, search, page = 1, limit = 50 } = input ?? {};
+    const skip = (page - 1) * limit;
+
+    const where = {
+      ...(category && { category }),
+      ...(isActive !== undefined && { isActive }),
+      ...(search && {
+        OR: [
+          { name: { contains: search, mode: 'insensitive' as const } },
+          { category: { contains: search, mode: 'insensitive' as const } },
+        ],
+      }),
+    };
+
+    const [amenities, total] = await Promise.all([
+      ctx.db.amenity.findMany({
+        where,
+        orderBy: [{ category: 'asc' }, { name: 'asc' }],
+        skip,
+        take: limit,
+      }),
+      ctx.db.amenity.count({ where }),
+    ]);
+
+    return {
+      items: amenities,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    };
   }),
 
   getById: publicProcedure.input(getAmenityByIdSchema).query(async ({ ctx, input }) => {

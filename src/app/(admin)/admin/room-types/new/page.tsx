@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Loader2, ArrowLeft, ChevronsUpDown, X } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
@@ -35,7 +35,11 @@ import {
 export default function NewRoomTypePage() {
   const router = useRouter();
 
-  const { data: amenities = [] } = api.amenity.getAll.useQuery();
+  const { data: amenitiesData } = api.amenity.getAll.useQuery();
+  const amenities = useMemo(() => amenitiesData?.items ?? [], [amenitiesData?.items]);
+
+  // Build Map for O(1) amenity lookups (js-index-maps optimization)
+  const amenityById = useMemo(() => new Map(amenities.map((a) => [a.id, a])), [amenities]);
 
   const form = useForm<RoomTypeFormData>({
     resolver: zodResolver(roomTypeFormSchema),
@@ -270,7 +274,7 @@ export default function NewRoomTypePage() {
                             {field.value && field.value.length > 0 ? (
                               <div className="flex flex-wrap gap-1">
                                 {field.value.map((id) => {
-                                  const amenity = amenities.find((a) => a.id === id);
+                                  const amenity = amenityById.get(id);
                                   return amenity ? (
                                     <Badge
                                       key={id}

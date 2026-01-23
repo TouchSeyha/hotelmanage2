@@ -31,7 +31,11 @@ import { TableSkeleton } from '~/components/shared/loadingSkeleton';
 export default function AmenitiesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const { data: amenities, isLoading, refetch } = api.amenity.getAll.useQuery();
+  const { data, isLoading, refetch } = api.amenity.getAll.useQuery();
+
+  // Extract items from paginated response
+  const amenities = data?.items ?? [];
+  const totalCount = data?.total ?? 0;
 
   const deleteAmenity = api.amenity.delete.useMutation({
     onSuccess: () => {
@@ -62,12 +66,12 @@ export default function AmenitiesPage() {
       <Card>
         <CardHeader>
           <CardTitle>All Amenities</CardTitle>
-          <CardDescription>{amenities?.length ?? 0} total amenities</CardDescription>
+          <CardDescription>{totalCount} total amenities</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading ? (
             <TableSkeleton rows={5} columns={5} />
-          ) : amenities && amenities.length > 0 ? (
+          ) : amenities.length > 0 ? (
             <Table>
               <TableHeader>
                 <TableRow>

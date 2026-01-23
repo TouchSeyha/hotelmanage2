@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
+import { IconPicker } from '~/components/shared/iconPicker';
 import {
   amenityFormSchema,
   defaultAmenityFormData,
@@ -97,13 +98,13 @@ export default function NewAmenityPage() {
                   <FormItem>
                     <FormLabel>Icon</FormLabel>
                     <FormControl>
-                      <Input
-                        placeholder="e.g. wifi, swimming-pool..."
-                        autoComplete="off"
-                        {...field}
+                      <IconPicker
+                        value={field.value}
+                        onChange={field.onChange}
+                        placeholder="Select an icon..."
                       />
                     </FormControl>
-                    <FormDescription>Icon name from Lucide icons (optional)</FormDescription>
+                    <FormDescription>Choose an icon for this amenity (optional)</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
