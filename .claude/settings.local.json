@@ -8,7 +8,8 @@
       "Bash(bun run lint)",
       "Bash(bun check:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(bun lint:*)"
     ]
   }
 }

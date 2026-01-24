@@ -14,6 +14,7 @@ import { EmptyState } from '~/components/shared/emptyState';
 import { BookingCardSkeleton } from '~/components/shared/loadingSkeleton';
 import { Breadcrumb } from '~/components/shared/breadcrumb';
 import { StatusBadge } from '~/components/shared/statusBadge';
+import { WriteReviewButton } from '~/components/reviews/writeReviewButton';
 import type { BookingStatus, PaymentStatus } from '~/lib/schemas';
 
 export default function BookingsPage() {
@@ -157,8 +158,16 @@ export default function BookingsPage() {
                     </div>
                   </div>
 
-                  {activeTab === 'upcoming' && booking.status !== 'checked_in' && (
-                    <div className="mt-4 flex gap-2">
+                  <div className="mt-4 flex gap-2">
+                    {activeTab === 'past' && (booking.status === 'completed' || booking.status === 'checked_out') && (
+                      <WriteReviewButton
+                        bookingId={booking.id}
+                        bookingNumber={booking.bookingNumber}
+                        roomName={booking.room.roomType.name}
+                        onReviewSubmitted={() => void refetch()}
+                      />
+                    )}
+                    {activeTab === 'upcoming' && booking.status !== 'checked_in' && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -168,8 +177,8 @@ export default function BookingsPage() {
                         <XCircle className="mr-2 h-4 w-4" />
                         Cancel Booking
                       </Button>
-                    </div>
-                  )}
+                    )}
+                  </div>
                 </CardContent>
               </Card>
             ))

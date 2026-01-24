@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Hotel, Home, User, LogOut, Settings } from 'lucide-react';
+import { Hotel, Home, User, LogOut, Settings, Star, Calendar } from 'lucide-react';
 
 import { auth, signOut } from '~/server/auth';
 import { Button } from '~/components/ui/button';
@@ -16,7 +16,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Home },
-  { href: '/dashboard/bookings', label: 'My Bookings', icon: User },
+  { href: '/dashboard/bookings', label: 'My Bookings', icon: Calendar },
+  { href: '/dashboard/reviews', label: 'My Reviews', icon: Star },
   { href: '/dashboard/profile', label: 'Profile', icon: User },
 ];
 
