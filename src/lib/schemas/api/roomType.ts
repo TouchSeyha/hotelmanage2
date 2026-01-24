@@ -11,16 +11,30 @@ export const createRoomTypeSchema = z.object({
   capacity: z.number().int().positive('Capacity must be at least 1'),
   size: z.number().int().positive().optional(),
   images: z.array(z.string().url()).default([]),
-  amenities: z.array(z.string()).default([]),
+  amenityIds: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
 });
 
 export type CreateRoomTypeInput = z.infer<typeof createRoomTypeSchema>;
 
+// Room type update data schema (without defaults to prevent unintentional overwrites)
+const updateRoomTypeDataSchema = z.object({
+  name: z.string().min(1, 'Name is required').max(100),
+  slug: slugSchema,
+  description: z.string().min(1, 'Description is required'),
+  shortDescription: z.string().min(1, 'Short description is required').max(200),
+  basePrice: z.number().positive('Price must be positive'),
+  capacity: z.number().int().positive('Capacity must be at least 1'),
+  size: z.number().int().positive().optional(),
+  images: z.array(z.string().url()),
+  amenityIds: z.array(z.string()),
+  isActive: z.boolean(),
+});
+
 // Room type update schema (all fields optional except id)
 export const updateRoomTypeSchema = z.object({
   id: z.string().cuid(),
-  data: createRoomTypeSchema.partial(),
+  data: updateRoomTypeDataSchema.partial(),
 });
 
 export type UpdateRoomTypeInput = z.infer<typeof updateRoomTypeSchema>;

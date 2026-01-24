@@ -42,7 +42,7 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
   }
 
   const images = roomType.images as string[];
-  const amenities = roomType.amenities as string[];
+  const amenities = roomType.amenities;
   const availableRooms = roomType.rooms.length;
 
   // Transform images for the gallery component
@@ -116,9 +116,9 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
               <h2 className="mb-3 text-xl font-semibold">Amenities</h2>
               <div className="grid grid-cols-2 gap-2">
                 {amenities.map((amenity) => (
-                  <div key={amenity} className="flex items-center gap-2 text-sm">
+                  <div key={amenity.id} className="flex items-center gap-2 text-sm">
                     <Check className="h-4 w-4 text-green-500" />
-                    <span>{amenity}</span>
+                    <span>{amenity.name}</span>
                   </div>
                 ))}
               </div>
@@ -128,7 +128,7 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
           {/* Booking CTA */}
           <div className="flex gap-4">
             <Button size="lg" className="flex-1" disabled={availableRooms === 0} asChild>
-              <Link href={`/book?room=${roomType.slug}`}>
+              <Link href={`/dashboard/book?room=${roomType.slug}`}>
                 {availableRooms > 0 ? 'Book Now' : 'Not Available'}
               </Link>
             </Button>

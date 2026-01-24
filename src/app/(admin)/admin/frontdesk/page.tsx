@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useMemo } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { format } from 'date-fns';
-import { Search, ArrowUpRight, Clock, CheckCircle, Loader2 } from 'lucide-react';
+import { Search, ArrowUpRight, Clock, CheckCircle, Loader2, Eye, User, MoreHorizontal } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { api } from '~/trpc/react';
@@ -21,8 +21,16 @@ import {
   DialogTitle,
 } from '~/components/ui/dialog';
 import { TableSkeleton } from '~/components/shared/loadingSkeleton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu';
 
 export default function FrontDeskPage() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const bookingIdParam = searchParams.get('booking');
 
@@ -71,16 +79,24 @@ export default function FrontDeskPage() {
     }
   };
 
-  const filteredCheckIns = todaySchedule?.checkIns.filter(
-    (b) =>
-      b.bookingNumber.toLowerCase().includes(search.toLowerCase()) ||
-      (b.guestName ?? b.user.name)?.toLowerCase().includes(search.toLowerCase())
+  const filteredCheckIns = useMemo(
+    () =>
+      todaySchedule?.checkIns.filter(
+        (b) =>
+          b.bookingNumber.toLowerCase().includes(search.toLowerCase()) ||
+          (b.guestName ?? b.user.name)?.toLowerCase().includes(search.toLowerCase())
+      ),
+    [todaySchedule, search]
   );
 
-  const filteredCheckOuts = todaySchedule?.checkOuts.filter(
-    (b) =>
-      b.bookingNumber.toLowerCase().includes(search.toLowerCase()) ||
-      (b.guestName ?? b.user.name)?.toLowerCase().includes(search.toLowerCase())
+  const filteredCheckOuts = useMemo(
+    () =>
+      todaySchedule?.checkOuts.filter(
+        (b) =>
+          b.bookingNumber.toLowerCase().includes(search.toLowerCase()) ||
+          (b.guestName ?? b.user.name)?.toLowerCase().includes(search.toLowerCase())
+      ),
+    [todaySchedule, search]
   );
 
   return (
@@ -196,7 +212,7 @@ export default function FrontDeskPage() {
                           {booking.numberOfGuests} guest(s)
                         </p>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex items-center gap-2">
                         {booking.status === 'confirmed' && (
                           <Button
                             onClick={() => {
@@ -214,6 +230,28 @@ export default function FrontDeskPage() {
                             Checked In
                           </Badge>
                         )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => router.push(`/admin/bookings/${booking.id}`)}
+                            >
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => router.push(`/admin/users/${booking.userId}`)}
+                            >
+                              <User className="mr-2 h-4 w-4" />
+                              Guest Profile
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   ))}
@@ -260,7 +298,7 @@ export default function FrontDeskPage() {
                           Total: ${Number(booking.totalPrice)} • Payment: {booking.paymentStatus}
                         </p>
                       </div>
-                      <div className="flex gap-2">
+                      <div className="flex items-center gap-2">
                         {booking.status === 'checked_in' && (
                           <Button
                             onClick={() => {
@@ -278,6 +316,28 @@ export default function FrontDeskPage() {
                             Completed
                           </Badge>
                         )}
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="outline" size="icon">
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => router.push(`/admin/bookings/${booking.id}`)}
+                            >
+                              <Eye className="mr-2 h-4 w-4" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => router.push(`/admin/users/${booking.userId}`)}
+                            >
+                              <User className="mr-2 h-4 w-4" />
+                              Guest Profile
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </div>
                   ))}

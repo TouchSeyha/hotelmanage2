@@ -1,5 +1,6 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
+import { format } from 'date-fns';
 
 import { createTRPCRouter, protectedProcedure, adminProcedure } from '~/server/api/trpc';
 import {
@@ -10,8 +11,14 @@ import {
   getBookingByIdSchema,
   checkInSchema,
   checkOutSchema,
+  earlyCheckOutSchema,
   posBookingSchema,
+  inactiveBookingStatuses,
 } from '~/lib/schemas';
+import { resend } from '~/server/resend';
+import { env } from '~/env';
+import { BookingConfirmationEmail } from '~/server/email/templates/booking-confirmation';
+import { PaymentConfirmationEmail } from '~/server/email/templates/payment-confirmation';
 
 // Helper function to generate booking number
 function generateBookingNumber(): string {
@@ -205,7 +212,7 @@ export const bookingRouter = createTRPCRouter({
               AND: [
                 { checkInDate: { lt: checkOutDate } },
                 { checkOutDate: { gt: checkInDate } },
-                { status: { notIn: ['cancelled', 'completed'] } },
+                { status: { notIn: inactiveBookingStatuses } },
               ],
             },
           },
@@ -241,7 +248,7 @@ export const bookingRouter = createTRPCRouter({
     const conflictingBooking = await ctx.db.booking.findFirst({
       where: {
         roomId: targetRoom.id,
-        status: { notIn: ['cancelled', 'completed'] },
+        status: { notIn: inactiveBookingStatuses },
         AND: [{ checkInDate: { lt: checkOutDate } }, { checkOutDate: { gt: checkInDate } }],
       },
     });
@@ -311,6 +318,32 @@ export const bookingRouter = createTRPCRouter({
         notes: `Booking created with ${paymentMethod} payment method`,
       },
     });
+
+    // Send confirmation email (don't fail booking if email fails)
+    try {
+      const guestEmailAddress = booking.guestEmail ?? user?.email;
+      if (guestEmailAddress) {
+        await resend.emails.send({
+          from: env.NODE_ENV === 'production' ? 'onboarding@resend.dev' : 'onboarding@resend.dev',
+          to: env.NODE_ENV === 'production' ? [guestEmailAddress] : [env.RESEND_DEV_EMAIL],
+          subject: `Booking Confirmation - ${bookingNumber}`,
+          react: BookingConfirmationEmail({
+            guestName: booking.guestName ?? user?.name ?? 'Guest',
+            bookingNumber: booking.bookingNumber,
+            roomType: booking.room.roomType.name,
+            roomNumber: booking.room.roomNumber,
+            checkInDate: format(booking.checkInDate, 'EEEE, MMMM d, yyyy'),
+            checkOutDate: format(booking.checkOutDate, 'EEEE, MMMM d, yyyy'),
+            numberOfGuests: booking.numberOfGuests,
+            totalPrice: Number(booking.totalPrice),
+            paymentStatus: booking.paymentStatus,
+          }),
+        });
+      }
+    } catch {
+      // Email failed but booking was successful
+      // In production, this should be logged to a monitoring service
+    }
 
     return booking;
   }),
@@ -531,6 +564,19 @@ export const bookingRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const booking = await ctx.db.booking.findUnique({
         where: { id: input.id },
+        include: {
+          user: {
+            select: {
+              name: true,
+              email: true,
+            },
+          },
+          room: {
+            include: {
+              roomType: true,
+            },
+          },
+        },
       });
 
       if (!booking) {
@@ -567,8 +613,86 @@ export const bookingRouter = createTRPCRouter({
         },
       });
 
+      // Send payment confirmation email (don't fail if email fails)
+      try {
+        const guestEmailAddress = booking.guestEmail ?? booking.user.email;
+        if (guestEmailAddress) {
+          await resend.emails.send({
+            from: env.NODE_ENV === 'production' ? 'onboarding@resend.dev' : 'onboarding@resend.dev',
+            to: env.NODE_ENV === 'production' ? [guestEmailAddress] : [env.RESEND_DEV_EMAIL],
+            subject: `Payment Confirmed - ${booking.bookingNumber}`,
+            react: PaymentConfirmationEmail({
+              guestName: booking.guestName ?? booking.user.name ?? 'Guest',
+              bookingNumber: booking.bookingNumber,
+              paymentAmount: Number(booking.totalPrice),
+              paymentMethod: booking.paymentMethod === 'online' ? 'Online Payment' : 'Pay at Hotel',
+              paymentDate: format(new Date(), 'EEEE, MMMM d, yyyy'),
+              roomType: booking.room.roomType.name,
+              checkInDate: format(booking.checkInDate, 'EEEE, MMMM d, yyyy'),
+              checkOutDate: format(booking.checkOutDate, 'EEEE, MMMM d, yyyy'),
+            }),
+          });
+        }
+      } catch {
+        // Email failed but payment was confirmed
+        // In production, this should be logged to a monitoring service
+      }
+
       return updatedBooking;
     }),
+
+  /**
+   * Early checkout (admin only)
+   * Allows admin to checkout guests early and automatically set room status to cleaning
+   */
+  earlyCheckout: adminProcedure.input(earlyCheckOutSchema).mutation(async ({ ctx, input }) => {
+    const booking = await ctx.db.booking.findUnique({
+      where: { id: input.id },
+      include: { room: true },
+    });
+
+    if (!booking) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Booking not found',
+      });
+    }
+
+    // Validate booking can be checked out early
+    if (booking.status !== 'checked_in') {
+      throw new TRPCError({
+        code: 'PRECONDITION_FAILED',
+        message: 'Only checked-in bookings can be checked out',
+      });
+    }
+
+    // Update booking and room status in a transaction
+    const [updatedBooking] = await ctx.db.$transaction([
+      ctx.db.booking.update({
+        where: { id: input.id },
+        data: {
+          status: 'checked_out',
+          checkedOutAt: new Date(),
+        },
+      }),
+      ctx.db.room.update({
+        where: { id: booking.roomId },
+        data: { status: 'cleaning' },
+      }),
+      ctx.db.bookingLog.create({
+        data: {
+          bookingId: input.id,
+          action: 'EARLY_CHECKOUT',
+          performedById: ctx.session.user.id,
+          previousStatus: booking.status,
+          newStatus: 'checked_out',
+          notes: 'Guest checked out early by admin',
+        },
+      }),
+    ]);
+
+    return updatedBooking;
+  }),
 
   /**
    * POS Booking - Walk-in booking by admin
@@ -612,7 +736,7 @@ export const bookingRouter = createTRPCRouter({
     const conflictingBooking = await ctx.db.booking.findFirst({
       where: {
         roomId,
-        status: { notIn: ['cancelled', 'completed'] },
+        status: { notIn: inactiveBookingStatuses },
         AND: [{ checkInDate: { lt: checkOutDate } }, { checkOutDate: { gt: checkInDate } }],
       },
     });

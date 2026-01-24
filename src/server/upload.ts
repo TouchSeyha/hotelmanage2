@@ -71,8 +71,17 @@ export function validateUpload(options: {
   return { valid: true };
 }
 
+/** Maximum filename length after sanitization */
+const MAX_FILENAME_LENGTH = 50;
+
 /**
- * Generates a safe filename with timestamp to avoid collisions
+ * Generates a safe filename with timestamp to avoid collisions.
+ * Sanitizes the filename by removing special characters and normalizing Unicode.
+ *
+ * @param filename - Original filename from upload
+ * @param contentType - MIME type of the file
+ * @param folder - Target folder for the upload
+ * @returns Safe, unique filename path
  */
 export function generateSafeFilename(
   filename: string,
@@ -82,12 +91,17 @@ export function generateSafeFilename(
   const timestamp = Date.now();
   const extension = MIME_TO_EXT[contentType] ?? 'jpg';
   const sanitizedFilename = filename
-    .replace(/[^a-zA-Z0-9.-]/g, '_')
-    .replace(/\.{2,}/g, '.')
+    .normalize('NFKD') // Normalize Unicode characters
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+    .replace(/[^a-zA-Z0-9.-]/g, '_') // Replace special chars with underscore
+    .replace(/\.{2,}/g, '.') // Remove consecutive dots
     .replace(/\.[^.]+$/, '') // Remove existing extension
-    .toLowerCase();
+    .replace(/_+/g, '_') // Remove consecutive underscores
+    .replace(/^_|_$/g, '') // Trim underscores from start/end
+    .toLowerCase()
+    .slice(0, MAX_FILENAME_LENGTH); // Limit length
 
-  return `${folder}/${timestamp}-${sanitizedFilename}.${extension}`;
+  return `${folder}/${timestamp}-${sanitizedFilename || 'file'}.${extension}`;
 }
 
 /**

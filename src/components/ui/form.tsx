@@ -79,8 +79,17 @@ function FormItem({ className, ...props }: React.ComponentProps<'div'>) {
   );
 }
 
-function FormLabel({ className, ...props }: React.ComponentProps<typeof LabelPrimitive.Root>) {
+type FormLabelProps = React.ComponentProps<typeof LabelPrimitive.Root> & {
+  required?: boolean;
+};
+
+function FormLabel({ className, children, required, ...props }: FormLabelProps) {
   const { error, formItemId } = useFormField();
+
+  const textChild = typeof children === 'string' ? children.trim() : null;
+  const hasManualAsterisk = textChild ? textChild.endsWith('*') : false;
+  const labelText = hasManualAsterisk ? textChild?.slice(0, -1).trimEnd() : children;
+  const showRequired = required ?? hasManualAsterisk;
 
   return (
     <Label
@@ -89,7 +98,10 @@ function FormLabel({ className, ...props }: React.ComponentProps<typeof LabelPri
       className={cn('data-[error=true]:text-destructive', className)}
       htmlFor={formItemId}
       {...props}
-    />
+    >
+      {labelText}
+      {showRequired && <span className="text-destructive ml-1">*</span>}
+    </Label>
   );
 }
 
@@ -123,19 +135,21 @@ function FormDescription({ className, ...props }: React.ComponentProps<'p'>) {
 function FormMessage({ className, ...props }: React.ComponentProps<'p'>) {
   const { error, formMessageId } = useFormField();
   const body = error ? String(error?.message ?? '') : props.children;
-
-  if (!body) {
-    return null;
-  }
+  const hasMessage = !!body;
 
   return (
     <p
       data-slot="form-message"
       id={formMessageId}
-      className={cn('text-destructive text-sm', className)}
+      aria-live="polite"
+      className={cn(
+        'min-h-4.5 text-sm leading-5',
+        hasMessage ? 'text-destructive' : 'text-muted-foreground',
+        className
+      )}
       {...props}
     >
-      {body}
+      {hasMessage ? body : '\u00A0'}
     </p>
   );
 }

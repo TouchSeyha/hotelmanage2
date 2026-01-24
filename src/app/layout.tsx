@@ -8,10 +8,17 @@ import { SpeedInsights } from '@vercel/speed-insights/next';
 import { TRPCReactProvider } from '~/trpc/react';
 
 export const metadata: Metadata = {
-  title: 'Hotel Name | Luxury Accommodation',
+  title: 'LuxeStay | Luxury Accommodation',
   description:
     'Experience luxury and comfort at our beautiful hotel. Exceptional service, stunning views, and unforgettable memories await.',
-  icons: [{ rel: 'icon', url: '/favicon.ico' }],
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
+      { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
 };
 
 const geist = Geist({

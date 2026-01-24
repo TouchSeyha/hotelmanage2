@@ -7,7 +7,7 @@ import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
 
 export const metadata: Metadata = {
-  title: 'About Us | Hotel Name',
+  title: 'About Us | LuxeStay',
   description: "Learn about our hotel's story, values, and commitment to exceptional hospitality",
 };
 
@@ -45,19 +45,14 @@ const values = [
 
 const team = [
   {
-    name: 'John Smith',
-    role: 'General Manager',
-    image: '/team-1.jpg',
+    name: 'Touch Seyha',
+    role: 'Developer & Founder',
+    image: '/assets/about/p1.png',
   },
   {
-    name: 'Sarah Johnson',
-    role: 'Head of Operations',
-    image: '/team-2.jpg',
-  },
-  {
-    name: 'Michael Chen',
-    role: 'Executive Chef',
-    image: '/team-3.jpg',
+    name: 'Sophy Sophana',
+    role: 'Developer & Co-Founder',
+    image: '/assets/about/p2.png',
   },
 ];
 
@@ -68,7 +63,7 @@ export default function AboutPage() {
       <section className="relative h-100 w-full">
         <div className="absolute inset-0 bg-linear-to-r from-black/70 to-black/40">
           <Image
-            src="/about-hero.jpg"
+            src="/assets/hotel/about.png"
             alt="Hotel lobby"
             fill
             className="-z-10 object-cover"
@@ -79,7 +74,7 @@ export default function AboutPage() {
         <div className="relative container flex h-full flex-col items-start justify-center text-white">
           <h1 className="mb-4 text-4xl font-bold md:text-5xl">About Our Hotel</h1>
           <p className="max-w-xl text-lg text-gray-200">
-            A legacy of luxury, comfort, and exceptional service since 2009.
+            A legacy of luxury, comfort, and exceptional service since 2025.
           </p>
         </div>
       </section>
@@ -107,7 +102,7 @@ export default function AboutPage() {
             <h2 className="mb-4 text-3xl font-bold">Our Story</h2>
             <div className="text-muted-foreground space-y-4">
               <p>
-                Founded in 2009, our hotel began with a simple vision: to create a sanctuary where
+                Founded in 2025, our hotel began with a simple vision: to create a sanctuary where
                 travelers could experience the perfect blend of luxury, comfort, and authentic
                 hospitality.
               </p>
@@ -132,7 +127,7 @@ export default function AboutPage() {
           </div>
           <div className="relative aspect-4/3 overflow-hidden rounded-lg">
             <Image
-              src="/about-story.jpg"
+              src="/assets/about/history.png"
               alt="Hotel history"
               fill
               className="object-cover"
@@ -176,7 +171,7 @@ export default function AboutPage() {
             Our dedicated team of professionals is committed to making your stay exceptional.
           </p>
         </div>
-        <div className="grid gap-8 md:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-2">
           {team.map((member) => (
             <Card key={member.name} className="overflow-hidden">
               <div className="relative aspect-square">
@@ -185,7 +180,7 @@ export default function AboutPage() {
                   alt={member.name}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 33vw"
+                  sizes="(max-width: 768px) 100vw, 50vw"
                 />
               </div>
               <CardContent className="p-4 text-center">
@@ -212,12 +207,7 @@ export default function AboutPage() {
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Link>
             </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white text-white hover:bg-white/10"
-              asChild
-            >
+            <Button size="lg" variant="default" className="hover:bg-white/50" asChild>
               <Link href="/contact">Contact Us</Link>
             </Button>
           </div>

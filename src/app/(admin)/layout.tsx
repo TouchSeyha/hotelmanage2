@@ -27,14 +27,14 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen">
       {/* Sidebar */}
-      <aside className="bg-muted/30 hidden w-64 shrink-0 border-r lg:block">
-        <div className="flex h-full flex-col">
+      <aside className="bg-muted/50 fixed inset-y-0 left-0 hidden w-64 border-r lg:block">
+        <div className="flex h-full flex-col overflow-y-auto">
           {/* Logo */}
           <div className="flex h-16 items-center gap-2 border-b px-6 font-bold">
             <Hotel className="h-6 w-6" />
-            <span>Hotel Admin</span>
+            <span>Hotel Admin Portal</span>
           </div>
 
           {/* Navigation */}
@@ -57,7 +57,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       </aside>
 
       {/* Main Content */}
-      <div className="flex flex-1 flex-col">
+      <div className="flex flex-1 flex-col lg:ml-64">
         {/* Top Header */}
         <header className="bg-background sticky top-0 z-50 flex h-16 items-center justify-between border-b px-6">
           {/* Mobile menu button would go here */}
@@ -122,7 +122,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         </header>
 
         {/* Page Content */}
-        <main className="flex-1 p-6">{children}</main>
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
   );

@@ -26,7 +26,7 @@ export function ContactEmail({ name, email, phone, topic, message }: ContactEmai
           color: '#171717',
         }}
       >
-        LuxeStay Phnom Penh
+        LuxeStay
       </h1>
 
       <p
@@ -159,7 +159,7 @@ export function ContactEmail({ name, email, phone, topic, message }: ContactEmai
           color: '#737373',
         }}
       >
-        <p style={{ margin: '0' }}>LuxeStay Phnom Penh • 325 Sisowath Quay, Daun Penh</p>
+        <p style={{ margin: '0' }}>LuxeStay • 325 Sisowath Quay, Daun Penh</p>
       </div>
     </div>
   );

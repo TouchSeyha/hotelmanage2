@@ -40,7 +40,7 @@ export function PaymentConfirmationEmail({
           color: '#171717',
         }}
       >
-        LuxeStay Phnom Penh
+        LuxeStay
       </h1>
 
       <div
@@ -64,7 +64,7 @@ export function PaymentConfirmationEmail({
             justifyContent: 'center',
           }}
         >
-          <span style={{ color: '#ffffff', fontSize: '24px' }}>✓</span>
+          <span style={{ color: '#ffffff', fontSize: '24px', textAlign: 'center' }}>✓</span>
         </div>
         <h2
           style={{
@@ -301,7 +301,7 @@ export function PaymentConfirmationEmail({
         <p style={{ margin: '0 0 8px 0' }}>
           Questions? Reply to this email or call us at +855 23 123 456
         </p>
-        <p style={{ margin: '0' }}>LuxeStay Phnom Penh • 325 Sisowath Quay, Daun Penh</p>
+        <p style={{ margin: '0' }}>LuxeStay • 325 Sisowath Quay, Daun Penh</p>
       </div>
     </div>
   );

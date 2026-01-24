@@ -2,9 +2,26 @@ import { z } from 'zod';
 import { dateRangeSchema } from '../common';
 
 // Room status enum matching Prisma
-export const roomStatusSchema = z.enum(['available', 'occupied', 'maintenance', 'out_of_service']);
+export const roomStatusSchema = z.enum(['available', 'occupied', 'cleaning', 'maintenance', 'out_of_service']);
 
 export type RoomStatus = z.infer<typeof roomStatusSchema>;
+
+/**
+ * Valid room status transitions.
+ * Key: current status, Value: array of allowed target statuses.
+ * - available → occupied (check-in), maintenance, out_of_service
+ * - occupied → cleaning (checkout), maintenance (emergency)
+ * - cleaning → available (ready), maintenance
+ * - maintenance → available, cleaning, out_of_service
+ * - out_of_service → maintenance, available
+ */
+export const validRoomStatusTransitions: Record<RoomStatus, RoomStatus[]> = {
+  available: ['occupied', 'maintenance', 'out_of_service'],
+  occupied: ['cleaning', 'maintenance'],
+  cleaning: ['available', 'maintenance'],
+  maintenance: ['available', 'cleaning', 'out_of_service'],
+  out_of_service: ['maintenance', 'available'],
+};
 
 // Room create schema
 export const createRoomSchema = z.object({
@@ -52,3 +69,11 @@ export const bulkCreateRoomsSchema = z.object({
 });
 
 export type BulkCreateRoomsInput = z.infer<typeof bulkCreateRoomsSchema>;
+
+// Update room status schema
+export const updateRoomStatusSchema = z.object({
+  id: z.string().cuid(),
+  status: roomStatusSchema,
+});
+
+export type UpdateRoomStatusInput = z.infer<typeof updateRoomStatusSchema>;

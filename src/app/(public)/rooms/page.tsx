@@ -48,7 +48,7 @@ async function RoomsList({ sortBy, order }: { sortBy: string; order: 'asc' | 'de
           capacity={room.capacity}
           size={room.size}
           images={room.images as string[]}
-          amenities={room.amenities as string[]}
+          amenities={room.amenities}
           availableRooms={room._count.rooms}
         />
       ))}

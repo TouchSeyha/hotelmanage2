@@ -41,7 +41,7 @@ export type POSBookingFormData = z.infer<typeof posBookingFormSchema>;
 export const defaultPOSBookingFormData: POSBookingFormData = {
   roomId: '',
   checkInDate: new Date(),
-  checkOutDate: new Date(),
+  checkOutDate: new Date(Date.now() + 24 * 60 * 60 * 1000), // Tomorrow
   numberOfGuests: 1,
   guestName: '',
   guestEmail: '',

@@ -1,11 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { CalendarIcon, Loader2, User, Mail, Phone, CreditCard } from 'lucide-react';
+import {
+  CalendarIcon,
+  Loader2,
+  User,
+  Mail,
+  Phone,
+  CreditCard,
+  Eye,
+  LogOut,
+  BedDouble,
+} from 'lucide-react';
 import { toast } from 'sonner';
 
 import { api } from '~/trpc/react';
@@ -31,6 +42,8 @@ import {
 import { Calendar } from '~/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover';
 import { Textarea } from '~/components/ui/textarea';
+import { Badge } from '~/components/ui/badge';
+import { ConfirmDialog } from '~/components/shared/confirmDialog';
 import { cn } from '~/lib/utils';
 import {
   posBookingFormSchema,
@@ -38,13 +51,34 @@ import {
   transformPOSBookingFormToApi,
   type POSBookingFormData,
 } from '~/lib/schemas';
+import 'yet-another-react-lightbox/styles.css';
+import 'yet-another-react-lightbox/plugins/thumbnails.css';
+
+const LightboxWrapper = lazy(() => import('~/components/shared/lightboxWrapper'));
 
 export default function POSPage() {
   const router = useRouter();
+  const utils = api.useUtils();
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<string>('all');
+  const [checkoutBookingId, setCheckoutBookingId] = useState<string | null>(null);
+  const [checkoutBookingNumber, setCheckoutBookingNumber] = useState<string>('');
+  const [isQrLightboxOpen, setIsQrLightboxOpen] = useState(false);
 
   const { data: roomTypes } = api.roomType.getAll.useQuery();
   const { data: rooms } = api.room.getAll.useQuery();
+  const { data: todaySchedule, isLoading: isLoadingSchedule } =
+    api.admin.getTodaySchedule.useQuery();
+
+  const earlyCheckout = api.booking.earlyCheckout.useMutation({
+    onSuccess: async () => {
+      toast.success('Guest checked out successfully - Room marked for cleaning');
+      await utils.admin.getTodaySchedule.invalidate();
+      setCheckoutBookingId(null);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   const form = useForm<POSBookingFormData>({
     resolver: zodResolver(posBookingFormSchema),
@@ -57,12 +91,12 @@ export default function POSPage() {
 
   const { data: availability } = api.room.checkAvailability.useQuery(
     {
-      checkIn: checkInDate,
-      checkOut: checkOutDate,
+      checkIn: checkInDate ?? new Date(),
+      checkOut: checkOutDate ?? new Date(),
       roomTypeId: selectedRoomTypeId === 'all' ? undefined : selectedRoomTypeId,
     },
     {
-      enabled: !!checkInDate && !!checkOutDate,
+      enabled: !!checkInDate && !!checkOutDate && checkOutDate > checkInDate,
     }
   );
 
@@ -128,7 +162,7 @@ export default function POSPage() {
                       name="checkInDate"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel>Check-in Date</FormLabel>
+                          <FormLabel required>Check-in Date</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -166,7 +200,7 @@ export default function POSPage() {
                       name="checkOutDate"
                       render={({ field }) => (
                         <FormItem className="flex flex-col">
-                          <FormLabel>Check-out Date</FormLabel>
+                          <FormLabel required>Check-out Date</FormLabel>
                           <Popover>
                             <PopoverTrigger asChild>
                               <FormControl>
@@ -225,7 +259,7 @@ export default function POSPage() {
                       name="roomId"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Available Room</FormLabel>
+                          <FormLabel required>Available Room</FormLabel>
                           <Select onValueChange={field.onChange} value={field.value}>
                             <FormControl>
                               <SelectTrigger>
@@ -262,7 +296,7 @@ export default function POSPage() {
                     name="numberOfGuests"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Number of Guests</FormLabel>
+                        <FormLabel required>Number of Guests</FormLabel>
                         <FormControl>
                           <Input
                             type="number"
@@ -303,7 +337,7 @@ export default function POSPage() {
                       name="guestName"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Full Name</FormLabel>
+                          <FormLabel required>Full Name</FormLabel>
                           <FormControl>
                             <div className="relative">
                               <User className="text-muted-foreground absolute top-3 left-3 h-4 w-4" />
@@ -448,6 +482,33 @@ export default function POSPage() {
                     Payment to be collected at counter
                   </p>
                 </div>
+                <div className="border-t pt-4">
+                  <p className="text-muted-foreground text-sm font-medium">Scan to pay</p>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Ask the guest to scan the QR code to complete payment.
+                  </p>
+                  <div className="mt-3 flex items-center justify-center">
+                    <div className="bg-background rounded-md border p-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsQrLightboxOpen(true)}
+                        className="group focus:ring-ring relative rounded-md focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                        aria-label="Open payment QR code"
+                      >
+                        <Image
+                          src="/assets/qr/qr-dollar.png"
+                          alt="Payment QR code"
+                          width={224}
+                          height={224}
+                          className="h-56 w-56 object-contain"
+                        />
+                        <span className="absolute inset-0 flex items-center justify-center rounded-md bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100">
+                          <Eye className="h-6 w-6" />
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </>
             ) : (
               <p className="text-muted-foreground text-sm">Select a room to see pricing</p>
@@ -455,6 +516,121 @@ export default function POSPage() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Today's Checkouts Section */}
+      <Card className="mt-6">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2">
+                <LogOut className="h-5 w-5" />
+                Today&apos;s Checkouts
+              </CardTitle>
+              <CardDescription>
+                {todaySchedule?.pendingCheckOuts ?? 0} guest(s) due to check out today
+              </CardDescription>
+            </div>
+            {todaySchedule && todaySchedule.pendingCheckOuts > 0 && (
+              <Badge variant="secondary">{todaySchedule.pendingCheckOuts} pending</Badge>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent>
+          {isLoadingSchedule ? (
+            <div className="flex items-center justify-center py-8">
+              <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+            </div>
+          ) : todaySchedule?.checkOuts && todaySchedule.checkOuts.length > 0 ? (
+            <div className="space-y-3">
+              {todaySchedule.checkOuts.map((booking) => (
+                <div
+                  key={booking.id}
+                  className="bg-muted/50 flex items-center justify-between rounded-lg border p-4"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="bg-primary/10 rounded-full p-2">
+                      <BedDouble className="text-primary h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{booking.user.name}</p>
+                      <p className="text-muted-foreground text-sm">
+                        Room {booking.room.roomNumber} • {booking.room.roomType.name}
+                      </p>
+                      <p className="text-muted-foreground text-xs">
+                        Booking #{booking.bookingNumber}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => {
+                      setCheckoutBookingId(booking.id);
+                      setCheckoutBookingNumber(booking.bookingNumber);
+                    }}
+                    disabled={earlyCheckout.isPending}
+                  >
+                    {earlyCheckout.isPending && checkoutBookingId === booking.id ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <LogOut className="mr-2 h-4 w-4" />
+                        Check Out
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted-foreground py-8 text-center text-sm">
+              No checkouts scheduled for today
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Checkout Confirmation Dialog */}
+      <ConfirmDialog
+        open={!!checkoutBookingId}
+        onOpenChange={(open) => {
+          if (!open) setCheckoutBookingId(null);
+        }}
+        title="Confirm Checkout"
+        description={`Are you sure you want to check out the guest for booking ${checkoutBookingNumber}? The room will be marked for cleaning.`}
+        confirmLabel="Check Out"
+        onConfirm={() => {
+          if (checkoutBookingId) {
+            earlyCheckout.mutate({ id: checkoutBookingId });
+          }
+        }}
+        loading={earlyCheckout.isPending}
+      />
+
+      <Suspense
+        fallback={
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+        }
+      >
+        <LightboxWrapper
+          open={isQrLightboxOpen}
+          onClose={() => setIsQrLightboxOpen(false)}
+          index={0}
+          slides={[
+            {
+              src: '/assets/qr/qr-dollar.png',
+              alt: 'Payment QR code',
+              width: 800,
+              height: 800,
+            },
+          ]}
+        />
+      </Suspense>
     </div>
   );
 }

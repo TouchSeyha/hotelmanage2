@@ -40,7 +40,7 @@ export function Step3Payment() {
 
   const createBooking = api.booking.create.useMutation({
     onSuccess: (data) => {
-      router.push(`/book/confirmation?id=${data.id}`);
+      router.push(`/dashboard/book/confirmation?id=${data.id}`);
     },
   });
 

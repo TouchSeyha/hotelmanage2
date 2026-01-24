@@ -90,7 +90,7 @@ export default function ContactPage() {
 
   return (
     <div className="space-y-16">
-      <section className="border-base-200 from-primary/5 via-secondary/5 to-accent/5 relative overflow-hidden border-b bg-linear-to-br py-16">
+      <section className="border-base-200 from-primary/50 via-secondary/50 to-accent/50 relative overflow-hidden border-b bg-linear-to-br py-16">
         <div className="hero-orbit" />
         <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
           <div className="border-primary/30 bg-base-100/70 text-primary inline-flex items-center gap-2 rounded-full border px-4 py-1 text-xs tracking-[0.3em] uppercase">
@@ -107,7 +107,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
           <Card className="p-8">
             <h2 className="text-2xl font-semibold">Send us a note</h2>

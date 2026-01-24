@@ -9,7 +9,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
         <div className="container flex h-16 items-center">
           <Link href="/" className="flex items-center gap-2 font-bold">
             <Hotel className="h-6 w-6" />
-            <span>Hotel Name</span>
+            <span>LuxeStay</span>
           </Link>
         </div>
       </header>
@@ -20,7 +20,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Simple Footer */}
       <footer className="border-t py-4">
         <div className="text-muted-foreground container text-center text-sm">
-          &copy; {new Date().getFullYear()} Hotel Name. All rights reserved.
+          &copy; {new Date().getFullYear()} LuxeStay. All rights reserved.
         </div>
       </footer>
     </div>

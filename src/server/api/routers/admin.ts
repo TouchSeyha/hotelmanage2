@@ -233,14 +233,25 @@ export const adminRouter = createTRPCRouter({
         orderBy: { checkInDate: 'asc' },
       }),
 
-      // Today's expected check-outs
+      // Today's check-outs (scheduled and early check-outs)
       ctx.db.booking.findMany({
         where: {
-          checkOutDate: {
-            gte: startOfToday,
-            lte: endOfToday,
-          },
-          status: 'checked_in',
+          OR: [
+            {
+              checkOutDate: {
+                gte: startOfToday,
+                lte: endOfToday,
+              },
+              status: 'checked_in',
+            },
+            {
+              checkedOutAt: {
+                gte: startOfToday,
+                lte: endOfToday,
+              },
+              status: 'checked_out',
+            },
+          ],
         },
         include: {
           user: {
