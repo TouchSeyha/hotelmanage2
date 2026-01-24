@@ -8,6 +8,7 @@ import {
   roomFiltersSchema,
   checkAvailabilitySchema,
   bulkCreateRoomsSchema,
+  updateRoomStatusSchema,
 } from '~/lib/schemas';
 
 export const roomRouter = createTRPCRouter({
@@ -247,6 +248,35 @@ export const roomRouter = createTRPCRouter({
     return ctx.db.room.update({
       where: { id },
       data,
+      include: {
+        roomType: true,
+      },
+    });
+  }),
+
+  /**
+   * Update room status (admin only)
+   * Quick action to change room status (e.g., cleaning -> available)
+   */
+  updateStatus: adminProcedure.input(updateRoomStatusSchema).mutation(async ({ ctx, input }) => {
+    const { id, status } = input;
+
+    // Check if room exists
+    const room = await ctx.db.room.findUnique({
+      where: { id },
+    });
+
+    if (!room) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Room not found',
+      });
+    }
+
+    // Update room status
+    return ctx.db.room.update({
+      where: { id },
+      data: { status },
       include: {
         roomType: true,
       },

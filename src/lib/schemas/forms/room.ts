@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Room status enum for forms
-export const roomStatusSchema = z.enum(['available', 'occupied', 'maintenance', 'out_of_service']);
+export const roomStatusSchema = z.enum(['available', 'occupied', 'cleaning', 'maintenance', 'out_of_service']);
 
 // Form schema for room create/edit
 export const roomFormSchema = z.object({

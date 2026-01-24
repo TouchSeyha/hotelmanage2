@@ -31,12 +31,14 @@ export {
   roomFiltersSchema,
   checkAvailabilitySchema,
   bulkCreateRoomsSchema,
+  updateRoomStatusSchema,
   type RoomStatus,
   type CreateRoomInput,
   type UpdateRoomInput,
   type RoomFiltersInput,
   type CheckAvailabilityInput,
   type BulkCreateRoomsInput,
+  type UpdateRoomStatusInput,
 } from './room';
 
 // Booking schemas

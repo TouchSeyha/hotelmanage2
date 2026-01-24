@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, MoreHorizontal, Pencil, Trash2, Loader2 } from 'lucide-react';
+import { Plus, MoreHorizontal, Pencil, Trash2, Loader2, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -108,6 +108,16 @@ export default function RoomsPage() {
     },
   });
 
+  const updateRoomStatus = api.room.updateStatus.useMutation({
+    onSuccess: () => {
+      toast.success('Room status updated to available');
+      void refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const handleEdit = (room: NonNullable<typeof rooms>[0]) => {
     setEditingRoom(room.id);
     form.reset({
@@ -189,7 +199,7 @@ export default function RoomsPage() {
                     <TableCell>
                       <StatusBadge
                         status={
-                          room.status as 'available' | 'occupied' | 'maintenance' | 'out_of_service'
+                          room.status as 'available' | 'occupied' | 'cleaning' | 'maintenance' | 'out_of_service'
                         }
                         type="room"
                       />
@@ -204,6 +214,16 @@ export default function RoomsPage() {
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
                           <DropdownMenuSeparator />
+                          {(room.status === 'cleaning' || room.status === 'maintenance') && (
+                            <DropdownMenuItem
+                              onClick={() =>
+                                updateRoomStatus.mutate({ id: room.id, status: 'available' })
+                              }
+                            >
+                              <CheckCircle className="mr-2 h-4 w-4" />
+                              Mark as Available
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem onClick={() => handleEdit(room)}>
                             <Pencil className="mr-2 h-4 w-4" />
                             Edit
@@ -315,6 +335,7 @@ export default function RoomsPage() {
                       <SelectContent>
                         <SelectItem value="available">Available</SelectItem>
                         <SelectItem value="occupied">Occupied</SelectItem>
+                        <SelectItem value="cleaning">Cleaning</SelectItem>
                         <SelectItem value="maintenance">Maintenance</SelectItem>
                         <SelectItem value="out_of_service">Out of Service</SelectItem>
                       </SelectContent>

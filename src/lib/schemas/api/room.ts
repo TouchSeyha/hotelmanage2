@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { dateRangeSchema } from '../common';
 
 // Room status enum matching Prisma
-export const roomStatusSchema = z.enum(['available', 'occupied', 'maintenance', 'out_of_service']);
+export const roomStatusSchema = z.enum(['available', 'occupied', 'cleaning', 'maintenance', 'out_of_service']);
 
 export type RoomStatus = z.infer<typeof roomStatusSchema>;
 
@@ -52,3 +52,11 @@ export const bulkCreateRoomsSchema = z.object({
 });
 
 export type BulkCreateRoomsInput = z.infer<typeof bulkCreateRoomsSchema>;
+
+// Update room status schema
+export const updateRoomStatusSchema = z.object({
+  id: z.string().cuid(),
+  status: roomStatusSchema,
+});
+
+export type UpdateRoomStatusInput = z.infer<typeof updateRoomStatusSchema>;
