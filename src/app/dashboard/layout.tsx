@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { Hotel, Home, User, LogOut, Settings } from 'lucide-react';
+import { Hotel, User, LogOut, Settings } from 'lucide-react';
 
 import { auth, signOut } from '~/server/auth';
 import { Button } from '~/components/ui/button';
@@ -13,12 +13,7 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
-
-const navItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: Home },
-  { href: '/dashboard/bookings', label: 'My Bookings', icon: User },
-  { href: '/dashboard/profile', label: 'Profile', icon: User },
-];
+import { DashboardNav } from '~/components/layout/dashboardNav';
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
@@ -37,18 +32,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <Hotel className="h-6 w-6" />
               <span>LuxeStay</span>
             </Link>
-            <nav className="hidden md:flex md:gap-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm font-medium transition-colors"
-                >
-                  <item.icon className="h-4 w-4" />
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+            <DashboardNav />
           </div>
 
           <DropdownMenu>

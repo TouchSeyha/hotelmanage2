@@ -14,6 +14,7 @@ import { EmptyState } from '~/components/shared/emptyState';
 import { BookingCardSkeleton } from '~/components/shared/loadingSkeleton';
 import { Breadcrumb } from '~/components/shared/breadcrumb';
 import { StatusBadge } from '~/components/shared/statusBadge';
+import { WriteReviewButton } from '~/components/reviews/writeReviewButton';
 import type { BookingStatus, PaymentStatus } from '~/lib/schemas';
 
 export default function BookingsPage() {
@@ -33,12 +34,21 @@ export default function BookingsPage() {
   const bookings = data?.bookings ?? [];
   const now = new Date();
 
+  // Bookings that are truly upcoming (not yet checked in/out/completed)
   const upcomingBookings = bookings.filter(
-    (b) => new Date(b.checkInDate) >= now && b.status !== 'cancelled' && b.status !== 'completed'
+    (b) =>
+      new Date(b.checkInDate) >= now &&
+      !['cancelled', 'completed', 'checked_out'].includes(b.status)
   );
+
+  // Past bookings: completed, checked_out, or checkout date has passed
   const pastBookings = bookings.filter(
-    (b) => b.status === 'completed' || (new Date(b.checkOutDate) < now && b.status !== 'cancelled')
+    (b) =>
+      b.status === 'completed' ||
+      b.status === 'checked_out' ||
+      (new Date(b.checkOutDate) < now && b.status !== 'cancelled')
   );
+
   const cancelledBookings = bookings.filter((b) => b.status === 'cancelled');
 
   const getDisplayBookings = () => {
@@ -157,19 +167,29 @@ export default function BookingsPage() {
                     </div>
                   </div>
 
-                  {activeTab === 'upcoming' && booking.status !== 'checked_in' && (
-                    <div className="mt-4 flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="text-destructive"
-                        onClick={() => setCancelBookingId(booking.id)}
-                      >
-                        <XCircle className="mr-2 h-4 w-4" />
-                        Cancel Booking
-                      </Button>
-                    </div>
-                  )}
+                  <div className="mt-4 flex gap-2">
+                    {activeTab === 'past' &&
+                      (booking.status === 'completed' || booking.status === 'checked_out') && (
+                        <WriteReviewButton
+                          bookingId={booking.id}
+                          bookingNumber={booking.bookingNumber}
+                          roomName={booking.room.roomType.name}
+                          onReviewSubmitted={() => void refetch()}
+                        />
+                      )}
+                    {activeTab === 'upcoming' &&
+                      ['pending', 'confirmed'].includes(booking.status) && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-destructive"
+                          onClick={() => setCancelBookingId(booking.id)}
+                        >
+                          <XCircle className="mr-2 h-4 w-4" />
+                          Cancel Booking
+                        </Button>
+                      )}
+                  </div>
                 </CardContent>
               </Card>
             ))

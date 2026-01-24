@@ -10,17 +10,19 @@ import {
   CreditCard,
   ClipboardList,
   Sparkles,
+  Star,
 } from 'lucide-react';
 
 import { cn } from '~/lib/utils';
 
 const sidebarItems = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/admin/bookings', label: 'Bookings', icon: Calendar },
   { href: '/admin/frontdesk', label: 'Front Desk', icon: ClipboardList },
+  { href: '/admin/bookings', label: 'Bookings', icon: Calendar },
   { href: '/admin/pos', label: 'POS', icon: CreditCard },
   { href: '/admin/room-types', label: 'Room Types', icon: BedDouble },
   { href: '/admin/rooms', label: 'Rooms', icon: BedDouble },
+  { href: '/admin/reviews', label: 'Reviews', icon: Star },
   { href: '/admin/amenities', label: 'Amenities', icon: Sparkles },
   { href: '/admin/users', label: 'Users', icon: Users },
 ];

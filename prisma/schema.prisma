@@ -48,6 +48,12 @@ enum PaymentStatus {
     refunded
 }
 
+enum ReviewStatus {
+    pending
+    approved
+    rejected
+}
+
 // ============================================
 // HOTEL DOMAIN MODELS
 // ============================================
@@ -87,6 +93,7 @@ model RoomType {
     // Relations
     rooms     Room[]
     amenities Amenity[]
+    reviews   Review[]
 
     @@index([slug])
     @@index([isActive])
@@ -106,6 +113,7 @@ model Room {
     // Relations
     roomType RoomType  @relation(fields: [roomTypeId], references: [id], onDelete: Cascade)
     bookings Booking[]
+    reviews  Review[]
 
     @@index([roomNumber])
     @@index([roomTypeId])
@@ -137,9 +145,10 @@ model Booking {
     checkedOutAt       DateTime?
 
     // Relations
-    user User         @relation(fields: [userId], references: [id], onDelete: Cascade)
-    room Room         @relation(fields: [roomId], references: [id], onDelete: Restrict)
-    logs BookingLog[]
+    user   User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+    room   Room         @relation(fields: [roomId], references: [id], onDelete: Restrict)
+    logs   BookingLog[]
+    review Review?
 
     @@index([bookingNumber])
     @@index([userId])
@@ -167,6 +176,47 @@ model BookingLog {
     @@index([bookingId])
     @@index([createdAt])
     @@map("booking_logs")
+}
+
+model Review {
+    id        String       @id @default(cuid())
+    bookingId String       @unique
+    userId    String
+    roomId    String
+    roomTypeId String
+
+    // Review content
+    rating    Int
+    comment   String       @db.Text
+
+    // Moderation
+    status           ReviewStatus @default(pending)
+    approvedAt       DateTime?
+    approvedById     String?
+    rejectedAt       DateTime?
+    rejectedById     String?
+    rejectionReason  String?
+
+    // Timestamps
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    booking    Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+    user       User      @relation("ReviewAuthor", fields: [userId], references: [id], onDelete: Cascade)
+    room       Room      @relation(fields: [roomId], references: [id], onDelete: Restrict)
+    roomType   RoomType  @relation(fields: [roomTypeId], references: [id], onDelete: Restrict)
+    approvedBy User?     @relation("ReviewApprover", fields: [approvedById], references: [id], onDelete: SetNull)
+    rejectedBy User?     @relation("ReviewRejecter", fields: [rejectedById], references: [id], onDelete: SetNull)
+
+    @@index([bookingId])
+    @@index([userId])
+    @@index([roomId])
+    @@index([roomTypeId])
+    @@index([status])
+    @@index([rating])
+    @@index([createdAt])
+    @@map("reviews")
 }
 
 // ============================================
@@ -215,11 +265,14 @@ model User {
     updatedAt     DateTime  @updatedAt
 
     // Relations
-    accounts    Account[]
-    sessions    Session[]
-    posts       Post[]
-    bookings    Booking[]
-    bookingLogs BookingLog[] @relation("BookingLogPerformer")
+    accounts        Account[]
+    sessions        Session[]
+    posts           Post[]
+    bookings        Booking[]
+    bookingLogs     BookingLog[] @relation("BookingLogPerformer")
+    reviewsWritten  Review[]     @relation("ReviewAuthor")
+    reviewsApproved Review[]     @relation("ReviewApprover")
+    reviewsRejected Review[]     @relation("ReviewRejecter")
 
     @@index([email])
     @@index([role])
