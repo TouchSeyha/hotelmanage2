@@ -46,6 +46,7 @@ export {
   bookingStatusSchema,
   paymentMethodSchema,
   paymentStatusSchema,
+  INACTIVE_BOOKING_STATUSES,
   createBookingSchema,
   updateBookingSchema,
   cancelBookingSchema,

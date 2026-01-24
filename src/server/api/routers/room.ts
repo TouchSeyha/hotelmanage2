@@ -9,6 +9,7 @@ import {
   checkAvailabilitySchema,
   bulkCreateRoomsSchema,
   updateRoomStatusSchema,
+  INACTIVE_BOOKING_STATUSES,
 } from '~/lib/schemas';
 
 export const roomRouter = createTRPCRouter({
@@ -65,7 +66,7 @@ export const roomRouter = createTRPCRouter({
               AND: [
                 { checkInDate: { lt: checkOut } },
                 { checkOutDate: { gt: checkIn } },
-                { status: { notIn: ['cancelled', 'completed'] } },
+                { status: { notIn: INACTIVE_BOOKING_STATUSES } },
               ],
             },
           },
@@ -110,7 +111,7 @@ export const roomRouter = createTRPCRouter({
           roomType: true,
           bookings: {
             where: {
-              status: { notIn: ['cancelled', 'completed'] },
+              status: { notIn: INACTIVE_BOOKING_STATUSES },
             },
             orderBy: { checkInDate: 'asc' },
             take: 5,
@@ -296,7 +297,7 @@ export const roomRouter = createTRPCRouter({
         include: {
           bookings: {
             where: {
-              status: { notIn: ['cancelled', 'completed'] },
+              status: { notIn: INACTIVE_BOOKING_STATUSES },
             },
           },
         },
