@@ -13,7 +13,7 @@ import {
   checkOutSchema,
   earlyCheckOutSchema,
   posBookingSchema,
-  INACTIVE_BOOKING_STATUSES,
+  inactiveBookingStatuses,
 } from '~/lib/schemas';
 import { resend } from '~/server/resend';
 import { env } from '~/env';
@@ -212,7 +212,7 @@ export const bookingRouter = createTRPCRouter({
               AND: [
                 { checkInDate: { lt: checkOutDate } },
                 { checkOutDate: { gt: checkInDate } },
-                { status: { notIn: INACTIVE_BOOKING_STATUSES } },
+                { status: { notIn: inactiveBookingStatuses } },
               ],
             },
           },
@@ -248,7 +248,7 @@ export const bookingRouter = createTRPCRouter({
     const conflictingBooking = await ctx.db.booking.findFirst({
       where: {
         roomId: targetRoom.id,
-        status: { notIn: INACTIVE_BOOKING_STATUSES },
+        status: { notIn: inactiveBookingStatuses },
         AND: [{ checkInDate: { lt: checkOutDate } }, { checkOutDate: { gt: checkInDate } }],
       },
     });
@@ -736,7 +736,7 @@ export const bookingRouter = createTRPCRouter({
     const conflictingBooking = await ctx.db.booking.findFirst({
       where: {
         roomId,
-        status: { notIn: INACTIVE_BOOKING_STATUSES },
+        status: { notIn: inactiveBookingStatuses },
         AND: [{ checkInDate: { lt: checkOutDate } }, { checkOutDate: { gt: checkInDate } }],
       },
     });

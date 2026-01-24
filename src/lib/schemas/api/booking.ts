@@ -18,7 +18,7 @@ export type BookingStatus = z.infer<typeof bookingStatusSchema>;
  * Used in availability checks, conflict detection, and deletion guards.
  * Includes: cancelled, completed, checked_out (early checkout)
  */
-export const INACTIVE_BOOKING_STATUSES: BookingStatus[] = ['cancelled', 'completed', 'checked_out'];
+export const inactiveBookingStatuses: BookingStatus[] = ['cancelled', 'completed', 'checked_out'];
 
 // Payment method enum matching Prisma
 export const paymentMethodSchema = z.enum(['online', 'counter']);

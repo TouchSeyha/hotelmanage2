@@ -8,7 +8,7 @@ import {
   userFiltersSchema,
   getUserByIdSchema,
   deleteUserSchema,
-  INACTIVE_BOOKING_STATUSES,
+  inactiveBookingStatuses,
 } from '~/lib/schemas';
 
 export const userRouter = createTRPCRouter({
@@ -294,7 +294,7 @@ export const userRouter = createTRPCRouter({
       include: {
         bookings: {
           where: {
-            status: { notIn: INACTIVE_BOOKING_STATUSES },
+            status: { notIn: inactiveBookingStatuses },
           },
         },
       },

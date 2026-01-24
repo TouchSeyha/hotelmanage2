@@ -9,7 +9,9 @@ import {
   checkAvailabilitySchema,
   bulkCreateRoomsSchema,
   updateRoomStatusSchema,
-  INACTIVE_BOOKING_STATUSES,
+  inactiveBookingStatuses,
+  validRoomStatusTransitions,
+  type RoomStatus,
 } from '~/lib/schemas';
 
 export const roomRouter = createTRPCRouter({
@@ -66,7 +68,7 @@ export const roomRouter = createTRPCRouter({
               AND: [
                 { checkInDate: { lt: checkOut } },
                 { checkOutDate: { gt: checkIn } },
-                { status: { notIn: INACTIVE_BOOKING_STATUSES } },
+                { status: { notIn: inactiveBookingStatuses } },
               ],
             },
           },
@@ -111,7 +113,7 @@ export const roomRouter = createTRPCRouter({
           roomType: true,
           bookings: {
             where: {
-              status: { notIn: INACTIVE_BOOKING_STATUSES },
+              status: { notIn: inactiveBookingStatuses },
             },
             orderBy: { checkInDate: 'asc' },
             take: 5,
@@ -258,19 +260,55 @@ export const roomRouter = createTRPCRouter({
   /**
    * Update room status (admin only)
    * Quick action to change room status (e.g., cleaning -> available)
+   * Validates status transitions and checks for active bookings
    */
   updateStatus: adminProcedure.input(updateRoomStatusSchema).mutation(async ({ ctx, input }) => {
     const { id, status } = input;
 
-    // Check if room exists
+    // Check if room exists and get current status + active bookings
     const room = await ctx.db.room.findUnique({
       where: { id },
+      include: {
+        bookings: {
+          where: {
+            status: { notIn: inactiveBookingStatuses },
+          },
+          take: 1,
+        },
+      },
     });
 
     if (!room) {
       throw new TRPCError({
         code: 'NOT_FOUND',
         message: 'Room not found',
+      });
+    }
+
+    // Skip validation if status is unchanged
+    if (room.status === status) {
+      return ctx.db.room.findUnique({
+        where: { id },
+        include: { roomType: true },
+      });
+    }
+
+    // Validate status transition
+    const currentStatus = room.status as RoomStatus;
+    const allowedTransitions = validRoomStatusTransitions[currentStatus];
+
+    if (!allowedTransitions.includes(status)) {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: `Cannot change room status from "${currentStatus}" to "${status}". Allowed transitions: ${allowedTransitions.join(', ') || 'none'}`,
+      });
+    }
+
+    // Block setting to 'available' if there's an active booking
+    if (status === 'available' && room.bookings.length > 0) {
+      throw new TRPCError({
+        code: 'PRECONDITION_FAILED',
+        message: 'Cannot set room to available while there is an active booking',
       });
     }
 
@@ -297,7 +335,7 @@ export const roomRouter = createTRPCRouter({
         include: {
           bookings: {
             where: {
-              status: { notIn: INACTIVE_BOOKING_STATUSES },
+              status: { notIn: inactiveBookingStatuses },
             },
           },
         },

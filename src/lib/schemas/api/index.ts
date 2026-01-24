@@ -26,6 +26,7 @@ export {
 // Room schemas
 export {
   roomStatusSchema,
+  validRoomStatusTransitions,
   createRoomSchema,
   updateRoomSchema,
   roomFiltersSchema,
@@ -46,7 +47,7 @@ export {
   bookingStatusSchema,
   paymentMethodSchema,
   paymentStatusSchema,
-  INACTIVE_BOOKING_STATUSES,
+  inactiveBookingStatuses,
   createBookingSchema,
   updateBookingSchema,
   cancelBookingSchema,

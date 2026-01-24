@@ -6,6 +6,23 @@ export const roomStatusSchema = z.enum(['available', 'occupied', 'cleaning', 'ma
 
 export type RoomStatus = z.infer<typeof roomStatusSchema>;
 
+/**
+ * Valid room status transitions.
+ * Key: current status, Value: array of allowed target statuses.
+ * - available → occupied (check-in), maintenance, out_of_service
+ * - occupied → cleaning (checkout), maintenance (emergency)
+ * - cleaning → available (ready), maintenance
+ * - maintenance → available, cleaning, out_of_service
+ * - out_of_service → maintenance, available
+ */
+export const validRoomStatusTransitions: Record<RoomStatus, RoomStatus[]> = {
+  available: ['occupied', 'maintenance', 'out_of_service'],
+  occupied: ['cleaning', 'maintenance'],
+  cleaning: ['available', 'maintenance'],
+  maintenance: ['available', 'cleaning', 'out_of_service'],
+  out_of_service: ['maintenance', 'available'],
+};
+
 // Room create schema
 export const createRoomSchema = z.object({
   roomNumber: z.string().min(1, 'Room number is required').max(20),
