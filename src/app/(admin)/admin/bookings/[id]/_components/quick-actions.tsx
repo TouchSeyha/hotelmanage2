@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -26,6 +27,7 @@ export function QuickActions({
   paymentStatus,
   userId,
 }: QuickActionsProps) {
+  const router = useRouter();
   const utils = api.useUtils();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showConfirmPaymentDialog, setShowConfirmPaymentDialog] = useState(false);
@@ -39,6 +41,7 @@ export function QuickActions({
     onSuccess: async () => {
       toast.success('Payment confirmed successfully');
       await utils.booking.getById.invalidate({ id: bookingId });
+      router.refresh();
       setShowConfirmPaymentDialog(false);
     },
     onError: (error) => {
@@ -50,6 +53,7 @@ export function QuickActions({
     onSuccess: async () => {
       toast.success('Guest checked in successfully');
       await utils.booking.getById.invalidate({ id: bookingId });
+      router.refresh();
       setShowCheckInDialog(false);
     },
     onError: (error) => {
@@ -61,6 +65,7 @@ export function QuickActions({
     onSuccess: async () => {
       toast.success('Guest checked out successfully');
       await utils.booking.getById.invalidate({ id: bookingId });
+      router.refresh();
       setShowCheckOutDialog(false);
     },
     onError: (error) => {
@@ -72,6 +77,7 @@ export function QuickActions({
     onSuccess: async () => {
       toast.success('Guest checked out early - Room marked for cleaning');
       await utils.booking.getById.invalidate({ id: bookingId });
+      router.refresh();
       setShowEarlyCheckOutDialog(false);
     },
     onError: (error) => {
@@ -83,6 +89,7 @@ export function QuickActions({
     onSuccess: async () => {
       toast.success('Booking cancelled successfully');
       await utils.booking.getById.invalidate({ id: bookingId });
+      router.refresh();
       setShowCancelDialog(false);
       setCancellationReason('');
     },
@@ -171,7 +178,7 @@ export function QuickActions({
                 className="w-full"
                 variant="default"
                 onClick={() => setShowEarlyCheckOutDialog(true)}
-                disabled={earlyCheckout.isPending}
+                disabled={earlyCheckout.isPending || paymentStatus !== 'paid'}
               >
                 {earlyCheckout.isPending ? (
                   <>
@@ -189,7 +196,7 @@ export function QuickActions({
                 className="w-full"
                 variant="outline"
                 onClick={() => setShowCheckOutDialog(true)}
-                disabled={checkOut.isPending}
+                disabled={checkOut.isPending || paymentStatus !== 'paid'}
               >
                 {checkOut.isPending ? (
                   <>

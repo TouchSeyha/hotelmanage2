@@ -269,6 +269,7 @@ export const roomRouter = createTRPCRouter({
     const room = await ctx.db.room.findUnique({
       where: { id },
       include: {
+        roomType: true,
         bookings: {
           where: {
             status: { notIn: inactiveBookingStatuses },
@@ -287,10 +288,7 @@ export const roomRouter = createTRPCRouter({
 
     // Skip validation if status is unchanged
     if (room.status === status) {
-      return ctx.db.room.findUnique({
-        where: { id },
-        include: { roomType: true },
-      });
+      return room;
     }
 
     // Validate status transition
