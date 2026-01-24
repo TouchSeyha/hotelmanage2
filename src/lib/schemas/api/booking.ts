@@ -6,11 +6,19 @@ export const bookingStatusSchema = z.enum([
   'pending',
   'confirmed',
   'checked_in',
+  'checked_out',
   'completed',
   'cancelled',
 ]);
 
 export type BookingStatus = z.infer<typeof bookingStatusSchema>;
+
+/**
+ * Statuses that indicate a booking is no longer active.
+ * Used in availability checks, conflict detection, and deletion guards.
+ * Includes: cancelled, completed, checked_out (early checkout)
+ */
+export const inactiveBookingStatuses: BookingStatus[] = ['cancelled', 'completed', 'checked_out'];
 
 // Payment method enum matching Prisma
 export const paymentMethodSchema = z.enum(['online', 'counter']);
@@ -101,6 +109,11 @@ export const checkOutSchema = z.object({
 
 export type CheckOutInput = z.infer<typeof checkOutSchema>;
 
+// Early check-out schema
+export const earlyCheckOutSchema = z.object({
+  id: z.string().cuid(),
+});
+
 // POS booking schema (admin walk-in)
 export const posBookingSchema = z
   .object({
@@ -119,3 +132,5 @@ export const posBookingSchema = z
   });
 
 export type PosBookingInput = z.infer<typeof posBookingSchema>;
+
+export type EarlyCheckOutInput = z.infer<typeof earlyCheckOutSchema>;

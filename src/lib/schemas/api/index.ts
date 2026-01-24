@@ -26,17 +26,20 @@ export {
 // Room schemas
 export {
   roomStatusSchema,
+  validRoomStatusTransitions,
   createRoomSchema,
   updateRoomSchema,
   roomFiltersSchema,
   checkAvailabilitySchema,
   bulkCreateRoomsSchema,
+  updateRoomStatusSchema,
   type RoomStatus,
   type CreateRoomInput,
   type UpdateRoomInput,
   type RoomFiltersInput,
   type CheckAvailabilityInput,
   type BulkCreateRoomsInput,
+  type UpdateRoomStatusInput,
 } from './room';
 
 // Booking schemas
@@ -44,6 +47,7 @@ export {
   bookingStatusSchema,
   paymentMethodSchema,
   paymentStatusSchema,
+  inactiveBookingStatuses,
   createBookingSchema,
   updateBookingSchema,
   cancelBookingSchema,
@@ -51,6 +55,7 @@ export {
   getBookingByIdSchema,
   checkInSchema,
   checkOutSchema,
+  earlyCheckOutSchema,
   posBookingSchema,
   type BookingStatus,
   type PaymentMethod,
@@ -62,6 +67,7 @@ export {
   type GetBookingByIdInput,
   type CheckInInput,
   type CheckOutInput,
+  type EarlyCheckOutInput,
   type PosBookingInput,
 } from './booking';
 

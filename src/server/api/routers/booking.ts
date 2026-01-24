@@ -11,7 +11,9 @@ import {
   getBookingByIdSchema,
   checkInSchema,
   checkOutSchema,
+  earlyCheckOutSchema,
   posBookingSchema,
+  inactiveBookingStatuses,
 } from '~/lib/schemas';
 import { resend } from '~/server/resend';
 import { env } from '~/env';
@@ -210,7 +212,7 @@ export const bookingRouter = createTRPCRouter({
               AND: [
                 { checkInDate: { lt: checkOutDate } },
                 { checkOutDate: { gt: checkInDate } },
-                { status: { notIn: ['cancelled', 'completed'] } },
+                { status: { notIn: inactiveBookingStatuses } },
               ],
             },
           },
@@ -246,7 +248,7 @@ export const bookingRouter = createTRPCRouter({
     const conflictingBooking = await ctx.db.booking.findFirst({
       where: {
         roomId: targetRoom.id,
-        status: { notIn: ['cancelled', 'completed'] },
+        status: { notIn: inactiveBookingStatuses },
         AND: [{ checkInDate: { lt: checkOutDate } }, { checkOutDate: { gt: checkInDate } }],
       },
     });
@@ -640,6 +642,59 @@ export const bookingRouter = createTRPCRouter({
     }),
 
   /**
+   * Early checkout (admin only)
+   * Allows admin to checkout guests early and automatically set room status to cleaning
+   */
+  earlyCheckout: adminProcedure.input(earlyCheckOutSchema).mutation(async ({ ctx, input }) => {
+    const booking = await ctx.db.booking.findUnique({
+      where: { id: input.id },
+      include: { room: true },
+    });
+
+    if (!booking) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Booking not found',
+      });
+    }
+
+    // Validate booking can be checked out early
+    if (booking.status !== 'checked_in') {
+      throw new TRPCError({
+        code: 'PRECONDITION_FAILED',
+        message: 'Only checked-in bookings can be checked out',
+      });
+    }
+
+    // Update booking and room status in a transaction
+    const [updatedBooking] = await ctx.db.$transaction([
+      ctx.db.booking.update({
+        where: { id: input.id },
+        data: {
+          status: 'checked_out',
+          checkedOutAt: new Date(),
+        },
+      }),
+      ctx.db.room.update({
+        where: { id: booking.roomId },
+        data: { status: 'cleaning' },
+      }),
+      ctx.db.bookingLog.create({
+        data: {
+          bookingId: input.id,
+          action: 'EARLY_CHECKOUT',
+          performedById: ctx.session.user.id,
+          previousStatus: booking.status,
+          newStatus: 'checked_out',
+          notes: 'Guest checked out early by admin',
+        },
+      }),
+    ]);
+
+    return updatedBooking;
+  }),
+
+  /**
    * POS Booking - Walk-in booking by admin
    */
   createPosBooking: adminProcedure.input(posBookingSchema).mutation(async ({ ctx, input }) => {
@@ -681,7 +736,7 @@ export const bookingRouter = createTRPCRouter({
     const conflictingBooking = await ctx.db.booking.findFirst({
       where: {
         roomId,
-        status: { notIn: ['cancelled', 'completed'] },
+        status: { notIn: inactiveBookingStatuses },
         AND: [{ checkInDate: { lt: checkOutDate } }, { checkOutDate: { gt: checkInDate } }],
       },
     });
