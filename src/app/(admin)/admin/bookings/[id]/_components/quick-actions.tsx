@@ -32,6 +32,7 @@ export function QuickActions({
   const [showConfirmPaymentDialog, setShowConfirmPaymentDialog] = useState(false);
   const [showCheckInDialog, setShowCheckInDialog] = useState(false);
   const [showCheckOutDialog, setShowCheckOutDialog] = useState(false);
+  const [showEarlyCheckOutDialog, setShowEarlyCheckOutDialog] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
 
   // Mutations
@@ -68,6 +69,17 @@ export function QuickActions({
     },
   });
 
+  const earlyCheckout = api.booking.earlyCheckout.useMutation({
+    onSuccess: async () => {
+      toast.success('Guest checked out early - Room marked for cleaning');
+      await utils.booking.getById.invalidate({ id: bookingId });
+      setShowEarlyCheckOutDialog(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const cancelBooking = api.booking.cancel.useMutation({
     onSuccess: async () => {
       toast.success('Booking cancelled successfully');
@@ -90,6 +102,10 @@ export function QuickActions({
 
   const handleCheckOut = () => {
     checkOut.mutate({ id: bookingId });
+  };
+
+  const handleEarlyCheckOut = () => {
+    earlyCheckout.mutate({ id: bookingId });
   };
 
   const handleCancelBooking = () => {
@@ -151,24 +167,44 @@ export function QuickActions({
             </Button>
           )}
           {status === 'checked_in' && (
-            <Button
-              className="w-full"
-              variant="default"
-              onClick={() => setShowCheckOutDialog(true)}
-              disabled={checkOut.isPending}
-            >
-              {checkOut.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Checking Out...
-                </>
-              ) : (
-                <>
-                  <CheckCircle className="mr-2 h-4 w-4" />
-                  Check Out
-                </>
-              )}
-            </Button>
+            <>
+              <Button
+                className="w-full"
+                variant="default"
+                onClick={() => setShowEarlyCheckOutDialog(true)}
+                disabled={earlyCheckout.isPending}
+              >
+                {earlyCheckout.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Checking Out...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Early Check Out
+                  </>
+                )}
+              </Button>
+              <Button
+                className="w-full"
+                variant="outline"
+                onClick={() => setShowCheckOutDialog(true)}
+                disabled={checkOut.isPending}
+              >
+                {checkOut.isPending ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Checking Out...
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle className="mr-2 h-4 w-4" />
+                    Normal Check Out
+                  </>
+                )}
+              </Button>
+            </>
           )}
           {['pending', 'confirmed'].includes(status) && (
             <Button
@@ -227,6 +263,17 @@ export function QuickActions({
         confirmLabel="Check Out"
         onConfirm={handleCheckOut}
         loading={checkOut.isPending}
+      />
+
+      {/* Early Check Out Dialog */}
+      <ConfirmDialog
+        open={showEarlyCheckOutDialog}
+        onOpenChange={setShowEarlyCheckOutDialog}
+        title="Early Check Out Guest"
+        description={`Are you sure you want to check out the guest early for booking ${bookingNumber}? The room will be marked for cleaning.`}
+        confirmLabel="Early Check Out"
+        onConfirm={handleEarlyCheckOut}
+        loading={earlyCheckout.isPending}
       />
 
       {/* Cancel Booking Dialog - Custom Implementation */}

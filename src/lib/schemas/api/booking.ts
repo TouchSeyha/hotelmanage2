@@ -6,6 +6,7 @@ export const bookingStatusSchema = z.enum([
   'pending',
   'confirmed',
   'checked_in',
+  'checked_out',
   'completed',
   'cancelled',
 ]);

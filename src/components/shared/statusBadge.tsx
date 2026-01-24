@@ -1,9 +1,9 @@
 import { Badge } from '~/components/ui/badge';
 import { cn } from '~/lib/utils';
 
-type BookingStatus = 'pending' | 'confirmed' | 'checked_in' | 'completed' | 'cancelled';
+type BookingStatus = 'pending' | 'confirmed' | 'checked_in' | 'checked_out' | 'completed' | 'cancelled';
 type PaymentStatus = 'pending' | 'paid' | 'refunded';
-type RoomStatus = 'available' | 'occupied' | 'maintenance' | 'out_of_service';
+type RoomStatus = 'available' | 'occupied' | 'cleaning' | 'maintenance' | 'out_of_service';
 
 interface StatusBadgeProps {
   status: BookingStatus | PaymentStatus | RoomStatus;
@@ -15,6 +15,7 @@ const bookingStatusConfig: Record<BookingStatus, { label: string; variant: strin
   pending: { label: 'Pending', variant: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100' },
   confirmed: { label: 'Confirmed', variant: 'bg-blue-100 text-blue-800 hover:bg-blue-100' },
   checked_in: { label: 'Checked In', variant: 'bg-green-100 text-green-800 hover:bg-green-100' },
+  checked_out: { label: 'Checked Out', variant: 'bg-purple-100 text-purple-800 hover:bg-purple-100' },
   completed: { label: 'Completed', variant: 'bg-gray-100 text-gray-800 hover:bg-gray-100' },
   cancelled: { label: 'Cancelled', variant: 'bg-red-100 text-red-800 hover:bg-red-100' },
 };
@@ -28,6 +29,7 @@ const paymentStatusConfig: Record<PaymentStatus, { label: string; variant: strin
 const roomStatusConfig: Record<RoomStatus, { label: string; variant: string }> = {
   available: { label: 'Available', variant: 'bg-green-100 text-green-800 hover:bg-green-100' },
   occupied: { label: 'Occupied', variant: 'bg-blue-100 text-blue-800 hover:bg-blue-100' },
+  cleaning: { label: 'Cleaning', variant: 'bg-orange-100 text-orange-800 hover:bg-orange-100' },
   maintenance: {
     label: 'Maintenance',
     variant: 'bg-yellow-100 text-yellow-800 hover:bg-yellow-100',
