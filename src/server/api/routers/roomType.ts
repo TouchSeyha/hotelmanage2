@@ -10,10 +10,6 @@ import {
 } from '~/lib/schemas';
 
 export const roomTypeRouter = createTRPCRouter({
-  /**
-   * Get all room types (public)
-   * Optionally filter by isActive and sort
-   */
   getAll: publicProcedure.input(roomTypeFiltersSchema.optional()).query(async ({ ctx, input }) => {
     const { isActive, sortBy = 'basePrice', order = 'asc' } = input ?? {};
 
@@ -21,6 +17,7 @@ export const roomTypeRouter = createTRPCRouter({
       where: isActive !== undefined ? { isActive } : undefined,
       orderBy: { [sortBy]: order },
       include: {
+        amenities: true,
         _count: {
           select: { rooms: true },
         },
@@ -28,14 +25,14 @@ export const roomTypeRouter = createTRPCRouter({
     });
   }),
 
-  /**
-   * Get a single room type by ID (admin)
-   */
   getById: adminProcedure
     .input(z.object({ id: z.string().cuid() }))
     .query(async ({ ctx, input }) => {
       const roomType = await ctx.db.roomType.findUnique({
         where: { id: input.id },
+        include: {
+          amenities: true,
+        },
       });
 
       if (!roomType) {
@@ -48,14 +45,11 @@ export const roomTypeRouter = createTRPCRouter({
       return roomType;
     }),
 
-  /**
-   * Get a single room type by slug (public)
-   * Includes available rooms
-   */
   getBySlug: publicProcedure.input(getRoomTypeBySlugSchema).query(async ({ ctx, input }) => {
     const roomType = await ctx.db.roomType.findUnique({
       where: { slug: input.slug },
       include: {
+        amenities: true,
         rooms: {
           where: { status: 'available' },
           select: {
@@ -78,11 +72,7 @@ export const roomTypeRouter = createTRPCRouter({
     return roomType;
   }),
 
-  /**
-   * Create a new room type (admin only)
-   */
   create: adminProcedure.input(createRoomTypeSchema).mutation(async ({ ctx, input }) => {
-    // Check if slug already exists
     const existing = await ctx.db.roomType.findUnique({
       where: { slug: input.slug },
     });
@@ -94,18 +84,22 @@ export const roomTypeRouter = createTRPCRouter({
       });
     }
 
+    const { amenityIds, ...data } = input;
+
     return ctx.db.roomType.create({
-      data: input,
+      data: {
+        ...data,
+        amenities: amenityIds?.length ? { connect: amenityIds.map((id) => ({ id })) } : undefined,
+      },
+      include: {
+        amenities: true,
+      },
     });
   }),
 
-  /**
-   * Update a room type (admin only)
-   */
   update: adminProcedure.input(updateRoomTypeSchema).mutation(async ({ ctx, input }) => {
     const { id, data } = input;
 
-    // Check if room type exists
     const existing = await ctx.db.roomType.findUnique({
       where: { id },
     });
@@ -117,7 +111,6 @@ export const roomTypeRouter = createTRPCRouter({
       });
     }
 
-    // If slug is being updated, check for conflicts
     if (data.slug && data.slug !== existing.slug) {
       const slugExists = await ctx.db.roomType.findUnique({
         where: { slug: data.slug },
@@ -131,20 +124,23 @@ export const roomTypeRouter = createTRPCRouter({
       }
     }
 
+    const { amenityIds, ...updateData } = data;
+
     return ctx.db.roomType.update({
       where: { id },
-      data,
+      data: {
+        ...updateData,
+        amenities: amenityIds !== undefined ? { set: amenityIds.map((id) => ({ id })) } : undefined,
+      },
+      include: {
+        amenities: true,
+      },
     });
   }),
 
-  /**
-   * Delete a room type (admin only)
-   * Only allowed if no rooms exist for this type
-   */
   delete: adminProcedure
     .input(z.object({ id: z.string().cuid() }))
     .mutation(async ({ ctx, input }) => {
-      // Check if room type has any rooms
       const roomType = await ctx.db.roomType.findUnique({
         where: { id: input.id },
         include: {

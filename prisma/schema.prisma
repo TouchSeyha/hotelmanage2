@@ -50,6 +50,24 @@ enum PaymentStatus {
 // HOTEL DOMAIN MODELS
 // ============================================
 
+model Amenity {
+    id        String   @id @default(cuid())
+    name      String   @unique
+    icon      String?
+    category  String?
+    isActive  Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    // Relations
+    roomTypes RoomType[]
+
+    @@index([name])
+    @@index([category])
+    @@index([isActive])
+    @@map("amenities")
+}
+
 model RoomType {
     id               String   @id @default(cuid())
     name             String   @unique
@@ -60,13 +78,13 @@ model RoomType {
     capacity         Int
     size             Int?
     images           Json     @db.JsonB @default("[]")
-    amenities        Json     @db.JsonB @default("[]")
     isActive         Boolean  @default(true)
     createdAt        DateTime @default(now())
     updatedAt        DateTime @updatedAt
 
     // Relations
-    rooms Room[]
+    rooms     Room[]
+    amenities Amenity[]
 
     @@index([slug])
     @@index([isActive])

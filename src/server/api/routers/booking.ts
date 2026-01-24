@@ -338,9 +338,9 @@ export const bookingRouter = createTRPCRouter({
           }),
         });
       }
-    } catch (emailError) {
-      // Log error but don't fail the booking
-      console.error('Failed to send booking confirmation email:', emailError);
+    } catch {
+      // Email failed but booking was successful
+      // In production, this should be logged to a monitoring service
     }
 
     return booking;
@@ -631,9 +631,9 @@ export const bookingRouter = createTRPCRouter({
             }),
           });
         }
-      } catch (emailError) {
-        // Log error but don't fail the payment confirmation
-        console.error('Failed to send payment confirmation email:', emailError);
+      } catch {
+        // Email failed but payment was confirmed
+        // In production, this should be logged to a monitoring service
       }
 
       return updatedBooking;

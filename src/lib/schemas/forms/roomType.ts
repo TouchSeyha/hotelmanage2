@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-// Form schema for room type create/edit (flat structure for UI)
 export const roomTypeFormSchema = z.object({
   name: z.string().min(1, 'Name is required').max(100),
   slug: z.string().min(1, 'Slug is required'),
@@ -10,12 +9,11 @@ export const roomTypeFormSchema = z.object({
   capacity: z.number().int().positive('Capacity must be at least 1'),
   size: z.number().int().positive().optional(),
   images: z.array(z.string().url()),
-  amenities: z.string().optional(),
+  amenityIds: z.array(z.string()).optional(),
 });
 
 export type RoomTypeFormData = z.infer<typeof roomTypeFormSchema>;
 
-// Default values for room type form
 export const defaultRoomTypeFormData: RoomTypeFormData = {
   name: '',
   slug: '',
@@ -25,24 +23,17 @@ export const defaultRoomTypeFormData: RoomTypeFormData = {
   capacity: 2,
   size: undefined,
   images: [],
-  amenities: '',
+  amenityIds: [],
 };
 
-// Transformer: Form → API
 export function transformRoomTypeFormToApi(formData: RoomTypeFormData) {
   return {
     ...formData,
     images: formData.images ?? [],
-    amenities: formData.amenities
-      ? formData.amenities
-          .split(',')
-          .map((a) => a.trim())
-          .filter(Boolean)
-      : [],
+    amenityIds: formData.amenityIds ?? [],
   };
 }
 
-// Transformer: API → Form (for edit forms)
 export function transformRoomTypeApiToForm(apiData: {
   name: string;
   slug: string;
@@ -52,7 +43,7 @@ export function transformRoomTypeApiToForm(apiData: {
   capacity: number;
   size?: number | null;
   images: unknown;
-  amenities: unknown;
+  amenities?: Array<{ id: string }>;
   isActive: boolean;
 }): RoomTypeFormData {
   return {
@@ -64,6 +55,6 @@ export function transformRoomTypeApiToForm(apiData: {
     capacity: apiData.capacity,
     size: apiData.size ?? undefined,
     images: Array.isArray(apiData.images) ? (apiData.images as string[]) : [],
-    amenities: Array.isArray(apiData.amenities) ? (apiData.amenities as string[]).join(', ') : '',
+    amenityIds: apiData.amenities?.map((a) => a.id) ?? [],
   };
 }

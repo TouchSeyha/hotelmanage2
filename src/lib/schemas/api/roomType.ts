@@ -11,7 +11,7 @@ export const createRoomTypeSchema = z.object({
   capacity: z.number().int().positive('Capacity must be at least 1'),
   size: z.number().int().positive().optional(),
   images: z.array(z.string().url()).default([]),
-  amenities: z.array(z.string()).default([]),
+  amenityIds: z.array(z.string()).default([]),
   isActive: z.boolean().default(true),
 });
 

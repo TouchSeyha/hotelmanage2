@@ -9,6 +9,7 @@ import {
   Users,
   CreditCard,
   ClipboardList,
+  Sparkles,
 } from 'lucide-react';
 
 import { cn } from '~/lib/utils';
@@ -20,6 +21,7 @@ const sidebarItems = [
   { href: '/admin/pos', label: 'POS', icon: CreditCard },
   { href: '/admin/room-types', label: 'Room Types', icon: BedDouble },
   { href: '/admin/rooms', label: 'Rooms', icon: BedDouble },
+  { href: '/admin/amenities', label: 'Amenities', icon: Sparkles },
   { href: '/admin/users', label: 'Users', icon: Users },
 ];
 

@@ -39,7 +39,7 @@ async function FeaturedRoomsSection() {
           capacity={room.capacity}
           size={room.size}
           images={room.images as string[]}
-          amenities={room.amenities as string[]}
+          amenities={room.amenities}
           availableRooms={room._count.rooms}
         />
       ))}
