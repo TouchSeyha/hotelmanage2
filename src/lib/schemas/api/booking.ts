@@ -102,6 +102,11 @@ export const checkOutSchema = z.object({
 
 export type CheckOutInput = z.infer<typeof checkOutSchema>;
 
+// Early check-out schema
+export const earlyCheckOutSchema = z.object({
+  id: z.string().cuid(),
+});
+
 // POS booking schema (admin walk-in)
 export const posBookingSchema = z
   .object({
@@ -120,3 +125,5 @@ export const posBookingSchema = z
   });
 
 export type PosBookingInput = z.infer<typeof posBookingSchema>;
+
+export type EarlyCheckOutInput = z.infer<typeof earlyCheckOutSchema>;

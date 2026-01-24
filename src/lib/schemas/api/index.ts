@@ -53,6 +53,7 @@ export {
   getBookingByIdSchema,
   checkInSchema,
   checkOutSchema,
+  earlyCheckOutSchema,
   posBookingSchema,
   type BookingStatus,
   type PaymentMethod,
@@ -64,6 +65,7 @@ export {
   type GetBookingByIdInput,
   type CheckInInput,
   type CheckOutInput,
+  type EarlyCheckOutInput,
   type PosBookingInput,
 } from './booking';
 

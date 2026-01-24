@@ -27,7 +27,6 @@ export function QuickActions({
   userId,
 }: QuickActionsProps) {
   const utils = api.useUtils();
-
   const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showConfirmPaymentDialog, setShowConfirmPaymentDialog] = useState(false);
   const [showCheckInDialog, setShowCheckInDialog] = useState(false);
