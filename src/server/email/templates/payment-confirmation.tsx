@@ -64,7 +64,7 @@ export function PaymentConfirmationEmail({
             justifyContent: 'center',
           }}
         >
-          <span style={{ color: '#ffffff', fontSize: '24px' }}>✓</span>
+          <span style={{ color: '#ffffff', fontSize: '24px', textAlign: 'center' }}>✓</span>
         </div>
         <h2
           style={{

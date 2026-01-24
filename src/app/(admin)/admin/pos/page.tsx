@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, lazy, Suspense } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -12,6 +13,7 @@ import {
   Mail,
   Phone,
   CreditCard,
+  Eye,
   LogOut,
   BedDouble,
 } from 'lucide-react';
@@ -49,6 +51,10 @@ import {
   transformPOSBookingFormToApi,
   type POSBookingFormData,
 } from '~/lib/schemas';
+import 'yet-another-react-lightbox/styles.css';
+import 'yet-another-react-lightbox/plugins/thumbnails.css';
+
+const LightboxWrapper = lazy(() => import('~/components/shared/lightboxWrapper'));
 
 export default function POSPage() {
   const router = useRouter();
@@ -56,10 +62,12 @@ export default function POSPage() {
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<string>('all');
   const [checkoutBookingId, setCheckoutBookingId] = useState<string | null>(null);
   const [checkoutBookingNumber, setCheckoutBookingNumber] = useState<string>('');
+  const [isQrLightboxOpen, setIsQrLightboxOpen] = useState(false);
 
   const { data: roomTypes } = api.roomType.getAll.useQuery();
   const { data: rooms } = api.room.getAll.useQuery();
-  const { data: todaySchedule, isLoading: isLoadingSchedule } = api.admin.getTodaySchedule.useQuery();
+  const { data: todaySchedule, isLoading: isLoadingSchedule } =
+    api.admin.getTodaySchedule.useQuery();
 
   const earlyCheckout = api.booking.earlyCheckout.useMutation({
     onSuccess: async () => {
@@ -474,6 +482,33 @@ export default function POSPage() {
                     Payment to be collected at counter
                   </p>
                 </div>
+                <div className="border-t pt-4">
+                  <p className="text-muted-foreground text-sm font-medium">Scan to pay</p>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    Ask the guest to scan the QR code to complete payment.
+                  </p>
+                  <div className="mt-3 flex items-center justify-center">
+                    <div className="bg-background rounded-md border p-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsQrLightboxOpen(true)}
+                        className="group focus:ring-ring relative rounded-md focus:ring-2 focus:ring-offset-2 focus:outline-none"
+                        aria-label="Open payment QR code"
+                      >
+                        <Image
+                          src="/assets/qr/qr-dollar.png"
+                          alt="Payment QR code"
+                          width={224}
+                          height={224}
+                          className="h-56 w-56 object-contain"
+                        />
+                        <span className="absolute inset-0 flex items-center justify-center rounded-md bg-black/50 text-white opacity-0 transition-opacity group-hover:opacity-100">
+                          <Eye className="h-6 w-6" />
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </>
             ) : (
               <p className="text-muted-foreground text-sm">Select a room to see pricing</p>
@@ -574,6 +609,28 @@ export default function POSPage() {
         }}
         loading={earlyCheckout.isPending}
       />
+
+      <Suspense
+        fallback={
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          </div>
+        }
+      >
+        <LightboxWrapper
+          open={isQrLightboxOpen}
+          onClose={() => setIsQrLightboxOpen(false)}
+          index={0}
+          slides={[
+            {
+              src: '/assets/qr/qr-dollar.png',
+              alt: 'Payment QR code',
+              width: 800,
+              height: 800,
+            },
+          ]}
+        />
+      </Suspense>
     </div>
   );
 }
