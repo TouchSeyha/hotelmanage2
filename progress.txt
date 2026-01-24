@@ -60,3 +60,46 @@
 - **Room status workflow**: Room goes from occupied -> cleaning (early checkout) or available (normal checkout)
 
 ---
+## 2026-01-24 - US-002
+- Implemented admin room status management functionality
+
+### What was implemented
+- Added 'cleaning' status to RoomStatus enum in API schemas (src/lib/schemas/api/room.ts)
+- Added 'cleaning' status to RoomStatus enum in form schemas (src/lib/schemas/forms/room.ts)
+- Created updateRoomStatusSchema in src/lib/schemas/api/room.ts for status-only updates
+- Exported updateRoomStatusSchema from src/lib/schemas/api/index.ts
+- Implemented roomRouter.updateStatus mutation in src/server/api/routers/room.ts
+  - Admin-only protected procedure
+  - Validates room exists
+  - Updates room status directly
+  - Returns updated room with roomType included
+- Updated admin rooms page (src/app/(admin)/admin/rooms/page.tsx)
+  - Added 'Cleaning' option to status dropdown in create/edit form
+  - Added updateRoomStatus mutation hook
+  - Added conditional "Mark as Available" quick action button in dropdown menu
+  - Shows for rooms with status='cleaning' or status='maintenance'
+  - Updates StatusBadge type assertion to include 'cleaning'
+- Verified booking flow already checks room.status='available':
+  - bookingRouter.create filters by status='available' when auto-assigning rooms
+  - roomRouter.checkAvailability filters by status='available'
+
+### Files changed
+1. src/lib/schemas/api/room.ts - Added cleaning status and updateRoomStatusSchema
+2. src/lib/schemas/api/index.ts - Exported updateRoomStatusSchema
+3. src/lib/schemas/forms/room.ts - Added cleaning status to form schema
+4. src/server/api/routers/room.ts - Added updateStatus mutation
+5. src/app/(admin)/admin/rooms/page.tsx - Added quick action button and cleaning status support
+
+### Learnings for future iterations
+- **Multi-location enum sync**: When adding enum values, must update BOTH API schemas (src/lib/schemas/api/) AND form schemas (src/lib/schemas/forms/)
+- **Quick action pattern in tables**: Conditional dropdown items based on entity state (e.g., show "Mark Available" only for cleaning/maintenance rooms)
+- **Mutation patterns**: Simple update mutations can be very focused - updateStatus only updates status field, not full entity
+- **Existing validation**: Always check if validation already exists before adding new checks - booking creation already validated room status
+- **StatusBadge updates**: When adding new status values, update:
+  1. Type union in statusBadge.tsx
+  2. Config object with label and color variant
+  3. Type assertions in component usage (e.g., line 192 in rooms page)
+- **Admin rooms page location**: /admin/rooms shows all rooms with CRUD operations
+- **Room status workflow verified**: occupied (check-in) -> cleaning (early checkout) -> available (admin marks ready)
+
+---
