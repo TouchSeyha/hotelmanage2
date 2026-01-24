@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { format } from 'date-fns';
 import {
   CheckCircle,
@@ -47,6 +47,7 @@ import { ConfirmDialog } from '~/components/shared/confirmDialog';
 import { TableSkeleton } from '~/components/shared/loadingSkeleton';
 import { StarRating } from '~/components/reviews/starRating';
 import { cn } from '~/lib/utils';
+import { useDebounce } from '~/lib/hooks/useDebounce';
 import type { ReviewStatus } from '~/lib/schemas';
 
 export default function AdminReviewsPage() {
@@ -57,63 +58,146 @@ export default function AdminReviewsPage() {
   const [rejectDialogOpen, setRejectDialogOpen] = useState(false);
   const [rejectionReason, setRejectionReason] = useState('');
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [viewDetailId, setViewDetailId] = useState<string | null>(null);
+
+  // Debounce search query to prevent excessive API calls
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
 
   const utils = api.useUtils();
 
-  const { data, isLoading, refetch } = api.review.getAll.useQuery({
-    status: statusFilter === 'all' ? undefined : statusFilter,
-    rating: ratingFilter === 'all' ? undefined : ratingFilter,
-    search: searchQuery || undefined,
-    sortBy: 'createdAt',
-    sortOrder: 'desc',
-  });
+  // Memoize query options for stable reference
+  const queryOptions = useMemo(
+    () => ({
+      status: statusFilter === 'all' ? undefined : statusFilter,
+      rating: ratingFilter === 'all' ? undefined : ratingFilter,
+      search: debouncedSearchQuery || undefined,
+      sortBy: 'createdAt' as const,
+      sortOrder: 'desc' as const,
+    }),
+    [statusFilter, ratingFilter, debouncedSearchQuery]
+  );
+
+  const { data, isLoading } = api.review.getAll.useQuery(queryOptions);
 
   const reviews = data?.reviews ?? [];
   const pendingCount = data?.pendingCount ?? 0;
 
-  // Approve mutation
+  // Approve mutation with optimistic updates
   const approveMutation = api.review.approve.useMutation({
-    onSuccess: () => {
-      toast.success('Review approved and published');
-      void refetch();
-      void utils.review.getAll.invalidate();
+    onMutate: async ({ id }) => {
+      // Cancel outgoing refetches to avoid overwriting optimistic update
+      await utils.review.getAll.cancel();
+
+      // Snapshot previous value for rollback
+      const previousData = utils.review.getAll.getData(queryOptions);
+
+      // Optimistically update the review status
+      utils.review.getAll.setData(queryOptions, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          reviews: old.reviews.map((r) =>
+            r.id === id ? { ...r, status: 'approved' as const } : r
+          ),
+          pendingCount: Math.max(0, old.pendingCount - 1),
+        };
+      });
+
+      return { previousData };
     },
-    onError: (error) => {
+    onError: (error, _vars, context) => {
+      // Rollback on error
+      if (context?.previousData) {
+        utils.review.getAll.setData(queryOptions, context.previousData);
+      }
       toast.error('Failed to approve review', {
         description: error.message,
       });
     },
+    onSuccess: () => {
+      toast.success('Review approved and published');
+    },
+    onSettled: () => {
+      // Sync with server after mutation settles
+      void utils.review.getAll.invalidate();
+    },
   });
 
-  // Reject mutation
+  // Reject mutation with optimistic updates
   const rejectMutation = api.review.reject.useMutation({
+    onMutate: async ({ id }) => {
+      await utils.review.getAll.cancel();
+      const previousData = utils.review.getAll.getData(queryOptions);
+
+      utils.review.getAll.setData(queryOptions, (old) => {
+        if (!old) return old;
+        return {
+          ...old,
+          reviews: old.reviews.map((r) =>
+            r.id === id ? { ...r, status: 'rejected' as const } : r
+          ),
+          pendingCount: Math.max(0, old.pendingCount - 1),
+        };
+      });
+
+      return { previousData };
+    },
+    onError: (error, _vars, context) => {
+      if (context?.previousData) {
+        utils.review.getAll.setData(queryOptions, context.previousData);
+      }
+      toast.error('Failed to reject review', {
+        description: error.message,
+      });
+    },
     onSuccess: () => {
       toast.success('Review rejected');
       setRejectDialogOpen(false);
       setSelectedReview(null);
       setRejectionReason('');
-      void refetch();
-      void utils.review.getAll.invalidate();
     },
-    onError: (error) => {
-      toast.error('Failed to reject review', {
-        description: error.message,
-      });
+    onSettled: () => {
+      void utils.review.getAll.invalidate();
     },
   });
 
-  // Delete mutation
+  // Delete mutation with optimistic updates
   const deleteMutation = api.review.delete.useMutation({
-    onSuccess: () => {
-      toast.success('Review deleted permanently');
-      setDeleteId(null);
-      void refetch();
-      void utils.review.getAll.invalidate();
+    onMutate: async ({ id }) => {
+      await utils.review.getAll.cancel();
+      const previousData = utils.review.getAll.getData(queryOptions);
+
+      utils.review.getAll.setData(queryOptions, (old) => {
+        if (!old) return old;
+        const deletedReview = old.reviews.find((r) => r.id === id);
+        const wasPending = deletedReview?.status === 'pending';
+        return {
+          ...old,
+          reviews: old.reviews.filter((r) => r.id !== id),
+          pendingCount: wasPending ? Math.max(0, old.pendingCount - 1) : old.pendingCount,
+          pagination: {
+            ...old.pagination,
+            total: old.pagination.total - 1,
+          },
+        };
+      });
+
+      return { previousData };
     },
-    onError: (error) => {
+    onError: (error, _vars, context) => {
+      if (context?.previousData) {
+        utils.review.getAll.setData(queryOptions, context.previousData);
+      }
       toast.error('Failed to delete review', {
         description: error.message,
       });
+    },
+    onSuccess: () => {
+      toast.success('Review deleted permanently');
+      setDeleteId(null);
+    },
+    onSettled: () => {
+      void utils.review.getAll.invalidate();
     },
   });
 
@@ -166,7 +250,7 @@ export default function AdminReviewsPage() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">Reviews Management</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Reviews Management</h1>
             <p className="text-muted-foreground mt-2">Moderate and publish guest reviews</p>
           </div>
           {pendingCount > 0 && (
@@ -298,6 +382,15 @@ export default function AdminReviewsPage() {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center justify-end gap-1">
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setViewDetailId(review.id)}
+                          className="text-muted-foreground hover:text-foreground"
+                          title="View Details"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
                         {review.status === 'pending' && (
                           <>
                             <Button
@@ -331,8 +424,9 @@ export default function AdminReviewsPage() {
                             onClick={() => handleRejectClick(review.id)}
                             disabled={rejectMutation.isPending}
                             className="text-amber-600 hover:bg-amber-50 hover:text-amber-700"
+                            title="Unpublish"
                           >
-                            <Eye className="h-4 w-4" />
+                            <XCircle className="h-4 w-4" />
                           </Button>
                         )}
                         {review.status === 'rejected' && (
@@ -412,6 +506,129 @@ export default function AdminReviewsPage() {
               )}
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Review Detail Dialog */}
+      <Dialog open={!!viewDetailId} onOpenChange={() => setViewDetailId(null)}>
+        <DialogContent className="max-w-2xl">
+          {(() => {
+            const review = reviews.find((r) => r.id === viewDetailId);
+            if (!review) return null;
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-3">
+                    <span>Review Details</span>
+                    {getStatusBadge(review.status)}
+                  </DialogTitle>
+                  <DialogDescription>
+                    Submitted on {format(new Date(review.createdAt), 'MMMM d, yyyy \"at\" h:mm a')}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-6 py-4">
+                  {/* Guest & Room Info */}
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs">Guest</Label>
+                      <p className="font-medium">{review.user.name}</p>
+                      <p className="text-muted-foreground text-sm">{review.user.email}</p>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-muted-foreground text-xs">Room</Label>
+                      <p className="font-medium">{review.roomType.name}</p>
+                      <p className="text-muted-foreground text-sm">Room {review.room.roomNumber}</p>
+                    </div>
+                  </div>
+
+                  {/* Rating */}
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground text-xs">Rating</Label>
+                    <div className="flex items-center gap-2">
+                      <StarRating rating={review.rating} size="md" />
+                      <span className="font-medium">{review.rating}/5</span>
+                    </div>
+                  </div>
+
+                  {/* Full Comment */}
+                  <div className="space-y-2">
+                    <Label className="text-muted-foreground text-xs">Review Comment</Label>
+                    <div className="bg-muted/30 border-border/40 rounded-lg border p-4">
+                      <p className="text-foreground/90 leading-relaxed whitespace-pre-wrap">
+                        {review.comment}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Rejection Reason if rejected */}
+                  {review.status === 'rejected' && review.rejectionReason && (
+                    <div className="space-y-2">
+                      <Label className="text-destructive text-xs">Rejection Reason</Label>
+                      <div className="bg-destructive/10 border-destructive/20 rounded-lg border p-3">
+                        <p className="text-destructive text-sm">{review.rejectionReason}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <DialogFooter className="flex-col gap-2 sm:flex-row">
+                  {review.status === 'pending' && (
+                    <>
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setViewDetailId(null);
+                          handleRejectClick(review.id);
+                        }}
+                        className="text-destructive"
+                      >
+                        <XCircle className="mr-2 h-4 w-4" />
+                        Reject
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          handleApprove(review.id);
+                          setViewDetailId(null);
+                        }}
+                        disabled={approveMutation.isPending}
+                        className="bg-green-600 hover:bg-green-700"
+                      >
+                        <CheckCircle className="mr-2 h-4 w-4" />
+                        Approve & Publish
+                      </Button>
+                    </>
+                  )}
+                  {review.status === 'approved' && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setViewDetailId(null);
+                        handleRejectClick(review.id);
+                      }}
+                    >
+                      <XCircle className="mr-2 h-4 w-4" />
+                      Unpublish
+                    </Button>
+                  )}
+                  {review.status === 'rejected' && (
+                    <Button
+                      onClick={() => {
+                        handleApprove(review.id);
+                        setViewDetailId(null);
+                      }}
+                      disabled={approveMutation.isPending}
+                      className="bg-green-600 hover:bg-green-700"
+                    >
+                      <CheckCircle className="mr-2 h-4 w-4" />
+                      Approve & Publish
+                    </Button>
+                  )}
+                  <Button variant="ghost" onClick={() => setViewDetailId(null)}>
+                    Close
+                  </Button>
+                </DialogFooter>
+              </>
+            );
+          })()}
         </DialogContent>
       </Dialog>
 

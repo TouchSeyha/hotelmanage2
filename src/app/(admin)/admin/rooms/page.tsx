@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, MoreHorizontal, Pencil, Trash2, Loader2, CheckCircle } from 'lucide-react';
+import { Plus, Pencil, Trash2, Loader2, CheckCircle } from 'lucide-react';
 import { toast } from 'sonner';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -18,14 +18,6 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '~/components/ui/dropdown-menu';
 import {
   Dialog,
   DialogContent,
@@ -199,44 +191,50 @@ export default function RoomsPage() {
                     <TableCell>
                       <StatusBadge
                         status={
-                          room.status as 'available' | 'occupied' | 'cleaning' | 'maintenance' | 'out_of_service'
+                          room.status as
+                            | 'available'
+                            | 'occupied'
+                            | 'cleaning'
+                            | 'maintenance'
+                            | 'out_of_service'
                         }
                         type="room"
                       />
                     </TableCell>
                     <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="sm">
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuSeparator />
-                          {(room.status === 'cleaning' || room.status === 'maintenance') && (
-                            <DropdownMenuItem
-                              onClick={() =>
-                                updateRoomStatus.mutate({ id: room.id, status: 'available' })
-                              }
-                            >
-                              <CheckCircle className="mr-2 h-4 w-4" />
-                              Mark as Available
-                            </DropdownMenuItem>
-                          )}
-                          <DropdownMenuItem onClick={() => handleEdit(room)}>
-                            <Pencil className="mr-2 h-4 w-4" />
-                            Edit
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="text-destructive"
-                            onClick={() => setDeleteId(room.id)}
+                      <div className="flex items-center justify-end gap-1">
+                        {(room.status === 'cleaning' || room.status === 'maintenance') && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() =>
+                              updateRoomStatus.mutate({ id: room.id, status: 'available' })
+                            }
+                            className="text-green-600 hover:bg-green-50 hover:text-green-700"
+                            title="Mark as available"
                           >
-                            <Trash2 className="mr-2 h-4 w-4" />
-                            Delete
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                            <CheckCircle className="h-4 w-4" />
+                          </Button>
+                        )}
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleEdit(room)}
+                          className="text-muted-foreground hover:text-foreground"
+                          title="Edit room"
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => setDeleteId(room.id)}
+                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          title="Delete room"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}

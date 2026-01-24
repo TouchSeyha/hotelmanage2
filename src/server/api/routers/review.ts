@@ -133,7 +133,7 @@ export const reviewRouter = createTRPCRouter({
         acc[rating] = found?._count.rating ?? 0;
         return acc;
       },
-      {} as Record<number, number>,
+      {} as Record<number, number>
     );
 
     return {
@@ -154,143 +154,139 @@ export const reviewRouter = createTRPCRouter({
    * - Booking must be completed or checked_out
    * - No existing review for this booking
    */
-  canReview: protectedProcedure
-    .input(canReviewBookingSchema)
-    .query(async ({ ctx, input }) => {
-      const booking = await ctx.db.booking.findUnique({
-        where: { id: input.bookingId },
-        include: {
-          review: true,
-        },
-      });
+  canReview: protectedProcedure.input(canReviewBookingSchema).query(async ({ ctx, input }) => {
+    const booking = await ctx.db.booking.findUnique({
+      where: { id: input.bookingId },
+      include: {
+        review: true,
+      },
+    });
 
-      if (!booking) {
-        return {
-          canReview: false,
-          reason: 'Booking not found',
-        };
-      }
-
-      // Check ownership
-      if (booking.userId !== ctx.session.user.id) {
-        return {
-          canReview: false,
-          reason: 'You can only review your own bookings',
-        };
-      }
-
-      // Check if already reviewed
-      if (booking.review) {
-        return {
-          canReview: false,
-          reason: 'You have already reviewed this booking',
-          existingReviewId: booking.review.id,
-        };
-      }
-
-      // Check booking status
-      const validStatuses = ['completed', 'checked_out'];
-      if (!validStatuses.includes(booking.status)) {
-        return {
-          canReview: false,
-          reason: 'You can only review completed stays',
-        };
-      }
-
+    if (!booking) {
       return {
-        canReview: true,
-        reason: null,
+        canReview: false,
+        reason: 'Booking not found',
       };
-    }),
+    }
+
+    // Check ownership
+    if (booking.userId !== ctx.session.user.id) {
+      return {
+        canReview: false,
+        reason: 'You can only review your own bookings',
+      };
+    }
+
+    // Check if already reviewed
+    if (booking.review) {
+      return {
+        canReview: false,
+        reason: 'You have already reviewed this booking',
+        existingReviewId: booking.review.id,
+      };
+    }
+
+    // Check booking status - allow review after checkout
+    const validStatuses = ['completed', 'checked_out'];
+    if (!validStatuses.includes(booking.status)) {
+      return {
+        canReview: false,
+        reason: 'You can review after checking out',
+      };
+    }
+
+    return {
+      canReview: true,
+      reason: null,
+    };
+  }),
 
   /**
    * Create a new review (customer-facing)
    * Validates business rules before creating
    */
-  create: protectedProcedure
-    .input(createReviewSchema)
-    .mutation(async ({ ctx, input }) => {
-      // Get booking with relations
-      const booking = await ctx.db.booking.findUnique({
-        where: { id: input.bookingId },
-        include: {
-          review: true,
-          room: {
-            include: {
-              roomType: true,
-            },
+  create: protectedProcedure.input(createReviewSchema).mutation(async ({ ctx, input }) => {
+    // Get booking with relations
+    const booking = await ctx.db.booking.findUnique({
+      where: { id: input.bookingId },
+      include: {
+        review: true,
+        room: {
+          include: {
+            roomType: true,
           },
         },
+      },
+    });
+
+    if (!booking) {
+      throw new TRPCError({
+        code: 'NOT_FOUND',
+        message: 'Booking not found',
       });
+    }
 
-      if (!booking) {
-        throw new TRPCError({
-          code: 'NOT_FOUND',
-          message: 'Booking not found',
-        });
-      }
-
-      // Verify ownership
-      if (booking.userId !== ctx.session.user.id) {
-        throw new TRPCError({
-          code: 'FORBIDDEN',
-          message: 'You can only review your own bookings',
-        });
-      }
-
-      // Check if already reviewed
-      if (booking.review) {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: 'You have already reviewed this booking',
-        });
-      }
-
-      // Check booking status - only completed or checked_out bookings can be reviewed
-      const validStatuses = ['completed', 'checked_out'];
-      if (!validStatuses.includes(booking.status)) {
-        throw new TRPCError({
-          code: 'PRECONDITION_FAILED',
-          message: 'You can only review completed stays',
-        });
-      }
-
-      // Create review
-      const review = await ctx.db.review.create({
-        data: {
-          bookingId: input.bookingId,
-          userId: ctx.session.user.id,
-          roomId: booking.roomId,
-          roomTypeId: booking.room.roomTypeId,
-          rating: input.rating,
-          comment: input.comment,
-          status: 'pending', // Requires admin approval
-        },
-        include: {
-          user: {
-            select: {
-              id: true,
-              name: true,
-              email: true,
-            },
-          },
-          room: {
-            select: {
-              roomNumber: true,
-            },
-          },
-          roomType: {
-            select: {
-              name: true,
-            },
-          },
-        },
+    // Verify ownership
+    if (booking.userId !== ctx.session.user.id) {
+      throw new TRPCError({
+        code: 'FORBIDDEN',
+        message: 'You can only review your own bookings',
       });
+    }
 
-      // TODO: Send notification to admin about new review pending approval
+    // Check if already reviewed
+    if (booking.review) {
+      throw new TRPCError({
+        code: 'CONFLICT',
+        message: 'You have already reviewed this booking',
+      });
+    }
 
-      return review;
-    }),
+    // Check booking status - allow review after checkout
+    const validStatuses = ['completed', 'checked_out'];
+    if (!validStatuses.includes(booking.status)) {
+      throw new TRPCError({
+        code: 'PRECONDITION_FAILED',
+        message: 'You can review after checking out',
+      });
+    }
+
+    // Create review
+    const review = await ctx.db.review.create({
+      data: {
+        bookingId: input.bookingId,
+        userId: ctx.session.user.id,
+        roomId: booking.roomId,
+        roomTypeId: booking.room.roomTypeId,
+        rating: input.rating,
+        comment: input.comment,
+        status: 'pending', // Requires admin approval
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+        room: {
+          select: {
+            roomNumber: true,
+          },
+        },
+        roomType: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    // TODO: Send notification to admin about new review pending approval
+
+    return review;
+  }),
 
   /**
    * Get current user's reviews
@@ -370,14 +366,17 @@ export const reviewRouter = createTRPCRouter({
 
     const skip = (page - 1) * limit;
 
+    // Trim search input for cleaner queries
+    const trimmedSearch = search?.trim();
+
     const where = {
       ...(status && { status }),
       ...(rating && { rating }),
       ...(roomTypeId && { roomTypeId }),
       ...(roomId && { roomId }),
       ...(userId && { userId }),
-      ...(search && {
-        comment: { contains: search, mode: 'insensitive' as const },
+      ...(trimmedSearch && {
+        comment: { contains: trimmedSearch, mode: 'insensitive' as const },
       }),
     };
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import {
@@ -19,6 +19,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 
 import { api } from '~/trpc/react';
+import { useDebounce } from '~/lib/hooks/useDebounce';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
@@ -80,12 +81,21 @@ export default function UsersPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const { data, isLoading, refetch } = api.user.getAll.useQuery({
-    page,
-    limit: 10,
-    search: search || undefined,
-    role: roleFilter !== 'all' ? (roleFilter as 'user' | 'admin') : undefined,
-  });
+  // Debounce search to prevent excessive API calls
+  const debouncedSearch = useDebounce(search, 500);
+
+  // Memoize query options for stable reference
+  const queryOptions = useMemo(
+    () => ({
+      page,
+      limit: 10,
+      search: debouncedSearch || undefined,
+      role: roleFilter !== 'all' ? (roleFilter as 'user' | 'admin') : undefined,
+    }),
+    [page, debouncedSearch, roleFilter]
+  );
+
+  const { data, isLoading, refetch } = api.user.getAll.useQuery(queryOptions);
 
   const form = useForm<UserEditFormData>({
     resolver: zodResolver(userEditFormSchema),

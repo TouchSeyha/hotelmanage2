@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { format } from 'date-fns';
 import { Search, Filter, MoreHorizontal, Check, X, Eye } from 'lucide-react';
 
 import { api } from '~/trpc/react';
+import { useDebounce } from '~/lib/hooks/useDebounce';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
@@ -41,12 +42,21 @@ export default function AdminBookingsPage() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [page, setPage] = useState(1);
 
-  const { data, isLoading, refetch } = api.booking.getAll.useQuery({
-    search: search || undefined,
-    status: statusFilter !== 'all' ? (statusFilter as BookingStatus) : undefined,
-    page,
-    limit: 10,
-  });
+  // Debounce search to prevent excessive API calls
+  const debouncedSearch = useDebounce(search, 500);
+
+  // Memoize query options for stable reference
+  const queryOptions = useMemo(
+    () => ({
+      search: debouncedSearch || undefined,
+      status: statusFilter !== 'all' ? (statusFilter as BookingStatus) : undefined,
+      page,
+      limit: 10,
+    }),
+    [debouncedSearch, statusFilter, page]
+  );
+
+  const { data, isLoading, refetch } = api.booking.getAll.useQuery(queryOptions);
 
   const confirmPayment = api.booking.confirmPayment.useMutation({
     onSuccess: () => void refetch(),

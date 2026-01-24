@@ -86,7 +86,7 @@ export default function MyReviewsPage() {
                   'overflow-hidden transition-all duration-300 hover:shadow-md',
                   review.status === 'approved' && 'border-l-4 border-l-green-500',
                   review.status === 'pending' && 'border-l-4 border-l-amber-500',
-                  review.status === 'rejected' && 'border-l-4 border-l-red-500 opacity-75',
+                  review.status === 'rejected' && 'border-l-4 border-l-red-500 opacity-75'
                 )}
               >
                 <CardHeader>
@@ -110,14 +110,14 @@ export default function MyReviewsPage() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   {/* Review Comment */}
-                  <div className="rounded-lg bg-muted/30 p-4 border border-border/40">
-                    <p className="text-sm leading-relaxed text-foreground/90 italic">
+                  <div className="bg-muted/30 border-border/40 rounded-lg border p-4">
+                    <p className="text-foreground/90 text-sm leading-relaxed italic">
                       &ldquo;{review.comment}&rdquo;
                     </p>
                   </div>
 
                   {/* Status Description */}
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <div className="text-muted-foreground flex items-center gap-2 text-xs">
                     <Clock className="h-3.5 w-3.5" />
                     <span>Submitted {format(new Date(review.createdAt), 'MMM d, yyyy')}</span>
                     {statusInfo.description && (
@@ -130,8 +130,8 @@ export default function MyReviewsPage() {
 
                   {/* Rejection Reason */}
                   {review.status === 'rejected' && review.rejectionReason && (
-                    <div className="rounded-lg bg-destructive/10 p-3 border border-destructive/20">
-                      <p className="text-xs font-medium text-destructive">
+                    <div className="bg-destructive/10 border-destructive/20 rounded-lg border p-3">
+                      <p className="text-destructive text-xs font-medium">
                         Reason: {review.rejectionReason}
                       </p>
                     </div>
