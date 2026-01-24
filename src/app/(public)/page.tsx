@@ -1,10 +1,11 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { Suspense } from 'react';
-import { ArrowRight, Wifi, Car, Coffee, Utensils, Waves, Dumbbell } from 'lucide-react';
+import { ArrowRight, Wifi, Car, Coffee, Utensils, Waves, Dumbbell, Star } from 'lucide-react';
 
 import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
+import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { api } from '~/trpc/server';
 import { RoomCard } from '~/components/shared/roomCard';
 
@@ -48,6 +49,71 @@ async function FeaturedRoomsSection() {
     <Card className="p-12 text-center">
       <p className="text-muted-foreground">No rooms available at the moment.</p>
     </Card>
+  );
+}
+
+/**
+ * Testimonials section that displays real guest reviews
+ * Returns null if no approved reviews exist (hides section completely)
+ */
+async function TestimonialsSection() {
+  const { reviews } = await api.review.getApproved({
+    limit: 3,
+    sortBy: 'createdAt',
+    sortOrder: 'desc',
+  });
+
+  // Hide section completely if no reviews
+  if (reviews.length === 0) {
+    return null;
+  }
+
+  return (
+    <section className="container py-16">
+      <div className="mb-8 text-center">
+        <h2 className="text-3xl font-bold">What Our Guests Say</h2>
+        <p className="text-muted-foreground mt-2">Read reviews from our satisfied guests</p>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-3">
+        {reviews.map((review) => (
+          <Card key={review.id} className="transition-shadow hover:shadow-md">
+            <CardContent className="p-6">
+              {/* Star Rating */}
+              <div className="mb-4 flex items-center gap-1">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star
+                    key={i}
+                    className={`h-4 w-4 ${
+                      i < review.rating ? 'fill-amber-400 text-amber-400' : 'fill-muted text-muted'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {/* Review Text */}
+              <p className="text-muted-foreground mb-4 line-clamp-4">
+                &ldquo;{review.comment}&rdquo;
+              </p>
+
+              {/* Guest Info */}
+              <div className="flex items-center gap-3">
+                <Avatar className="h-10 w-10">
+                  <AvatarImage src={review.user.image ?? undefined} />
+                  <AvatarFallback className="bg-primary/10 text-primary">
+                    {review.user.name?.charAt(0).toUpperCase() ?? 'G'}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="font-semibold">{review.user.name}</p>
+                  <p className="text-muted-foreground text-xs">Stayed in {review.roomType.name}</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -175,45 +241,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="container py-16">
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold">What Our Guests Say</h2>
-          <p className="text-muted-foreground mt-2">Read reviews from our satisfied guests</p>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          {[
-            {
-              name: 'Sarah Johnson',
-              rating: 5,
-              text: 'Absolutely wonderful experience! The staff went above and beyond to make our stay memorable. Will definitely return.',
-            },
-            {
-              name: 'Michael Chen',
-              rating: 5,
-              text: 'The rooms are spacious and beautifully decorated. The view from our balcony was breathtaking. Highly recommend!',
-            },
-            {
-              name: 'Emily Davis',
-              rating: 5,
-              text: "Perfect location, amazing breakfast, and the most comfortable bed I've ever slept in. Five stars all around!",
-            },
-          ].map((testimonial, i) => (
-            <Card key={i}>
-              <CardContent className="p-6">
-                <div className="mb-4 flex text-yellow-400">
-                  {Array.from({ length: testimonial.rating }).map((_, j) => (
-                    <span key={j}>★</span>
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-4">&ldquo;{testimonial.text}&rdquo;</p>
-                <p className="font-semibold">{testimonial.name}</p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
+      {/* Testimonials - Only shown when reviews exist */}
+      <Suspense fallback={null}>
+        <TestimonialsSection />
+      </Suspense>
 
       {/* CTA Section */}
       <section className="bg-primary text-primary-foreground py-16">
