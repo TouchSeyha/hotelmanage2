@@ -6,7 +6,9 @@
       "Bash(bun run typecheck:*)",
       "mcp__ide__getDiagnostics",
       "Bash(bun run lint)",
-      "Bash(bun check:*)"
+      "Bash(bun check:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)"
     ]
   }
 }
