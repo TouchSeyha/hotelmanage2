@@ -70,8 +70,11 @@ export default function RoomTypesPage() {
       ) : roomTypes && roomTypes.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {roomTypes.map((roomType) => (
-            <Card key={roomType.id} className="overflow-hidden">
-              <div className="bg-muted relative h-48 w-full">
+            <Card
+              key={roomType.id}
+              className="overflow-hidden pt-0 transition-shadow hover:shadow-lg"
+            >
+              <div className="bg-muted relative h-52 w-full">
                 {Array.isArray(roomType.images) && roomType.images[0] ? (
                   <Image
                     src={roomType.images[0] as string}

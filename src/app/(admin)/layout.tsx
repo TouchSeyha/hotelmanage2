@@ -29,7 +29,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <aside className="bg-muted/50 fixed inset-y-0 left-0 hidden w-64 border-r lg:block">
+      <aside className="bg-sidebar fixed inset-y-0 left-0 hidden w-64 border-r lg:block">
         <div className="flex h-full flex-col overflow-y-auto">
           {/* Logo */}
           <div className="flex h-16 items-center gap-2 border-b px-6 font-bold">

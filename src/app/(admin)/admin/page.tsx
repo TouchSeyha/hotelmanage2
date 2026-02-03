@@ -6,7 +6,7 @@ import { Calendar, DollarSign, Users, BedDouble, ArrowUpRight, Clock } from 'luc
 import { api } from '~/trpc/server';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import { Button } from '~/components/ui/button';
-import { Badge } from '~/components/ui/badge';
+import { StatusBadge } from '~/components/shared/statusBadge';
 import { DashboardSkeleton } from '~/components/shared/loadingSkeleton';
 
 const cachedGetDashboardStats = cache(() => api.admin.getDashboardStats());
@@ -169,17 +169,7 @@ async function DashboardContent() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Badge
-                        variant={
-                          booking.status === 'confirmed'
-                            ? 'default'
-                            : booking.status === 'cancelled'
-                              ? 'destructive'
-                              : 'secondary'
-                        }
-                      >
-                        {booking.status}
-                      </Badge>
+                      <StatusBadge status={booking.status} type="booking" />
                       <span className="text-sm font-medium">${Number(booking.totalPrice)}</span>
                     </div>
                   </div>
