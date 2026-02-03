@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
+import { ModeToggle } from '~/components/modeToggle';
 
 const navLinks = [
   { href: '/', label: 'Home' },
@@ -40,7 +41,10 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center space-x-2">
-          <span className="text-xl font-bold">LuxeStay</span>
+          <span className="font-(family-name:--font-playfair) text-2xl font-semibold tracking-wide">
+            <span className="text-primary">Luxe</span>
+            <span className="italic">Stay</span>
+          </span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -80,6 +84,9 @@ export function Header() {
                   <div className="flex flex-col space-y-1 leading-none">
                     <p className="font-medium">{session.user.name}</p>
                     <p className="text-muted-foreground text-xs">{session.user.email}</p>
+                  </div>
+                  <div className="ml-auto">
+                    <ModeToggle />
                   </div>
                 </div>
                 <DropdownMenuSeparator />
