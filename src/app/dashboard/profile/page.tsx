@@ -2,9 +2,10 @@
 
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Loader2, User, Mail, Phone, Calendar, Shield } from 'lucide-react';
+import { Loader2, User, Mail, Phone, Calendar, Shield, Sun, Moon, Monitor } from 'lucide-react';
 import { format } from 'date-fns';
 import { toast } from 'sonner';
+import { useTheme } from 'next-themes';
 
 import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
@@ -185,6 +186,17 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
 
+        {/* Appearance Settings */}
+        <Card className="lg:col-span-3">
+          <CardHeader>
+            <CardTitle>Appearance</CardTitle>
+            <CardDescription>Customize how the application looks</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ThemeSelector />
+          </CardContent>
+        </Card>
+
         {/* Account Info */}
         <Card className="lg:col-span-3">
           <CardHeader>
@@ -219,6 +231,33 @@ export default function ProfilePage() {
           </CardContent>
         </Card>
       </div>
+    </div>
+  );
+}
+
+function ThemeSelector() {
+  const { theme, setTheme } = useTheme();
+
+  const themes = [
+    { value: 'light', label: 'Light', icon: Sun },
+    { value: 'dark', label: 'Dark', icon: Moon },
+    { value: 'system', label: 'System', icon: Monitor },
+  ];
+
+  return (
+    <div className="grid gap-4 sm:grid-cols-3">
+      {themes.map(({ value, label, icon: Icon }) => (
+        <button
+          key={value}
+          onClick={() => setTheme(value)}
+          className={`hover:bg-muted flex flex-col items-center justify-center gap-2 rounded-lg border p-4 transition-all ${
+            theme === value ? 'border-primary bg-muted ring-primary ring-1' : 'border-border'
+          }`}
+        >
+          <Icon className="h-6 w-6" />
+          <span className="text-sm font-medium">{label}</span>
+        </button>
+      ))}
     </div>
   );
 }

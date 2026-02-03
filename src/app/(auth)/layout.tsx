@@ -7,9 +7,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Simple Header */}
       <header className="border-b">
         <div className="container flex h-16 items-center">
-          <Link href="/" className="flex items-center gap-2 font-bold">
-            <Hotel className="h-6 w-6" />
-            <span>LuxeStay</span>
+          <Link href="/" className="flex items-center gap-2">
+            <Hotel className="text-primary h-6 w-6" />
+            <span className="font-(family-name:--font-playfair) text-xl font-semibold tracking-wide">
+              <span className="text-primary">Luxe</span>
+              <span className="italic">Stay</span>
+            </span>
           </Link>
         </div>
       </header>
