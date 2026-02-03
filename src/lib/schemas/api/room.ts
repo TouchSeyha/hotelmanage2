@@ -2,7 +2,13 @@ import { z } from 'zod';
 import { dateRangeSchema } from '../common';
 
 // Room status enum matching Prisma
-export const roomStatusSchema = z.enum(['available', 'occupied', 'cleaning', 'maintenance', 'out_of_service']);
+export const roomStatusSchema = z.enum([
+  'available',
+  'occupied',
+  'cleaning',
+  'maintenance',
+  'out_of_service',
+]);
 
 export type RoomStatus = z.infer<typeof roomStatusSchema>;
 

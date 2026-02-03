@@ -30,6 +30,7 @@ export function QuickActions({
   const router = useRouter();
   const utils = api.useUtils();
   const [showCancelDialog, setShowCancelDialog] = useState(false);
+  const [showConfirmBookingDialog, setShowConfirmBookingDialog] = useState(false);
   const [showConfirmPaymentDialog, setShowConfirmPaymentDialog] = useState(false);
   const [showCheckInDialog, setShowCheckInDialog] = useState(false);
   const [showCheckOutDialog, setShowCheckOutDialog] = useState(false);
@@ -37,6 +38,18 @@ export function QuickActions({
   const [cancellationReason, setCancellationReason] = useState('');
 
   // Mutations
+  const confirmBooking = api.booking.confirmBooking.useMutation({
+    onSuccess: async () => {
+      toast.success('Booking confirmed successfully');
+      await utils.booking.getById.invalidate({ id: bookingId });
+      router.refresh();
+      setShowConfirmBookingDialog(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const confirmPayment = api.booking.confirmPayment.useMutation({
     onSuccess: async () => {
       toast.success('Payment confirmed successfully');
@@ -98,6 +111,10 @@ export function QuickActions({
     },
   });
 
+  const handleConfirmBooking = () => {
+    confirmBooking.mutate({ id: bookingId });
+  };
+
   const handleConfirmPayment = () => {
     confirmPayment.mutate({ id: bookingId });
   };
@@ -132,6 +149,26 @@ export function QuickActions({
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
         <CardContent className="space-y-2">
+          {status === 'pending' && (
+            <Button
+              className="w-full"
+              variant="default"
+              onClick={() => setShowConfirmBookingDialog(true)}
+              disabled={confirmBooking.isPending}
+            >
+              {confirmBooking.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Confirming...
+                </>
+              ) : (
+                <>
+                  <CheckCircle className="mr-2 h-4 w-4" />
+                  Confirm Booking
+                </>
+              )}
+            </Button>
+          )}
           {status === 'confirmed' && paymentStatus === 'pending' && (
             <Button
               className="w-full"
@@ -238,12 +275,23 @@ export function QuickActions({
         </CardContent>
       </Card>
 
+      {/* Confirm Booking Dialog */}
+      <ConfirmDialog
+        open={showConfirmBookingDialog}
+        onOpenChange={setShowConfirmBookingDialog}
+        title="Confirm Booking"
+        description={`Are you sure you want to confirm booking ${bookingNumber}? The guest can pay later at the hotel on arrival.`}
+        confirmLabel="Confirm Booking"
+        onConfirm={handleConfirmBooking}
+        loading={confirmBooking.isPending}
+      />
+
       {/* Confirm Payment Dialog */}
       <ConfirmDialog
         open={showConfirmPaymentDialog}
         onOpenChange={setShowConfirmPaymentDialog}
         title="Confirm Payment"
-        description={`Are you sure you want to mark payment as received for booking ${bookingNumber}? This will update the booking status to confirmed.`}
+        description={`Are you sure you want to mark payment as received for booking ${bookingNumber}?`}
         confirmLabel="Confirm Payment"
         onConfirm={handleConfirmPayment}
         loading={confirmPayment.isPending}

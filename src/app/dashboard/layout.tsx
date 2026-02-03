@@ -28,9 +28,12 @@ export default async function DashboardLayout({ children }: { children: React.Re
       <header className="bg-background sticky top-0 z-50 border-b">
         <div className="container flex h-16 items-center justify-between">
           <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2 font-bold">
-              <Hotel className="h-6 w-6" />
-              <span>LuxeStay</span>
+            <Link href="/" className="flex items-center gap-2">
+              <Hotel className="text-primary h-6 w-6" />
+              <span className="font-(family-name:--font-playfair) text-xl font-semibold tracking-wide">
+                <span className="text-primary">Luxe</span>
+                <span className="italic">Stay</span>
+              </span>
             </Link>
             <DashboardNav />
           </div>

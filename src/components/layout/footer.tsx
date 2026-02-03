@@ -19,8 +19,12 @@ export function Footer() {
         <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
           {/* Brand & Description */}
           <div className="space-y-4">
-            <Link href="/" className="text-xl font-bold">
-              LuxeStay
+            <Link
+              href="/"
+              className="font-[family-name:var(--font-playfair)] text-xl font-semibold tracking-wide"
+            >
+              <span className="text-primary">Luxe</span>
+              <span className="italic">Stay</span>
             </Link>
             <p className="text-muted-foreground text-sm">
               Experience luxury and comfort at our beautiful hotel. Perfect for business and leisure

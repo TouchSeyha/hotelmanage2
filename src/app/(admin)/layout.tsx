@@ -29,12 +29,16 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="flex h-screen">
       {/* Sidebar */}
-      <aside className="bg-muted/50 fixed inset-y-0 left-0 hidden w-64 border-r lg:block">
+      <aside className="bg-sidebar fixed inset-y-0 left-0 hidden w-64 border-r lg:block">
         <div className="flex h-full flex-col overflow-y-auto">
           {/* Logo */}
-          <div className="flex h-16 items-center gap-2 border-b px-6 font-bold">
-            <Hotel className="h-6 w-6" />
-            <span>Hotel Admin Portal</span>
+          <div className="flex h-16 items-center gap-2 border-b px-6">
+            <Hotel className="text-primary h-6 w-6" />
+            <span className="font-(family-name:--font-playfair) text-lg font-semibold tracking-wide">
+              <span className="text-primary">Luxe</span>
+              <span className="italic">Stay</span>
+              <span className="text-muted-foreground ml-1 text-xs font-normal">Admin</span>
+            </span>
           </div>
 
           {/* Navigation */}
@@ -62,9 +66,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
         <header className="bg-background sticky top-0 z-50 flex h-16 items-center justify-between border-b px-6">
           {/* Mobile menu button would go here */}
           <div className="flex items-center gap-4 lg:hidden">
-            <Link href="/admin" className="flex items-center gap-2 font-bold">
-              <Hotel className="h-6 w-6" />
-              <span>Admin</span>
+            <Link href="/admin" className="flex items-center gap-2">
+              <Hotel className="text-primary h-6 w-6" />
+              <span className="font-(family-name:--font-playfair) text-lg font-semibold tracking-wide">
+                <span className="text-primary">Luxe</span>
+                <span className="italic">Stay</span>
+              </span>
             </Link>
           </div>
 
@@ -97,7 +104,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
-                  <Link href="/admin/settings" className="flex items-center gap-2">
+                  <Link href="/dashboard/profile" className="flex items-center gap-2">
                     <Settings className="h-4 w-4" />
                     Settings
                   </Link>
