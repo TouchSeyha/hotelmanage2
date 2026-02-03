@@ -69,7 +69,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <api.Provider client={trpcClient} queryClient={queryClient}>
           {props.children}
-          <Toaster richColors position="top-right" />
+          <Toaster richColors position="top-right" closeButton />
         </api.Provider>
       </QueryClientProvider>
     </SessionProvider>

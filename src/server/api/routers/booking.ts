@@ -557,6 +557,52 @@ export const bookingRouter = createTRPCRouter({
   }),
 
   /**
+   * Confirm booking (admin only)
+   * Confirms a pending booking without requiring payment first (pay at hotel)
+   */
+  confirmBooking: adminProcedure
+    .input(z.object({ id: z.string().cuid() }))
+    .mutation(async ({ ctx, input }) => {
+      const booking = await ctx.db.booking.findUnique({
+        where: { id: input.id },
+      });
+
+      if (!booking) {
+        throw new TRPCError({
+          code: 'NOT_FOUND',
+          message: 'Booking not found',
+        });
+      }
+
+      if (booking.status !== 'pending') {
+        throw new TRPCError({
+          code: 'PRECONDITION_FAILED',
+          message: 'Only pending bookings can be confirmed',
+        });
+      }
+
+      const updatedBooking = await ctx.db.booking.update({
+        where: { id: input.id },
+        data: {
+          status: 'confirmed',
+        },
+      });
+
+      await ctx.db.bookingLog.create({
+        data: {
+          bookingId: input.id,
+          action: 'STATUS_CHANGE',
+          performedById: ctx.session.user.id,
+          previousStatus: 'pending',
+          newStatus: 'confirmed',
+          notes: 'Booking confirmed by admin (payment pending)',
+        },
+      });
+
+      return updatedBooking;
+    }),
+
+  /**
    * Confirm payment (admin only)
    */
   confirmPayment: adminProcedure
