@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, Award, Heart, Users, MapPin } from 'lucide-react';
+import { ArrowRight, Award, Heart, Users, MapPin, Linkedin, Github } from 'lucide-react';
 import type { Metadata } from 'next';
 
 import { Button } from '~/components/ui/button';
@@ -48,11 +48,8 @@ const team = [
     name: 'Touch Seyha',
     role: 'Developer & Founder',
     image: '/assets/about/p1.png',
-  },
-  {
-    name: 'Sophy Sophana',
-    role: 'Developer & Co-Founder',
-    image: '/assets/about/p2.png',
+    linkedin: 'https://www.linkedin.com/in/seyha-touch-141799265/',
+    github: 'https://github.com/TouchSeyha',
   },
 ];
 
@@ -166,12 +163,12 @@ export default function AboutPage() {
       {/* Team Section */}
       <section className="container py-16">
         <div className="mb-12 text-center">
-          <h2 className="mb-4 text-3xl font-bold">Meet Our Team</h2>
+          <h2 className="mb-4 text-3xl font-bold">Meet the Maker</h2>
           <p className="text-muted-foreground mx-auto max-w-2xl">
-            Our dedicated team of professionals is committed to making your stay exceptional.
+            The passionate mind behind creating exceptional hotel experiences.
           </p>
         </div>
-        <div className="grid gap-8 md:grid-cols-2">
+        <div className="mx-auto max-w-md">
           {team.map((member) => (
             <Card key={member.name} className="overflow-hidden">
               <div className="relative aspect-square">
@@ -180,12 +177,30 @@ export default function AboutPage() {
                   alt={member.name}
                   fill
                   className="object-cover"
-                  sizes="(max-width: 768px) 100vw, 50vw"
+                  sizes="(max-width: 768px) 100vw, 400px"
                 />
               </div>
-              <CardContent className="p-4 text-center">
-                <h3 className="font-semibold">{member.name}</h3>
-                <p className="text-muted-foreground text-sm">{member.role}</p>
+              <CardContent className="p-6 text-center">
+                <h3 className="text-xl font-semibold">{member.name}</h3>
+                <p className="text-primary mt-1 text-sm font-medium">{member.role}</p>
+                <div className="mt-3 flex items-center justify-center gap-3">
+                  <a
+                    href={member.linkedin}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Linkedin className="h-5 w-5" />
+                  </a>
+                  <a
+                    href={member.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    <Github className="h-5 w-5" />
+                  </a>
+                </div>
               </CardContent>
             </Card>
           ))}
