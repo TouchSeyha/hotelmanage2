@@ -33,21 +33,21 @@ export function Footer() {
             <div className="flex gap-4">
               <a
                 href="#"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="motion-link-fade text-muted-foreground hover:text-primary"
                 aria-label="Facebook"
               >
                 <Facebook className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="motion-link-fade text-muted-foreground hover:text-primary"
                 aria-label="Instagram"
               >
                 <Instagram className="h-5 w-5" />
               </a>
               <a
                 href="#"
-                className="text-muted-foreground hover:text-primary transition-colors"
+                className="motion-link-fade text-muted-foreground hover:text-primary"
                 aria-label="Twitter"
               >
                 <Twitter className="h-5 w-5" />
@@ -63,7 +63,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-muted-foreground hover:text-primary text-sm transition-colors"
+                    className="motion-link-fade text-muted-foreground hover:text-primary text-sm"
                   >
                     {link.label}
                   </Link>
@@ -82,13 +82,13 @@ export function Footer() {
               </li>
               <li className="text-muted-foreground flex items-center gap-2 text-sm">
                 <Phone className="h-4 w-4 shrink-0" />
-                <a href="tel:+855234567890" className="hover:text-primary">
+                <a href="tel:+855234567890" className="motion-link-fade hover:text-primary">
                   +855 (234) 567-890
                 </a>
               </li>
               <li className="text-muted-foreground flex items-center gap-2 text-sm">
                 <Mail className="h-4 w-4 shrink-0" />
-                <a href="mailto:info@hotel.com" className="hover:text-primary">
+                <a href="mailto:info@hotel.com" className="motion-link-fade hover:text-primary">
                   info@hotel.com
                 </a>
               </li>
@@ -103,7 +103,7 @@ export function Footer() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="text-muted-foreground hover:text-primary text-sm transition-colors"
+                    className="motion-link-fade text-muted-foreground hover:text-primary text-sm"
                   >
                     {link.label}
                   </Link>

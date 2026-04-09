@@ -5,6 +5,7 @@ import type { Metadata } from 'next';
 
 import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
+import { Reveal } from '~/components/motion/reveal';
 
 export const metadata: Metadata = {
   title: 'About Us | LuxeStay',
@@ -68,19 +69,22 @@ export default function AboutPage() {
             sizes="100vw"
           />
         </div>
-        <div className="relative container flex h-full flex-col items-start justify-center text-white">
+        <Reveal
+          variant="hero"
+          className="relative container flex h-full flex-col items-start justify-center text-white"
+        >
           <h1 className="mb-4 text-4xl font-bold md:text-5xl">About Our Hotel</h1>
           <p className="max-w-xl text-lg text-gray-200">
             A legacy of luxury, comfort, and exceptional service since 2025.
           </p>
-        </div>
+        </Reveal>
       </section>
 
       {/* Stats Section */}
-      <section className="relative z-10 container -mt-12">
+      <Reveal delay={1} className="relative z-10 container -mt-12">
         <Card className="shadow-lg">
           <CardContent className="p-6">
-            <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+            <div className="motion-stagger grid grid-cols-2 gap-6 md:grid-cols-4">
               {stats.map((stat) => (
                 <div key={stat.label} className="text-center">
                   <div className="text-primary text-3xl font-bold md:text-4xl">{stat.value}</div>
@@ -90,10 +94,10 @@ export default function AboutPage() {
             </div>
           </CardContent>
         </Card>
-      </section>
+      </Reveal>
 
       {/* Story Section */}
-      <section className="container py-16">
+      <Reveal delay={2} className="container py-16">
         <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
           <div>
             <h2 className="mb-4 text-3xl font-bold">Our Story</h2>
@@ -132,10 +136,10 @@ export default function AboutPage() {
             />
           </div>
         </div>
-      </section>
+      </Reveal>
 
       {/* Values Section */}
-      <section className="bg-muted/50 py-16">
+      <Reveal delay={3} className="bg-muted/50 py-16">
         <div className="container">
           <div className="mb-12 text-center">
             <h2 className="mb-4 text-3xl font-bold">Our Values</h2>
@@ -144,9 +148,9 @@ export default function AboutPage() {
               maintain our facilities.
             </p>
           </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="motion-stagger grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {values.map((value) => (
-              <Card key={value.title} className="text-center">
+              <Card key={value.title} className="motion-card-hover text-center">
                 <CardContent className="p-6">
                   <div className="bg-primary/10 mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full">
                     <value.icon className="text-primary h-6 w-6" />
@@ -158,10 +162,10 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
-      </section>
+      </Reveal>
 
       {/* Team Section */}
-      <section className="container py-16">
+      <Reveal delay={4} className="container py-16">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-3xl font-bold">Meet the Maker</h2>
           <p className="text-muted-foreground mx-auto max-w-2xl">
@@ -170,7 +174,7 @@ export default function AboutPage() {
         </div>
         <div className="mx-auto max-w-md">
           {team.map((member) => (
-            <Card key={member.name} className="overflow-hidden">
+            <Card key={member.name} className="motion-card-hover overflow-hidden">
               <div className="relative aspect-square">
                 <Image
                   src={member.image}
@@ -205,10 +209,10 @@ export default function AboutPage() {
             </Card>
           ))}
         </div>
-      </section>
+      </Reveal>
 
       {/* CTA Section */}
-      <section className="bg-primary text-primary-foreground py-16">
+      <Reveal className="bg-primary text-primary-foreground py-16">
         <div className="container text-center">
           <h2 className="mb-4 text-3xl font-bold">Experience Our Hospitality</h2>
           <p className="mx-auto mb-8 max-w-2xl">
@@ -227,7 +231,7 @@ export default function AboutPage() {
             </Button>
           </div>
         </div>
-      </section>
+      </Reveal>
     </div>
   );
 }

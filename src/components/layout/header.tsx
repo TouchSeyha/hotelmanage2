@@ -53,8 +53,9 @@ export function Header() {
             <Link
               key={link.href}
               href={link.href}
+              data-active={isActive(link.href)}
               className={cn(
-                'hover:text-primary text-sm font-medium transition-colors',
+                'motion-nav-link hover:text-primary text-sm font-medium',
                 isActive(link.href) ? 'text-primary' : 'text-muted-foreground'
               )}
             >
@@ -128,14 +129,15 @@ export function Header() {
             <SheetHeader>
               <SheetTitle>Menu</SheetTitle>
             </SheetHeader>
-            <nav className="mt-6 flex flex-col gap-4">
+            <nav className="motion-sheet-list mt-6 flex flex-col gap-4">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setMobileMenuOpen(false)}
+                  data-active={isActive(link.href)}
                   className={cn(
-                    'hover:text-primary text-lg font-medium transition-colors',
+                    'motion-link-fade hover:text-primary text-lg font-medium',
                     isActive(link.href) ? 'text-primary' : 'text-muted-foreground'
                   )}
                 >
@@ -160,7 +162,7 @@ export function Header() {
                     <Link
                       href="/dashboard"
                       onClick={() => setMobileMenuOpen(false)}
-                      className="block py-2 text-lg font-medium"
+                      className="motion-link-fade block py-2 text-lg font-medium"
                     >
                       Dashboard
                     </Link>
@@ -168,7 +170,7 @@ export function Header() {
                       <Link
                         href="/admin"
                         onClick={() => setMobileMenuOpen(false)}
-                        className="block py-2 text-lg font-medium"
+                        className="motion-link-fade block py-2 text-lg font-medium"
                       >
                         Admin Panel
                       </Link>

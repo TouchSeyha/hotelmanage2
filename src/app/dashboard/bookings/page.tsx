@@ -16,6 +16,8 @@ import { Breadcrumb } from '~/components/shared/breadcrumb';
 import { StatusBadge } from '~/components/shared/statusBadge';
 import { WriteReviewButton } from '~/components/reviews/writeReviewButton';
 import type { BookingStatus, PaymentStatus } from '~/lib/schemas';
+import { Reveal } from '~/components/motion/reveal';
+import { AnimatedList } from '~/components/motion/animatedList';
 
 export default function BookingsPage() {
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past' | 'cancelled'>('upcoming');
@@ -69,7 +71,9 @@ export default function BookingsPage() {
   if (isLoading) {
     return (
       <div className="container py-8">
-        <h1 className="mb-6 text-2xl font-bold">My Bookings</h1>
+        <Reveal className="mb-6">
+          <h1 className="text-2xl font-bold">My Bookings</h1>
+        </Reveal>
         <div className="space-y-4">
           {[1, 2, 3].map((i) => (
             <BookingCardSkeleton key={i} />
@@ -82,9 +86,13 @@ export default function BookingsPage() {
   return (
     <div className="container py-8">
       {/* Breadcrumb */}
-      <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'My Bookings' }]} />
+      <Reveal>
+        <Breadcrumb
+          items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'My Bookings' }]}
+        />
+      </Reveal>
 
-      <div className="mb-6 flex items-center justify-between">
+      <Reveal delay={1} className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">My Bookings</h1>
           <p className="text-muted-foreground">View and manage your hotel reservations</p>
@@ -92,110 +100,117 @@ export default function BookingsPage() {
         <Button asChild>
           <Link href="/dashboard/book">New Booking</Link>
         </Button>
-      </div>
+      </Reveal>
 
-      <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="upcoming">Upcoming ({upcomingBookings.length})</TabsTrigger>
-          <TabsTrigger value="past">Past ({pastBookings.length})</TabsTrigger>
-          <TabsTrigger value="cancelled">Cancelled ({cancelledBookings.length})</TabsTrigger>
-        </TabsList>
+      <Reveal delay={2} variant="panel">
+        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as typeof activeTab)}>
+          <TabsList className="mb-6">
+            <TabsTrigger value="upcoming">Upcoming ({upcomingBookings.length})</TabsTrigger>
+            <TabsTrigger value="past">Past ({pastBookings.length})</TabsTrigger>
+            <TabsTrigger value="cancelled">Cancelled ({cancelledBookings.length})</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value={activeTab} className="space-y-4">
-          {displayBookings.length === 0 ? (
-            <EmptyState
-              icon={Calendar}
-              title={`No ${activeTab} bookings`}
-              description={
-                activeTab === 'upcoming'
-                  ? "You don't have any upcoming reservations."
-                  : activeTab === 'past'
-                    ? "You haven't completed any stays yet."
-                    : "You haven't cancelled any bookings."
-              }
-              action={
-                activeTab === 'upcoming' ? (
-                  <Button asChild>
-                    <Link href="/rooms">Browse Rooms</Link>
-                  </Button>
-                ) : undefined
-              }
-            />
-          ) : (
-            displayBookings.map((booking) => (
-              <Card key={booking.id}>
-                <CardHeader className="flex-row items-start justify-between space-y-0 pb-2">
-                  <div>
-                    <CardTitle className="text-lg">{booking.room.roomType.name}</CardTitle>
-                    <CardDescription>Booking #{booking.bookingNumber}</CardDescription>
-                  </div>
-                  <div className="flex gap-2">
-                    <StatusBadge status={booking.status as BookingStatus} type="booking" />
-                    <StatusBadge status={booking.paymentStatus as PaymentStatus} type="payment" />
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div className="flex items-center gap-2 text-sm">
-                      <Calendar className="text-muted-foreground h-4 w-4" />
+          <TabsContent value={activeTab} className="space-y-4">
+            {displayBookings.length === 0 ? (
+              <EmptyState
+                icon={Calendar}
+                title={`No ${activeTab} bookings`}
+                description={
+                  activeTab === 'upcoming'
+                    ? "You don't have any upcoming reservations."
+                    : activeTab === 'past'
+                      ? "You haven't completed any stays yet."
+                      : "You haven't cancelled any bookings."
+                }
+                action={
+                  activeTab === 'upcoming' ? (
+                    <Button asChild>
+                      <Link href="/rooms">Browse Rooms</Link>
+                    </Button>
+                  ) : undefined
+                }
+              />
+            ) : (
+              <AnimatedList className="space-y-4">
+                {displayBookings.map((booking) => (
+                  <Card key={booking.id} className="motion-card-hover">
+                    <CardHeader className="flex-row items-start justify-between space-y-0 pb-2">
                       <div>
-                        <p className="font-medium">
-                          {format(new Date(booking.checkInDate), 'MMM d')} -{' '}
-                          {format(new Date(booking.checkOutDate), 'MMM d, yyyy')}
-                        </p>
-                        <p className="text-muted-foreground text-xs">
-                          {Math.ceil(
-                            (new Date(booking.checkOutDate).getTime() -
-                              new Date(booking.checkInDate).getTime()) /
-                              (1000 * 60 * 60 * 24)
-                          )}{' '}
-                          nights
-                        </p>
+                        <CardTitle className="text-lg">{booking.room.roomType.name}</CardTitle>
+                        <CardDescription>Booking #{booking.bookingNumber}</CardDescription>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <MapPin className="text-muted-foreground h-4 w-4" />
-                      <span>Room {booking.room.roomNumber}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Users className="text-muted-foreground h-4 w-4" />
-                      <span>{booking.numberOfGuests} guest(s)</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm">
-                      <Clock className="text-muted-foreground h-4 w-4" />
-                      <span>${Number(booking.totalPrice)} total</span>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 flex gap-2">
-                    {activeTab === 'past' &&
-                      (booking.status === 'completed' || booking.status === 'checked_out') && (
-                        <WriteReviewButton
-                          bookingId={booking.id}
-                          bookingNumber={booking.bookingNumber}
-                          roomName={booking.room.roomType.name}
-                          onReviewSubmitted={() => void refetch()}
+                      <div className="flex gap-2">
+                        <StatusBadge status={booking.status as BookingStatus} type="booking" />
+                        <StatusBadge
+                          status={booking.paymentStatus as PaymentStatus}
+                          type="payment"
                         />
-                      )}
-                    {activeTab === 'upcoming' &&
-                      ['pending', 'confirmed'].includes(booking.status) && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="text-destructive"
-                          onClick={() => setCancelBookingId(booking.id)}
-                        >
-                          <XCircle className="mr-2 h-4 w-4" />
-                          Cancel Booking
-                        </Button>
-                      )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </TabsContent>
-      </Tabs>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Calendar className="text-muted-foreground h-4 w-4" />
+                          <div>
+                            <p className="font-medium">
+                              {format(new Date(booking.checkInDate), 'MMM d')} -{' '}
+                              {format(new Date(booking.checkOutDate), 'MMM d, yyyy')}
+                            </p>
+                            <p className="text-muted-foreground text-xs">
+                              {Math.ceil(
+                                (new Date(booking.checkOutDate).getTime() -
+                                  new Date(booking.checkInDate).getTime()) /
+                                  (1000 * 60 * 60 * 24)
+                              )}{' '}
+                              nights
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <MapPin className="text-muted-foreground h-4 w-4" />
+                          <span>Room {booking.room.roomNumber}</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Users className="text-muted-foreground h-4 w-4" />
+                          <span>{booking.numberOfGuests} guest(s)</span>
+                        </div>
+                        <div className="flex items-center gap-2 text-sm">
+                          <Clock className="text-muted-foreground h-4 w-4" />
+                          <span>${Number(booking.totalPrice)} total</span>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 flex gap-2">
+                        {activeTab === 'past' &&
+                          (booking.status === 'completed' || booking.status === 'checked_out') && (
+                            <WriteReviewButton
+                              bookingId={booking.id}
+                              bookingNumber={booking.bookingNumber}
+                              roomName={booking.room.roomType.name}
+                              onReviewSubmitted={() => void refetch()}
+                            />
+                          )}
+                        {activeTab === 'upcoming' &&
+                          ['pending', 'confirmed'].includes(booking.status) && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="text-destructive"
+                              onClick={() => setCancelBookingId(booking.id)}
+                            >
+                              <XCircle className="mr-2 h-4 w-4" />
+                              Cancel Booking
+                            </Button>
+                          )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </AnimatedList>
+            )}
+          </TabsContent>
+        </Tabs>
+      </Reveal>
 
       {/* Cancel Booking Confirmation Dialog */}
       <ConfirmDialog

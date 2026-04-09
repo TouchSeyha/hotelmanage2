@@ -50,6 +50,7 @@ import {
   transformRoomFormToApi,
   type RoomFormData,
 } from '~/lib/schemas';
+import { Reveal } from '~/components/motion/reveal';
 
 export default function RoomsPage() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -145,7 +146,7 @@ export default function RoomsPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <Reveal delay={1} className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Rooms</h1>
           <p className="text-muted-foreground">Manage your hotel room inventory</p>
@@ -154,99 +155,101 @@ export default function RoomsPage() {
           <Plus className="mr-2 h-4 w-4" />
           Add Room
         </Button>
-      </div>
+      </Reveal>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>All Rooms</CardTitle>
-          <CardDescription>{rooms?.length ?? 0} total rooms</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <TableSkeleton rows={5} columns={5} />
-          ) : rooms && rooms.length > 0 ? (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Room Number</TableHead>
-                  <TableHead>Floor</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-12.5"></TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rooms.map((room) => (
-                  <TableRow key={room.id}>
-                    <TableCell className="font-medium">{room.roomNumber}</TableCell>
-                    <TableCell>Floor {room.floor}</TableCell>
-                    <TableCell>
-                      <div>
-                        <p>{room.roomType.name}</p>
-                        <p className="text-muted-foreground text-xs">
-                          ${Number(room.roomType.basePrice)}/night
-                        </p>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge
-                        status={
-                          room.status as
-                            | 'available'
-                            | 'occupied'
-                            | 'cleaning'
-                            | 'maintenance'
-                            | 'out_of_service'
-                        }
-                        type="room"
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center justify-end gap-1">
-                        {(room.status === 'cleaning' || room.status === 'maintenance') && (
+      <Reveal delay={2} variant="panel">
+        <Card className="motion-card-hover">
+          <CardHeader>
+            <CardTitle>All Rooms</CardTitle>
+            <CardDescription>{rooms?.length ?? 0} total rooms</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <TableSkeleton rows={5} columns={5} />
+            ) : rooms && rooms.length > 0 ? (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Room Number</TableHead>
+                    <TableHead>Floor</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead className="w-12.5"></TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {rooms.map((room) => (
+                    <TableRow key={room.id}>
+                      <TableCell className="font-medium">{room.roomNumber}</TableCell>
+                      <TableCell>Floor {room.floor}</TableCell>
+                      <TableCell>
+                        <div>
+                          <p>{room.roomType.name}</p>
+                          <p className="text-muted-foreground text-xs">
+                            ${Number(room.roomType.basePrice)}/night
+                          </p>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <StatusBadge
+                          status={
+                            room.status as
+                              | 'available'
+                              | 'occupied'
+                              | 'cleaning'
+                              | 'maintenance'
+                              | 'out_of_service'
+                          }
+                          type="room"
+                        />
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center justify-end gap-1">
+                          {(room.status === 'cleaning' || room.status === 'maintenance') && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() =>
+                                updateRoomStatus.mutate({ id: room.id, status: 'available' })
+                              }
+                              className="text-green-600 hover:bg-green-50 hover:text-green-700"
+                              title="Mark as available"
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                          )}
                           <Button
                             size="sm"
                             variant="ghost"
-                            onClick={() =>
-                              updateRoomStatus.mutate({ id: room.id, status: 'available' })
-                            }
-                            className="text-green-600 hover:bg-green-50 hover:text-green-700"
-                            title="Mark as available"
+                            onClick={() => handleEdit(room)}
+                            className="text-muted-foreground hover:text-foreground"
+                            title="Edit room"
                           >
-                            <CheckCircle className="h-4 w-4" />
+                            <Pencil className="h-4 w-4" />
                           </Button>
-                        )}
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => handleEdit(room)}
-                          className="text-muted-foreground hover:text-foreground"
-                          title="Edit room"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setDeleteId(room.id)}
-                          className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                          title="Delete room"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          ) : (
-            <p className="text-muted-foreground py-8 text-center">
-              No rooms yet. Add your first room to get started.
-            </p>
-          )}
-        </CardContent>
-      </Card>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setDeleteId(room.id)}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            title="Delete room"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            ) : (
+              <p className="text-muted-foreground py-8 text-center">
+                No rooms yet. Add your first room to get started.
+              </p>
+            )}
+          </CardContent>
+        </Card>
+      </Reveal>
 
       {/* Create/Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>

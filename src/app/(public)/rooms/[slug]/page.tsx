@@ -8,6 +8,7 @@ import { Button } from '~/components/ui/button';
 import { Card, CardContent } from '~/components/ui/card';
 import { Badge } from '~/components/ui/badge';
 import { RoomGallery } from '~/components/shared/roomGallery';
+import { Reveal } from '~/components/motion/reveal';
 
 interface RoomDetailPageProps {
   params: Promise<{
@@ -55,7 +56,7 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
   return (
     <div className="container py-8">
       {/* Breadcrumb */}
-      <div className="mb-6">
+      <Reveal className="mb-6">
         <Link
           href="/rooms"
           className="text-muted-foreground hover:text-primary inline-flex items-center text-sm"
@@ -63,9 +64,9 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Rooms
         </Link>
-      </div>
+      </Reveal>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <Reveal delay={1} variant="panel" className="grid gap-8 lg:grid-cols-2">
         {/* Image Gallery with Hero + Thumbnails Layout */}
         <RoomGallery images={galleryImages} roomName={roomType.name} maxThumbnails={4} />
 
@@ -137,23 +138,23 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
             </Button>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {/* Policies */}
-      <div className="mt-12 grid gap-6 md:grid-cols-3">
-        <Card>
+      <Reveal delay={2} className="motion-stagger mt-12 grid gap-6 md:grid-cols-3">
+        <Card className="motion-card-hover">
           <CardContent className="p-6">
             <h3 className="mb-2 font-semibold">Check-in</h3>
             <p className="text-muted-foreground text-sm">From 2:00 PM</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="motion-card-hover">
           <CardContent className="p-6">
             <h3 className="mb-2 font-semibold">Check-out</h3>
             <p className="text-muted-foreground text-sm">Until 11:00 AM</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="motion-card-hover">
           <CardContent className="p-6">
             <h3 className="mb-2 font-semibold">Cancellation</h3>
             <p className="text-muted-foreground text-sm">
@@ -161,7 +162,7 @@ export default async function RoomDetailPage({ params }: RoomDetailPageProps) {
             </p>
           </CardContent>
         </Card>
-      </div>
+      </Reveal>
     </div>
   );
 }
