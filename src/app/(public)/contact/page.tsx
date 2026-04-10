@@ -1,16 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import {
-  MapPin,
-  Phone,
-  Mail,
-  MessageCircle,
-  Clock,
-  CreditCard,
-  ArrowUpRight,
-  Send,
-} from 'lucide-react';
+import { MapPin, Phone, Mail, MessageCircle, ArrowUpRight, Send } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '~/trpc/react';
@@ -96,7 +87,7 @@ export default function ContactPage() {
 
   return (
     <div>
-      <section className="border-border/50 from-primary/[0.04] relative isolate overflow-hidden border-b bg-gradient-to-b via-transparent to-transparent">
+      <section className="border-border/50 from-primary/20 relative isolate overflow-hidden border-b bg-linear-to-b via-transparent to-transparent">
         <div className="bg-primary/5 pointer-events-none absolute -top-20 -right-20 h-80 w-80 rounded-full blur-3xl" />
         <div className="bg-foreground/5 pointer-events-none absolute bottom-0 -left-16 h-60 w-60 rounded-full blur-3xl" />
 
@@ -139,7 +130,7 @@ export default function ContactPage() {
         <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
           <Reveal delay={0} className="lg:col-span-7">
             <div className="border-border/60 bg-card relative rounded-2xl border p-8 shadow-sm sm:p-10">
-              <div className="via-primary/30 pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent to-transparent" />
+              <div className="via-primary/30 pointer-events-none absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent to-transparent" />
 
               <div className="flex items-center gap-3">
                 <div className="border-primary/20 bg-primary/10 flex h-10 w-10 items-center justify-center rounded-full border">
@@ -154,7 +145,7 @@ export default function ContactPage() {
               </div>
 
               {success && (
-                <div className="mt-6 overflow-hidden rounded-xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-teal-50 dark:border-emerald-900/40 dark:from-emerald-950/30 dark:to-teal-950/30">
+                <div className="mt-6 overflow-hidden rounded-xl border border-emerald-200 bg-linear-to-r from-emerald-50 to-teal-50 dark:border-emerald-900/40 dark:from-emerald-950/30 dark:to-teal-950/30">
                   <div className="flex items-center gap-3 px-5 py-4">
                     <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">
                       <svg
@@ -300,7 +291,7 @@ export default function ContactPage() {
                     disabled={sendContactEmail.isPending}
                     className="group bg-primary text-primary-foreground hover:shadow-primary/25 relative h-12 w-full overflow-hidden rounded-xl font-medium tracking-wide transition-all hover:shadow-lg"
                   >
-                    <span className="absolute inset-0 translate-x-[-100%] bg-gradient-to-r from-white/0 via-white/20 to-white/0 transition-transform duration-500 group-hover:translate-x-[100%]" />
+                    <span className="absolute inset-0 -translate-x-full bg-linear-to-r from-white/0 via-white/20 to-white/0 transition-transform duration-500 group-hover:translate-x-full" />
                     <span className="relative flex items-center justify-center gap-2">
                       {sendContactEmail.isPending ? 'Sending...' : 'Send message'}
                       <ArrowUpRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
@@ -328,7 +319,7 @@ export default function ContactPage() {
                     className="motion-card-hover group border-border/60 bg-card relative overflow-hidden rounded-xl border p-5"
                   >
                     <div
-                      className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${channel.accent} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
+                      className={`pointer-events-none absolute inset-0 bg-linear-to-br ${channel.accent} opacity-0 transition-opacity duration-300 group-hover:opacity-100`}
                     />
                     <div className="relative flex items-start gap-4">
                       <div
