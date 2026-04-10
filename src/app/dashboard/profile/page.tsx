@@ -20,6 +20,7 @@ import {
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
+import { PhoneInput } from '~/components/ui/phoneInput';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
 import { Skeleton } from '~/components/ui/skeleton';
@@ -162,11 +163,12 @@ export default function ProfilePage() {
                       <FormControl>
                         <div className="relative">
                           <Phone className="text-muted-foreground absolute top-3 left-3 h-4 w-4" />
-                          <Input
+                          <PhoneInput
                             className="pl-9"
-                            placeholder="+1 (555) 000-0000"
-                            {...field}
                             value={field.value ?? ''}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
                           />
                         </div>
                       </FormControl>

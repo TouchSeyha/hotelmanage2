@@ -22,6 +22,7 @@ import { api } from '~/trpc/react';
 import { useDebounce } from '~/lib/hooks/useDebounce';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
+import { PhoneInput } from '~/components/ui/phoneInput';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import {
   Table,
@@ -352,7 +353,12 @@ export default function UsersPage() {
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <Input placeholder="+1 234 567 8900" {...field} />
+                      <PhoneInput
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

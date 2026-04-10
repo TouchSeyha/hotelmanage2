@@ -19,6 +19,7 @@ import {
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
+import { PhoneInput } from '~/components/ui/phoneInput';
 import { Textarea } from '~/components/ui/textarea';
 import { guestInfoSchema, defaultGuestInfoFormData, type GuestInfoFormData } from '~/lib/schemas';
 
@@ -150,7 +151,12 @@ export function Step2Guest({ userEmail, userName }: Step2GuestProps) {
                       <FormItem>
                         <FormLabel required>Phone Number</FormLabel>
                         <FormControl>
-                          <Input type="tel" placeholder="+855 (096) 000-0000" {...field} />
+                          <PhoneInput
+                            value={field.value ?? ''}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

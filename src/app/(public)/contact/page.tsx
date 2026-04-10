@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
+import { PhoneInput } from '~/components/ui/phoneInput';
 import { Textarea } from '~/components/ui/textarea';
 import {
   Select,
@@ -164,7 +165,12 @@ export default function ContactPage() {
                       <FormItem>
                         <FormLabel>Phone</FormLabel>
                         <FormControl>
-                          <Input type="tel" placeholder="+855 (0)89 555 120" {...field} />
+                          <PhoneInput
+                            value={field.value ?? ''}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
