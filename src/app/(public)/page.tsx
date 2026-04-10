@@ -8,6 +8,7 @@ import { Card, CardContent } from '~/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { api } from '~/trpc/server';
 import { RoomCard } from '~/components/shared/roomCard';
+import { Reveal } from '~/components/motion/reveal';
 
 const amenities = [
   { icon: Wifi, label: 'Free WiFi', description: 'High-speed internet throughout' },
@@ -28,7 +29,7 @@ async function FeaturedRoomsSection() {
   const featuredRooms = roomTypes.slice(0, 3);
 
   return featuredRooms.length > 0 ? (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="motion-stagger grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {featuredRooms.map((room) => (
         <RoomCard
           key={room.id}
@@ -75,9 +76,9 @@ async function TestimonialsSection() {
         <p className="text-muted-foreground mt-2">Read reviews from our satisfied guests</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3">
+      <div className="motion-stagger grid gap-6 md:grid-cols-3">
         {reviews.map((review) => (
-          <Card key={review.id} className="transition-shadow hover:shadow-md">
+          <Card key={review.id} className="motion-card-hover transition-shadow hover:shadow-md">
             <CardContent className="p-6">
               {/* Star Rating */}
               <div className="mb-4 flex items-center gap-1">
@@ -132,7 +133,10 @@ export default async function HomePage() {
             sizes="100vw"
           />
         </div>
-        <div className="relative container flex h-full flex-col items-start justify-center text-white">
+        <Reveal
+          variant="hero"
+          className="relative container flex h-full flex-col items-start justify-center text-white"
+        >
           <h1 className="mb-4 max-w-2xl text-4xl leading-tight font-bold md:text-5xl lg:text-6xl">
             Experience Luxury & Comfort
           </h1>
@@ -156,11 +160,11 @@ export default async function HomePage() {
               <Link href="/contact">Contact Us</Link>
             </Button>
           </div>
-        </div>
+        </Reveal>
       </section>
 
       {/* Quick Booking Widget */}
-      <section className="relative z-10 container -mt-16">
+      <Reveal delay={1} className="relative z-10 container -mt-16">
         <Card className="shadow-lg">
           <CardContent className="p-6">
             <div className="flex flex-col gap-4 md:flex-row md:items-end">
@@ -191,10 +195,10 @@ export default async function HomePage() {
             </div>
           </CardContent>
         </Card>
-      </section>
+      </Reveal>
 
       {/* Featured Rooms */}
-      <section className="container py-16">
+      <Reveal delay={2} className="container py-16">
         <div className="mb-8 flex items-center justify-between">
           <div>
             <h2 className="text-3xl font-bold">Featured Rooms</h2>
@@ -213,19 +217,22 @@ export default async function HomePage() {
         <Suspense fallback={<div>Loading featured rooms...</div>}>
           <FeaturedRoomsSection />
         </Suspense>
-      </section>
+      </Reveal>
 
       {/* Amenities Section */}
-      <section className="bg-muted/50 py-16">
+      <Reveal delay={3} className="bg-muted/50 py-16">
         <div className="container">
           <div className="mb-8 text-center">
             <h2 className="text-3xl font-bold">Hotel Amenities</h2>
             <p className="text-muted-foreground mt-2">Everything you need for a comfortable stay</p>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          <div className="motion-stagger grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {amenities.map((amenity) => (
-              <Card key={amenity.label} className="transition-shadow hover:shadow-md">
+              <Card
+                key={amenity.label}
+                className="motion-card-hover transition-shadow hover:shadow-md"
+              >
                 <CardContent className="flex items-start gap-4 p-6">
                   <div className="bg-primary/10 rounded-full p-3">
                     <amenity.icon className="text-primary h-6 w-6" />
@@ -239,7 +246,7 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
-      </section>
+      </Reveal>
 
       {/* Testimonials - Only shown when reviews exist */}
       <Suspense fallback={null}>
@@ -247,7 +254,7 @@ export default async function HomePage() {
       </Suspense>
 
       {/* CTA Section */}
-      <section className="bg-primary text-primary-foreground py-16">
+      <Reveal delay={4} className="bg-primary text-primary-foreground py-16">
         <div className="container text-center">
           <h2 className="mb-4 text-3xl font-bold">Ready to Book Your Stay?</h2>
           <p className="mx-auto mb-8 max-w-2xl">
@@ -261,7 +268,7 @@ export default async function HomePage() {
             </Link>
           </Button>
         </div>
-      </section>
+      </Reveal>
     </div>
   );
 }

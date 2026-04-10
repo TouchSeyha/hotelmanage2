@@ -20,11 +20,13 @@ import {
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
+import { PhoneInput } from '~/components/ui/phoneInput';
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
 import { Skeleton } from '~/components/ui/skeleton';
 import { Breadcrumb } from '~/components/shared/breadcrumb';
 import { profileFormSchema, transformProfileFormToApi, type ProfileFormData } from '~/lib/schemas';
+import { Reveal } from '~/components/motion/reveal';
 
 export default function ProfilePage() {
   const { data: profile, isLoading, refetch } = api.user.getProfile.useQuery();
@@ -54,7 +56,9 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div className="container py-8">
-        <h1 className="mb-6 text-2xl font-bold">Profile</h1>
+        <Reveal className="mb-6">
+          <h1 className="text-2xl font-bold">Profile</h1>
+        </Reveal>
         <div className="grid gap-6 lg:grid-cols-3">
           <Card className="lg:col-span-1">
             <CardContent className="flex flex-col items-center py-8">
@@ -86,13 +90,17 @@ export default function ProfilePage() {
   return (
     <div className="container py-8">
       {/* Breadcrumb */}
-      <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Profile' }]} />
+      <Reveal>
+        <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Profile' }]} />
+      </Reveal>
 
-      <h1 className="mb-6 text-2xl font-bold">Profile</h1>
+      <Reveal delay={1}>
+        <h1 className="mb-6 text-2xl font-bold">Profile</h1>
+      </Reveal>
 
-      <div className="grid gap-6 lg:grid-cols-3">
+      <Reveal delay={2} variant="panel" className="grid gap-6 lg:grid-cols-3">
         {/* Profile Card */}
-        <Card className="lg:col-span-1">
+        <Card className="motion-card-hover lg:col-span-1">
           <CardContent className="flex flex-col items-center py-8">
             <Avatar className="h-24 w-24">
               <AvatarImage src={profile.image ?? undefined} alt={profile.name ?? 'User'} />
@@ -110,7 +118,7 @@ export default function ProfilePage() {
         </Card>
 
         {/* Edit Profile Form */}
-        <Card className="lg:col-span-2">
+        <Card className="motion-card-hover lg:col-span-2">
           <CardHeader>
             <CardTitle>Edit Profile</CardTitle>
             <CardDescription>Update your personal information</CardDescription>
@@ -155,11 +163,12 @@ export default function ProfilePage() {
                       <FormControl>
                         <div className="relative">
                           <Phone className="text-muted-foreground absolute top-3 left-3 h-4 w-4" />
-                          <Input
+                          <PhoneInput
                             className="pl-9"
-                            placeholder="+1 (555) 000-0000"
-                            {...field}
                             value={field.value ?? ''}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
                           />
                         </div>
                       </FormControl>
@@ -187,7 +196,7 @@ export default function ProfilePage() {
         </Card>
 
         {/* Appearance Settings */}
-        <Card className="lg:col-span-3">
+        <Card className="motion-card-hover lg:col-span-3">
           <CardHeader>
             <CardTitle>Appearance</CardTitle>
             <CardDescription>Customize how the application looks</CardDescription>
@@ -198,7 +207,7 @@ export default function ProfilePage() {
         </Card>
 
         {/* Account Info */}
-        <Card className="lg:col-span-3">
+        <Card className="motion-card-hover lg:col-span-3">
           <CardHeader>
             <CardTitle>Account Information</CardTitle>
             <CardDescription>Your account details and preferences</CardDescription>
@@ -230,7 +239,7 @@ export default function ProfilePage() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </Reveal>
     </div>
   );
 }

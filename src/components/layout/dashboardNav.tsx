@@ -26,8 +26,9 @@ export function DashboardNav() {
         <Link
           key={item.href}
           href={item.href}
+          data-active={isActive(item.href)}
           className={cn(
-            'flex items-center gap-2 text-sm font-medium transition-colors',
+            'motion-nav-link flex items-center gap-2 text-sm font-medium',
             isActive(item.href) ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
           )}
         >

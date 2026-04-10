@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { api } from '~/trpc/react';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
+import { PhoneInput } from '~/components/ui/phoneInput';
 import { Textarea } from '~/components/ui/textarea';
 import {
   Select,
@@ -25,6 +26,7 @@ import {
   FormMessage,
 } from '~/components/ui/form';
 import { contactFormSchema, type ContactFormValues } from '~/lib/schemas';
+import { Reveal } from '~/components/motion/reveal';
 
 const channels = [
   {
@@ -92,7 +94,10 @@ export default function ContactPage() {
     <div className="space-y-16">
       <section className="border-base-200 from-primary/50 via-secondary/50 to-accent/50 relative overflow-hidden border-b bg-linear-to-br py-16">
         <div className="hero-orbit" />
-        <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
+        <Reveal
+          variant="hero"
+          className="relative mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8"
+        >
           <div className="border-primary/30 bg-base-100/70 text-primary inline-flex items-center gap-2 rounded-full border px-4 py-1 text-xs tracking-[0.3em] uppercase">
             <Sparkles className="h-4 w-4" />
             Concierge desk
@@ -104,12 +109,12 @@ export default function ContactPage() {
             We confirm transfers, suites, and rituals manually so you never worry about payments or
             timing.
           </p>
-        </div>
+        </Reveal>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
+      <Reveal delay={1} className="mx-auto max-w-6xl px-4 py-4 sm:px-6 lg:px-8">
         <div className="grid gap-6 lg:grid-cols-2 lg:gap-12">
-          <Card className="p-8">
+          <Card className="motion-card-hover p-8">
             <h2 className="text-2xl font-semibold">Send us a note</h2>
             <p className="text-base-content/60 text-sm">
               Stylists reply with suite pairings, hydro circuit times, or help with in-house stays.
@@ -160,7 +165,12 @@ export default function ContactPage() {
                       <FormItem>
                         <FormLabel>Phone</FormLabel>
                         <FormControl>
-                          <Input type="tel" placeholder="+855 (0)89 555 120" {...field} />
+                          <PhoneInput
+                            value={field.value ?? ''}
+                            onChange={field.onChange}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -216,7 +226,7 @@ export default function ContactPage() {
           </Card>
 
           <div className="space-y-6">
-            <Card className="p-6">
+            <Card className="motion-card-hover p-6">
               <p className="text-base-content/60 text-xs tracking-[0.4em] uppercase">Channels</p>
               <div className="mt-6 space-y-5">
                 {channels.map((channel) => (
@@ -231,7 +241,7 @@ export default function ContactPage() {
               </div>
             </Card>
 
-            <Card className="p-6">
+            <Card className="motion-card-hover p-6">
               <p className="text-base-content/60 text-xs tracking-[0.4em] uppercase">
                 Riverside address
               </p>
@@ -250,7 +260,7 @@ export default function ContactPage() {
             </Card>
           </div>
         </div>
-      </section>
+      </Reveal>
     </div>
   );
 }

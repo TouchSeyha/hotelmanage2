@@ -20,6 +20,7 @@ import {
 import { ConfirmDialog } from '~/components/shared/confirmDialog';
 import { Badge } from '~/components/ui/badge';
 import { Skeleton } from '~/components/ui/skeleton';
+import { Reveal } from '~/components/motion/reveal';
 
 export default function RoomTypesPage() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -39,7 +40,7 @@ export default function RoomTypesPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <Reveal delay={1} className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold">Room Types</h1>
           <p className="text-muted-foreground">Manage room categories and pricing</p>
@@ -50,10 +51,10 @@ export default function RoomTypesPage() {
             Add Room Type
           </Link>
         </Button>
-      </div>
+      </Reveal>
 
       {isLoading ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <Reveal delay={2} variant="panel" className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {[1, 2, 3].map((i) => (
             <Card key={i}>
               <Skeleton className="h-48 w-full rounded-t-lg" />
@@ -66,13 +67,17 @@ export default function RoomTypesPage() {
               </CardContent>
             </Card>
           ))}
-        </div>
+        </Reveal>
       ) : roomTypes && roomTypes.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <Reveal
+          delay={2}
+          variant="panel"
+          className="motion-stagger grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+        >
           {roomTypes.map((roomType) => (
             <Card
               key={roomType.id}
-              className="overflow-hidden pt-0 transition-shadow hover:shadow-lg"
+              className="motion-card-hover overflow-hidden pt-0 transition-shadow hover:shadow-lg"
             >
               <div className="bg-muted relative h-52 w-full">
                 {Array.isArray(roomType.images) && roomType.images[0] ? (
@@ -151,23 +156,25 @@ export default function RoomTypesPage() {
               </CardContent>
             </Card>
           ))}
-        </div>
+        </Reveal>
       ) : (
-        <Card>
-          <CardContent className="flex flex-col items-center justify-center py-12">
-            <BedDouble className="text-muted-foreground mb-4 h-12 w-12" />
-            <h3 className="text-lg font-medium">No room types yet</h3>
-            <p className="text-muted-foreground mb-4">
-              Get started by creating your first room type
-            </p>
-            <Button asChild>
-              <Link href="/admin/room-types/new">
-                <Plus className="mr-2 h-4 w-4" />
-                Add Room Type
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <Reveal delay={2} variant="panel">
+          <Card className="motion-card-hover">
+            <CardContent className="flex flex-col items-center justify-center py-12">
+              <BedDouble className="text-muted-foreground mb-4 h-12 w-12" />
+              <h3 className="text-lg font-medium">No room types yet</h3>
+              <p className="text-muted-foreground mb-4">
+                Get started by creating your first room type
+              </p>
+              <Button asChild>
+                <Link href="/admin/room-types/new">
+                  <Plus className="mr-2 h-4 w-4" />
+                  Add Room Type
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </Reveal>
       )}
 
       {/* Delete Confirmation Dialog */}

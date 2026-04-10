@@ -43,8 +43,9 @@ export function AdminSidebarNav() {
           <Link
             key={item.href}
             href={item.href}
+            data-active={isActive}
             className={cn(
-              'flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-200',
+              'motion-pill-link flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-all duration-200',
               isActive
                 ? 'bg-primary text-primary-foreground font-medium shadow-sm'
                 : 'text-muted-foreground hover:bg-muted hover:text-foreground'
