@@ -21,7 +21,7 @@ export function Footer() {
           <div className="space-y-4">
             <Link
               href="/"
-              className="font-[family-name:var(--font-playfair)] text-xl font-semibold tracking-wide"
+              className="font-(family-name:--font-playfair) text-xl font-semibold tracking-wide"
             >
               <span className="text-primary">Luxe</span>
               <span className="italic">Stay</span>
