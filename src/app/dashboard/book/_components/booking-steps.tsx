@@ -29,9 +29,10 @@ export function BookingSteps() {
                 onClick={() => isClickable && goToStep(step.number)}
                 disabled={!isClickable}
                 className={cn(
-                  'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-colors',
+                  'relative flex h-10 w-10 shrink-0 items-center justify-center rounded-full border-2 transition-all duration-300',
                   isCompleted && 'border-primary bg-primary text-primary-foreground',
-                  isCurrent && 'border-primary bg-background text-primary',
+                  isCurrent &&
+                    'border-primary bg-background text-primary shadow-primary/10 scale-105 shadow-lg',
                   !isCompleted && !isCurrent && 'border-muted bg-background text-muted-foreground',
                   isClickable && 'hover:bg-primary/10 cursor-pointer'
                 )}
@@ -56,7 +57,7 @@ export function BookingSteps() {
                 <div className="mx-4 flex-1">
                   <div
                     className={cn(
-                      'h-0.5 w-full rounded-full transition-colors',
+                      'h-0.5 w-full rounded-full transition-all duration-300',
                       isCompleted ? 'bg-primary' : 'bg-muted'
                     )}
                   />

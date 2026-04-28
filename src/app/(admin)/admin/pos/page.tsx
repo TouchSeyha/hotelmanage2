@@ -32,6 +32,7 @@ import {
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
+import { PhoneInput } from '~/components/ui/phoneInput';
 import {
   Select,
   SelectContent,
@@ -358,7 +359,13 @@ export default function POSPage() {
                           <FormControl>
                             <div className="relative">
                               <Phone className="text-muted-foreground absolute top-3 left-3 h-4 w-4" />
-                              <Input className="pl-9" placeholder="Phone number" {...field} />
+                              <PhoneInput
+                                className="pl-9"
+                                value={field.value ?? ''}
+                                onChange={field.onChange}
+                                onBlur={field.onBlur}
+                                name={field.name}
+                              />
                             </div>
                           </FormControl>
                           <FormMessage />

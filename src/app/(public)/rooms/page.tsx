@@ -5,6 +5,8 @@ import { RoomGridSkeleton } from '~/components/shared/loadingSkeleton';
 import { EmptyState } from '~/components/shared/emptyState';
 import { BedDouble } from 'lucide-react';
 import type { Metadata } from 'next';
+import { Reveal } from '~/components/motion/reveal';
+import { AnimatedList } from '~/components/motion/animatedList';
 
 export const metadata: Metadata = {
   title: 'Our Rooms',
@@ -36,7 +38,10 @@ async function RoomsList({ sortBy, order }: { sortBy: string; order: 'asc' | 'de
   }
 
   return (
-    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <AnimatedList
+      key={`${sortBy}-${order}`}
+      className="motion-stagger grid gap-6 md:grid-cols-2 lg:grid-cols-3"
+    >
       {roomTypes.map((room) => (
         <RoomCard
           key={room.id}
@@ -52,7 +57,7 @@ async function RoomsList({ sortBy, order }: { sortBy: string; order: 'asc' | 'de
           availableRooms={room._count.rooms}
         />
       ))}
-    </div>
+    </AnimatedList>
   );
 }
 
@@ -64,15 +69,18 @@ export default async function RoomsPage({ searchParams }: RoomsPageProps) {
   return (
     <div className="container py-8">
       {/* Header */}
-      <div className="mb-8">
+      <Reveal variant="hero" className="mb-8">
         <h1 className="text-3xl font-bold">Our Rooms</h1>
         <p className="text-muted-foreground mt-2">
           Choose from our selection of beautifully appointed rooms and suites
         </p>
-      </div>
+      </Reveal>
 
       {/* Filters & Sort */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <Reveal
+        delay={1}
+        className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
+      >
         <div className="flex items-center gap-4">
           <span className="text-muted-foreground text-sm">Sort by:</span>
           <div className="flex gap-2">
@@ -108,12 +116,14 @@ export default async function RoomsPage({ searchParams }: RoomsPageProps) {
             </a>
           </div>
         </div>
-      </div>
+      </Reveal>
 
       {/* Room Grid */}
-      <Suspense fallback={<RoomGridSkeleton count={6} />}>
-        <RoomsList sortBy={sortBy} order={order} />
-      </Suspense>
+      <Reveal delay={2} variant="panel">
+        <Suspense fallback={<RoomGridSkeleton count={6} />}>
+          <RoomsList sortBy={sortBy} order={order} />
+        </Suspense>
+      </Reveal>
     </div>
   );
 }

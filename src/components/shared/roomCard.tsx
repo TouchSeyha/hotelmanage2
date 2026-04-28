@@ -50,7 +50,12 @@ export function RoomCard({
   const displayAmenities = amenities.slice(0, 3);
 
   return (
-    <Card className={cn('overflow-hidden pt-0 transition-shadow hover:shadow-lg', className)}>
+    <Card
+      className={cn(
+        'motion-card-hover overflow-hidden pt-0 transition-shadow hover:shadow-lg',
+        className
+      )}
+    >
       {/* Image */}
       <div className="relative aspect-4/3 overflow-hidden">
         <Image

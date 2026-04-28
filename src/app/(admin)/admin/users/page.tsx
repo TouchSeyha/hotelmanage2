@@ -22,6 +22,7 @@ import { api } from '~/trpc/react';
 import { useDebounce } from '~/lib/hooks/useDebounce';
 import { Button } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
+import { PhoneInput } from '~/components/ui/phoneInput';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
 import {
   Table,
@@ -72,6 +73,7 @@ import {
   transformUserEditFormToApi,
   type UserEditFormData,
 } from '~/lib/schemas';
+import { Reveal } from '~/components/motion/reveal';
 
 export default function UsersPage() {
   const [search, setSearch] = useState('');
@@ -149,13 +151,13 @@ export default function UsersPage() {
 
   return (
     <div>
-      <div className="mb-6">
+      <Reveal delay={1} className="mb-6">
         <h1 className="text-2xl font-bold">Users</h1>
         <p className="text-muted-foreground">Manage user accounts and permissions</p>
-      </div>
+      </Reveal>
 
       {/* Filters */}
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row">
+      <Reveal delay={2} className="mb-6 flex flex-col gap-4 sm:flex-row">
         <div className="relative flex-1 sm:max-w-xs">
           <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
           <Input
@@ -184,139 +186,141 @@ export default function UsersPage() {
             <SelectItem value="admin">Admins</SelectItem>
           </SelectContent>
         </Select>
-      </div>
+      </Reveal>
 
       {/* Users Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Users</CardTitle>
-          <CardDescription>{pagination?.total ?? 0} total users</CardDescription>
-        </CardHeader>
-        <CardContent>
-          {isLoading ? (
-            <TableSkeleton rows={5} columns={6} />
-          ) : users.length > 0 ? (
-            <>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Phone</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Bookings</TableHead>
-                    <TableHead>Joined</TableHead>
-                    <TableHead className="w-12.5"></TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.id}>
-                      <TableCell>
-                        <div className="flex items-center gap-3">
-                          <Avatar className="h-8 w-8">
-                            <AvatarImage src={user.image ?? undefined} />
-                            <AvatarFallback>
-                              {user.name?.charAt(0).toUpperCase() ?? 'U'}
-                            </AvatarFallback>
-                          </Avatar>
-                          <span className="font-medium">{user.name ?? 'Unnamed'}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-muted-foreground">{user.email}</TableCell>
-                      <TableCell className="text-muted-foreground">{user.phone ?? '-'}</TableCell>
-                      <TableCell>
-                        <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
-                          {user.role === 'admin' ? (
-                            <Shield className="mr-1 h-3 w-3" />
-                          ) : (
-                            <UserCircle className="mr-1 h-3 w-3" />
-                          )}
-                          {user.role}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{user._count.bookings}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {format(new Date(user.createdAt), 'MMM d, yyyy')}
-                      </TableCell>
-                      <TableCell>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem asChild>
-                              <Link href={`/admin/users/${user.id}`}>
-                                <Eye className="mr-2 h-4 w-4" />
-                                View Details
-                              </Link>
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleEdit(user)}>
-                              <Pencil className="mr-2 h-4 w-4" />
-                              Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem
-                              className="text-destructive"
-                              onClick={() => setDeleteId(user.id)}
-                            >
-                              <Trash2 className="mr-2 h-4 w-4" />
-                              Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
+      <Reveal delay={3} variant="panel">
+        <Card className="motion-card-hover">
+          <CardHeader>
+            <CardTitle>All Users</CardTitle>
+            <CardDescription>{pagination?.total ?? 0} total users</CardDescription>
+          </CardHeader>
+          <CardContent>
+            {isLoading ? (
+              <TableSkeleton rows={5} columns={6} />
+            ) : users.length > 0 ? (
+              <>
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead>User</TableHead>
+                      <TableHead>Email</TableHead>
+                      <TableHead>Phone</TableHead>
+                      <TableHead>Role</TableHead>
+                      <TableHead>Bookings</TableHead>
+                      <TableHead>Joined</TableHead>
+                      <TableHead className="w-12.5"></TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+                  </TableHeader>
+                  <TableBody>
+                    {users.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell>
+                          <div className="flex items-center gap-3">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={user.image ?? undefined} />
+                              <AvatarFallback>
+                                {user.name?.charAt(0).toUpperCase() ?? 'U'}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span className="font-medium">{user.name ?? 'Unnamed'}</span>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-muted-foreground">{user.email}</TableCell>
+                        <TableCell className="text-muted-foreground">{user.phone ?? '-'}</TableCell>
+                        <TableCell>
+                          <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
+                            {user.role === 'admin' ? (
+                              <Shield className="mr-1 h-3 w-3" />
+                            ) : (
+                              <UserCircle className="mr-1 h-3 w-3" />
+                            )}
+                            {user.role}
+                          </Badge>
+                        </TableCell>
+                        <TableCell>{user._count.bookings}</TableCell>
+                        <TableCell className="text-muted-foreground">
+                          {format(new Date(user.createdAt), 'MMM d, yyyy')}
+                        </TableCell>
+                        <TableCell>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="sm">
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem asChild>
+                                <Link href={`/admin/users/${user.id}`}>
+                                  <Eye className="mr-2 h-4 w-4" />
+                                  View Details
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => handleEdit(user)}>
+                                <Pencil className="mr-2 h-4 w-4" />
+                                Edit
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="text-destructive"
+                                onClick={() => setDeleteId(user.id)}
+                              >
+                                <Trash2 className="mr-2 h-4 w-4" />
+                                Delete
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
 
-              {/* Pagination */}
-              {pagination && pagination.totalPages > 1 && (
-                <div className="mt-4 flex items-center justify-between">
-                  <p className="text-muted-foreground text-sm">
-                    Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
-                    {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
-                    {pagination.total} users
-                  </p>
-                  <div className="flex gap-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={pagination.page === 1}
-                      onClick={() => setPage(page - 1)}
-                    >
-                      Previous
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      disabled={pagination.page === pagination.totalPages}
-                      onClick={() => setPage(page + 1)}
-                    >
-                      Next
-                    </Button>
+                {/* Pagination */}
+                {pagination && pagination.totalPages > 1 && (
+                  <div className="mt-4 flex items-center justify-between">
+                    <p className="text-muted-foreground text-sm">
+                      Showing {(pagination.page - 1) * pagination.limit + 1} to{' '}
+                      {Math.min(pagination.page * pagination.limit, pagination.total)} of{' '}
+                      {pagination.total} users
+                    </p>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={pagination.page === 1}
+                        onClick={() => setPage(page - 1)}
+                      >
+                        Previous
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        disabled={pagination.page === pagination.totalPages}
+                        onClick={() => setPage(page + 1)}
+                      >
+                        Next
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-12">
-              <User className="text-muted-foreground mb-4 h-12 w-12" />
-              <h3 className="text-lg font-medium">No users found</h3>
-              <p className="text-muted-foreground">
-                {search || roleFilter !== 'all'
-                  ? 'Try adjusting your filters'
-                  : 'Users will appear here once they sign up'}
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                )}
+              </>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-12">
+                <User className="text-muted-foreground mb-4 h-12 w-12" />
+                <h3 className="text-lg font-medium">No users found</h3>
+                <p className="text-muted-foreground">
+                  {search || roleFilter !== 'all'
+                    ? 'Try adjusting your filters'
+                    : 'Users will appear here once they sign up'}
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </Reveal>
 
       {/* Edit Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -349,7 +353,12 @@ export default function UsersPage() {
                   <FormItem>
                     <FormLabel>Phone</FormLabel>
                     <FormControl>
-                      <Input placeholder="+1 234 567 8900" {...field} />
+                      <PhoneInput
+                        value={field.value ?? ''}
+                        onChange={field.onChange}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

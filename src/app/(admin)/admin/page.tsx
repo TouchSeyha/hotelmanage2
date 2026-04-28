@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/com
 import { Button } from '~/components/ui/button';
 import { StatusBadge } from '~/components/shared/statusBadge';
 import { DashboardSkeleton } from '~/components/shared/loadingSkeleton';
+import { Reveal } from '~/components/motion/reveal';
 
 const cachedGetDashboardStats = cache(() => api.admin.getDashboardStats());
 const cachedGetTodaySchedule = cache(() => api.admin.getTodaySchedule());
@@ -23,8 +24,8 @@ async function DashboardContent() {
   return (
     <div className="space-y-6">
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
+      <div className="motion-stagger grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        <Card className="motion-card-hover">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
             <DollarSign className="text-muted-foreground h-4 w-4" />
@@ -35,7 +36,7 @@ async function DashboardContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="motion-card-hover">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Pending Bookings</CardTitle>
             <Calendar className="text-muted-foreground h-4 w-4" />
@@ -46,7 +47,7 @@ async function DashboardContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="motion-card-hover">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Occupancy Rate</CardTitle>
             <BedDouble className="text-muted-foreground h-4 w-4" />
@@ -59,7 +60,7 @@ async function DashboardContent() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="motion-card-hover">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Today&apos;s Activity</CardTitle>
             <Users className="text-muted-foreground h-4 w-4" />
@@ -76,7 +77,7 @@ async function DashboardContent() {
       {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Today's Schedule */}
-        <Card>
+        <Card className="motion-card-hover">
           <CardHeader>
             <CardTitle>Today&apos;s Schedule</CardTitle>
             <CardDescription>Check-ins and check-outs for today</CardDescription>
@@ -145,7 +146,7 @@ async function DashboardContent() {
         </Card>
 
         {/* Recent Bookings */}
-        <Card>
+        <Card className="motion-card-hover">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
               <CardTitle>Recent Bookings</CardTitle>
@@ -183,7 +184,7 @@ async function DashboardContent() {
       </div>
 
       {/* Quick Actions */}
-      <Card>
+      <Card className="motion-card-hover">
         <CardHeader>
           <CardTitle>Quick Actions</CardTitle>
         </CardHeader>
@@ -211,14 +212,16 @@ async function DashboardContent() {
 export default function AdminDashboardPage() {
   return (
     <div>
-      <div className="mb-6">
+      <Reveal delay={1} className="mb-6">
         <h1 className="text-2xl font-bold">Dashboard</h1>
         <p className="text-muted-foreground">Overview of your hotel operations</p>
-      </div>
+      </Reveal>
 
-      <Suspense fallback={<DashboardSkeleton />}>
-        <DashboardContent />
-      </Suspense>
+      <Reveal delay={2} variant="panel">
+        <Suspense fallback={<DashboardSkeleton />}>
+          <DashboardContent />
+        </Suspense>
+      </Reveal>
     </div>
   );
 }

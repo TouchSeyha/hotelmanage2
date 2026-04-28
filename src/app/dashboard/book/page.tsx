@@ -10,6 +10,7 @@ import { Step2Guest } from './_components/step-2-guest';
 import { Step3Payment } from './_components/step-3-payment';
 import { api } from '~/trpc/react';
 import { Breadcrumb } from '~/components/shared/breadcrumb';
+import { Reveal } from '~/components/motion/reveal';
 
 function BookingContent() {
   const { state } = useBooking();
@@ -20,25 +21,31 @@ function BookingContent() {
   return (
     <div className="container py-8">
       {/* Breadcrumb */}
-      <Breadcrumb items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Book a Room' }]} />
+      <Reveal>
+        <Breadcrumb
+          items={[{ label: 'Dashboard', href: '/dashboard' }, { label: 'Book a Room' }]}
+        />
+      </Reveal>
 
       {/* Progress Steps */}
-      <div className="mb-8">
+      <Reveal delay={1} className="mb-8">
         <BookingSteps />
-      </div>
+      </Reveal>
 
       {/* Step Content */}
-      <Suspense
-        fallback={
-          <div className="flex items-center justify-center py-12">
-            <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-          </div>
-        }
-      >
-        {state.step === 1 && <Step1Room />}
-        {state.step === 2 && <Step2Guest userEmail={profile?.email} userName={profile?.name} />}
-        {state.step === 3 && <Step3Payment />}
-      </Suspense>
+      <Reveal key={state.step} delay={2} variant="panel">
+        <Suspense
+          fallback={
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
+            </div>
+          }
+        >
+          {state.step === 1 && <Step1Room />}
+          {state.step === 2 && <Step2Guest userEmail={profile?.email} userName={profile?.name} />}
+          {state.step === 3 && <Step3Payment />}
+        </Suspense>
+      </Reveal>
     </div>
   );
 }
