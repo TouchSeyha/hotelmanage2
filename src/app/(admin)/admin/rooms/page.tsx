@@ -117,7 +117,7 @@ export default function RoomsPage() {
       roomNumber: room.roomNumber,
       floor: room.floor ?? 1,
       roomTypeId: room.roomTypeId,
-      status: room.status as RoomFormData['status'],
+      status: room.status,
     });
     setIsDialogOpen(true);
   };
@@ -192,14 +192,7 @@ export default function RoomsPage() {
                       </TableCell>
                       <TableCell>
                         <StatusBadge
-                          status={
-                            room.status as
-                              | 'available'
-                              | 'occupied'
-                              | 'cleaning'
-                              | 'maintenance'
-                              | 'out_of_service'
-                          }
+                          status={room.status}
                           type="room"
                         />
                       </TableCell>

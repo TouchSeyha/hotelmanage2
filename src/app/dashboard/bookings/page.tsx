@@ -15,7 +15,6 @@ import { BookingCardSkeleton } from '~/components/shared/loadingSkeleton';
 import { Breadcrumb } from '~/components/shared/breadcrumb';
 import { StatusBadge } from '~/components/shared/statusBadge';
 import { WriteReviewButton } from '~/components/reviews/writeReviewButton';
-import type { BookingStatus, PaymentStatus } from '~/lib/schemas';
 import { Reveal } from '~/components/motion/reveal';
 import { AnimatedList } from '~/components/motion/animatedList';
 
@@ -140,11 +139,8 @@ export default function BookingsPage() {
                         <CardDescription>Booking #{booking.bookingNumber}</CardDescription>
                       </div>
                       <div className="flex gap-2">
-                        <StatusBadge status={booking.status as BookingStatus} type="booking" />
-                        <StatusBadge
-                          status={booking.paymentStatus as PaymentStatus}
-                          type="payment"
-                        />
+                        <StatusBadge status={booking.status} type="booking" />
+                        <StatusBadge status={booking.paymentStatus} type="payment" />
                       </div>
                     </CardHeader>
                     <CardContent>

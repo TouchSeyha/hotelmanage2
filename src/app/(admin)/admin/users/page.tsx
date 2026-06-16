@@ -133,7 +133,7 @@ export default function UsersPage() {
     form.reset({
       name: user.name ?? '',
       phone: user.phone ?? '',
-      role: user.role as 'user' | 'admin',
+      role: user.role,
     });
     setIsDialogOpen(true);
   };

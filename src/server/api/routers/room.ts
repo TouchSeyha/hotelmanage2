@@ -11,7 +11,6 @@ import {
   updateRoomStatusSchema,
   inactiveBookingStatuses,
   validRoomStatusTransitions,
-  type RoomStatus,
 } from '~/lib/schemas';
 
 export const roomRouter = createTRPCRouter({
@@ -292,7 +291,7 @@ export const roomRouter = createTRPCRouter({
     }
 
     // Validate status transition
-    const currentStatus = room.status as RoomStatus;
+    const currentStatus = room.status;
     const allowedTransitions = validRoomStatusTransitions[currentStatus];
 
     if (!allowedTransitions.includes(status)) {

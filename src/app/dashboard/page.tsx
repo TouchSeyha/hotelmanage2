@@ -108,14 +108,7 @@ async function DashboardContent() {
                     </p>
                   </div>
                   <StatusBadge
-                    status={
-                      nextBooking.status as
-                        | 'pending'
-                        | 'confirmed'
-                        | 'checked_in'
-                        | 'completed'
-                        | 'cancelled'
-                    }
+                    status={nextBooking.status}
                     type="booking"
                   />
                 </div>
