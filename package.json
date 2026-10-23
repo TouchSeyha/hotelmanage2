@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "build": "next build",
     "check": "next lint && tsc --noEmit",
@@ -22,7 +25,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.11.2",
+    "@auth/prisma-adapter": "^2.11.3",
     "@formkit/auto-animate": "^0.9.0",
     "@hookform/resolvers": "^5.4.0",
     "@prisma/client": "^6.19.3",
@@ -52,8 +55,8 @@
     "date-fns": "^4.4.0",
     "embla-carousel-react": "^8.6.0",
     "lucide-react": "^0.562.0",
-    "next": "^15.5.19",
-    "next-auth": "5.0.0-beta.31",
+    "next": "^15.5.28",
+    "next-auth": "5.0.0-beta.32",
     "next-themes": "^0.4.6",
     "react": "^19.2.7",
     "react-day-picker": "^9.14.0",
@@ -75,8 +78,8 @@
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
     "eslint": "^9.39.4",
-    "eslint-config-next": "^15.5.19",
-    "postcss": "^8.5.15",
+    "eslint-config-next": "^15.5.28",
+    "postcss": "^8.5.31",
     "prettier": "^3.8.4",
     "prettier-plugin-tailwindcss": "^0.6.14",
     "prisma": "^6.19.3",
@@ -86,13 +89,18 @@
     "typescript-eslint": "^8.61.1"
   },
   "overrides": {
-    "brace-expansion": "5.0.6",
+    "@humanfs/node": "0.16.8",
+    "brace-expansion": "5.0.12",
+    "deepmerge-ts": "8.0.2",
     "defu": "6.1.7",
     "flatted": "3.4.2",
-    "js-yaml": "4.2.0",
+    "js-yaml": "4.3.2",
     "minimatch": "3.1.5",
     "picomatch": ">=2.3.2 <3 || >=4.0.4",
-    "postcss": "8.5.15"
+    "postcss": "8.5.31",
+    "sharp": "0.35.5",
+    "source-map-js": "1.2.2",
+    "undici": "6.29.1"
   },
   "ct3aMetadata": {
     "initVersion": "7.40.0"
